@@ -1,65 +1,67 @@
-export default function Footer() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-  };
+import { Link } from 'react-router-dom';
+import { useSiteNav } from '../hooks/useSiteNav';
+import Container from './ui/Container';
 
-  const links = [
-    { label: 'Startseite', id: 'hero' },
-    { label: 'Ansatz', id: 'ansatz' },
-    { label: 'Branchen', id: 'branchen' },
-    { label: 'Über uns', id: 'ueber-uns' },
-    { label: 'Kontakt', id: 'kontakt' },
-  ];
+const NAV_LINKS = [
+  { label: 'Startseite', id: 'hero' },
+  { label: 'Ansatz', id: 'ansatz' },
+  { label: 'Branchen', id: 'branchen' },
+  { label: 'Über uns', id: 'ueber-uns' },
+  { label: 'Kontakt', id: 'kontakt' },
+];
+
+export default function Footer() {
+  const { goTo } = useSiteNav();
 
   return (
-    <footer id="footer" className="bg-bright-snow">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+    <footer id="footer" className="bg-ink-950 text-white">
+      <Container width="shell" className="py-16 md:py-20">
+        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-16">
           <div>
-            <h3 className="text-xl font-semibold text-primary mb-2">
+            <h3 className="flex items-center gap-2.5 text-h4 font-semibold tracking-tight text-white">
+              <span aria-hidden="true" className="h-5 w-[3px] rounded-full bg-ice-300" />
               Leibinn Consulting
             </h3>
-            <p className="text-black/60 text-sm">
+            <p className="mt-4 max-w-sm text-small leading-relaxed text-white/55">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>
           </div>
 
-          <div>
-            <h4 className="text-sm font-semibold text-black/80 mb-3">Navigation</h4>
-            <div className="flex flex-wrap gap-4">
-              {links.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className="text-sm text-black/60 hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </button>
+          <nav aria-label="Footer-Navigation">
+            <h4 className="text-eyebrow uppercase text-ice-300">Navigation</h4>
+            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3">
+              {NAV_LINKS.map((link) => (
+                <li key={link.id}>
+                  <button
+                    onClick={() => goTo(link.id)}
+                    className="text-small text-white/65 transition-colors hover:text-white"
+                  >
+                    {link.label}
+                  </button>
+                </li>
               ))}
-            </div>
-          </div>
+            </ul>
+          </nav>
         </div>
 
-        <div className="border-t border-icy-blue/30 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-black/50">
+        <div className="mt-14 flex flex-col items-start justify-between gap-5 border-t border-white/10 pt-7 sm:flex-row sm:items-center">
+          <p className="text-small text-white/45">
             © {new Date().getFullYear()} Leibinn Consulting. Alle Rechte vorbehalten.
           </p>
-          <div className="flex gap-4">
-            <button className="text-sm text-black/50 hover:text-primary transition-colors">
+          {/*
+            These were <button> elements with no onClick — inert, although both
+            pages are legally required for a German commercial site.
+          */}
+          <div className="flex gap-7">
+            <Link to="/impressum" className="text-small text-white/45 transition-colors hover:text-white">
               Impressum
-            </button>
-            <button className="text-sm text-black/50 hover:text-primary transition-colors">
+            </Link>
+            <Link to="/datenschutz" className="text-small text-white/45 transition-colors hover:text-white">
               Datenschutz
-            </button>
+            </Link>
           </div>
         </div>
-      </div>
+      </Container>
     </footer>
   );
 }

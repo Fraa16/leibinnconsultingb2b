@@ -1,4 +1,8 @@
-import AnimatedSection from './AnimatedSection';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
+import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
+import Section from './ui/Section';
+import Button from './ui/Button';
 
 const processSteps = [
   {
@@ -24,73 +28,66 @@ const processSteps = [
 ];
 
 export default function AblaufSection() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-  };
+  const reduced = useReducedMotion();
+  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.15);
+  const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <section id="ablauf" className="bg-bright-snow py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between mb-10 md:mb-12">
-          <AnimatedSection delay={0.1}>
-            <h2 className="text-3xl md:text-4xl font-semibold text-black">
-              So arbeiten wir gemeinsam – Schritt für Schritt
-            </h2>
-          </AnimatedSection>
-        </div>
+    <Section id="ablauf" tone="subtle" size="lg">
+      <motion.div variants={container} initial="hidden" whileInView="show" viewport={VIEWPORT}>
+        <motion.h2 variants={item} className="max-w-[20ch]">
+          So arbeiten wir gemeinsam – Schritt für Schritt
+        </motion.h2>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-10">
-          {processSteps.map((step, index) => (
-            <AnimatedSection key={index} delay={0.3 + index * 0.1}>
-              <div className="group relative px-8 py-10 flex flex-col gap-4">
-                <div
-                  className="absolute -top-9 right-4 text-[200px] md:text-[220px] lg:text-[180px] leading-none font-bold pointer-events-none select-none transition-transform duration-250 ease-out group-hover:-translate-y-0.5"
+        {/* A hairline connects the four steps into a single sequence. */}
+        <div className="relative mt-14">
+          <div
+            aria-hidden="true"
+            className="rule-fade absolute inset-x-0 top-0 hidden h-px lg:block"
+          />
+
+          <ol className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4">
+            {processSteps.map((step) => (
+              <motion.li variants={item} key={step.stepNumber} className="group relative pt-8">
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-2 right-2 select-none text-[7.5rem] font-semibold leading-none
+                             transition-transform duration-300 ease-entrance group-hover:-translate-y-1 lg:text-[8.5rem]"
                   style={{
-                    backgroundImage: 'linear-gradient(to bottom, #2A2D7C 0%, #2A2D7C 66%, transparent 100%)',
+                    backgroundImage:
+                      'linear-gradient(to bottom, rgba(42,45,124,0.22) 0%, rgba(42,45,124,0.16) 58%, rgba(42,45,124,0) 100%)',
                     WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
-                    opacity: 0.2,
+                    WebkitTextFillColor: 'transparent',
                   }}
                 >
                   {step.stepNumber}
-                </div>
+                </span>
 
-                <div className="relative z-10">
-                  <h3 className="text-xl md:text-2xl font-semibold text-black mb-3 leading-tight">
-                    {step.title}
-                  </h3>
+                {/* Node on the connector line. */}
+                <span
+                  aria-hidden="true"
+                  className="absolute -top-[5px] left-0 hidden h-2.5 w-2.5 rounded-full bg-ink-600
+                             ring-4 ring-surface-subtle transition-transform duration-300 group-hover:scale-125 lg:block"
+                />
 
-                  <p className="text-sm md:text-base text-black/70 leading-relaxed">
-                    {step.text}
-                  </p>
+                <div className="relative">
+                  <h3 className="max-w-[16ch] text-h4">{step.title}</h3>
+                  <p className="mt-3 text-small leading-relaxed text-content">{step.text}</p>
                 </div>
-              </div>
-            </AnimatedSection>
-          ))}
+              </motion.li>
+            ))}
+          </ol>
         </div>
 
-        <AnimatedSection delay={0.7}>
-          <div className="mt-12 flex justify-center">
-            <button
-              onClick={() => scrollToSection('kontakt')}
-              className="group inline-flex items-center gap-2 text-black font-medium text-lg hover:text-primary transition-colors duration-300"
-            >
-              <span className="relative">
-                Unverbindliche Beratung anfragen
-                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black group-hover:bg-primary transition-colors duration-300"></span>
-              </span>
-              <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
-            </button>
-          </div>
-        </AnimatedSection>
-      </div>
-    </section>
+        <motion.div variants={item} className="mt-16 flex justify-center">
+          {/* Previously scrollToSection('kontakt') — there is no #kontakt
+              element on the homepage, so this button did nothing. */}
+          <Button to="/kontakt" variant="link" icon={<ArrowRight size={16} />}>
+            Unverbindliche Beratung anfragen
+          </Button>
+        </motion.div>
+      </motion.div>
+    </Section>
   );
 }

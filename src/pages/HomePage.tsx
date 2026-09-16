@@ -12,9 +12,9 @@ import FinalCTASection from '../components/FinalCTASection';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#E2E7E8' }}>
+    <div className="min-h-screen bg-surface">
       <Navigation />
-      <main>
+      <main id="inhalt">
         <HeroSection />
         <RealitaetscheckSection />
         <AnsatzSection />

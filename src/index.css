@@ -1,29 +1,85 @@
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-signature: 'Alex Brush', cursive;
-}
-
 @layer base {
+  :root {
+    --font-signature: 'Alex Brush', cursive;
+  }
+
   html {
     scroll-behavior: smooth;
+    /* Sticky header is h-20 (80px); keeps anchored sections clear of it. */
+    scroll-padding-top: 6rem;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply text-black/80 leading-body tracking-body font-light;
-    font-size: 1.125rem;
+    @apply bg-surface-subtle font-sans text-body font-light text-content antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  h1 {
-    @apply font-semibold leading-heading tracking-heading;
-    font-size: 2.75rem;
+  /*
+   * Tailwind Preflight resets headings to `font-size: inherit`. The previous
+   * config re-declared a size for h1 only, so h2–h6 silently rendered at body
+   * size unless every single element carried its own class. These restore a
+   * real scale, so markup only needs a size class when it wants to deviate.
+   */
+  h1 { @apply text-h1 text-content-strong; }
+  h2 { @apply text-h2 text-content-strong; }
+  h3 { @apply text-h3 text-content-strong; }
+  h4 { @apply text-h4 text-content-strong; }
+  h5, h6 { @apply text-body font-semibold text-content-strong; }
+
+  /* One visible focus treatment for every interactive element. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ink-600 ring-offset-2 ring-offset-white rounded-sm;
   }
 
-  h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-heading;
+  ::selection {
+    @apply bg-ink-600 text-white;
+  }
+
+  /* Form controls inherit the type system rather than the UA default. */
+  input, textarea, select, button {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+}
+
+@layer components {
+  .signature {
+    font-family: var(--font-signature);
+    font-weight: 400;
+  }
+
+  /* Hairline that fades out at both ends — used as a section divider. */
+  .rule-fade {
+    background-image: linear-gradient(
+      to right,
+      transparent,
+      theme('colors.ink.200') 15%,
+      theme('colors.ink.200') 85%,
+      transparent
+    );
+  }
+}
+
+/*
+ * Respect the OS reduced-motion setting. framer-motion is driven separately
+ * via useReducedMotion(); this covers CSS transitions and the scroll behaviour.
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

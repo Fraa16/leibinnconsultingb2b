@@ -1,220 +1,195 @@
-import { motion } from 'framer-motion';
-import { ChevronRight, X, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useId } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ChevronDown, Minus } from 'lucide-react';
 import pattern3 from '../patterns/3.png';
+import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT, transition } from '../lib/motion';
+import Section from './ui/Section';
+import Eyebrow from './ui/Eyebrow';
+import { cn } from '../lib/cn';
 
-export default function RealitaetscheckSection() {
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
+const painPoints = [
+  'Sie erhalten deutlich weniger qualifizierte Bewerbungen als benötigt.',
+  'Mitarbeitende wechseln nach einigen Jahren zu größeren Arbeitgebern.',
+  'Vereinzelte Benefits existieren, werden aber kaum aktiv genutzt.',
+  'Unsicherheit, was steuerlich sinnvoll oder rechtlich zulässig ist.',
+  'Benefits werden in Stellenanzeigen oder Gesprächen nur unklar kommuniziert.',
+];
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-  };
+const impacts = [
+  {
+    title: 'Längere Vakanzzeiten',
+    description: 'Offene Stellen bleiben länger unbesetzt und bremsen Wachstum.',
+    details:
+      'Kritische Positionen bleiben monatelang unbesetzt, Projekte verzögern sich, und das bestehende Team muss Mehrarbeit leisten. Die Wettbewerbsfähigkeit Ihres Unternehmens leidet, während qualifizierte Bewerber sich für attraktivere Arbeitgeber entscheiden.',
+  },
+  {
+    title: 'Steigende Gehaltskosten',
+    description: 'Höhere Löhne ohne echten Attraktivitätsgewinn führen zu unnötigen Kosten.',
+    details:
+      'Immer höhere Gehälter ohne spürbaren Attraktivitätsgewinn gegenüber Wettbewerbern. Die Personalkosten steigen kontinuierlich, ohne dass sich die Position Ihres Unternehmens als attraktiver Arbeitgeber verbessert. Dies führt zu einer Kostenspirale ohne nachhaltigen Nutzen.',
+  },
+  {
+    title: 'Höhere Fluktuation',
+    description: 'Gut qualifizierte Mitarbeitende orientieren sich schneller um.',
+    details:
+      'Langjährige Mitarbeitende verlassen das Unternehmen, wertvolles Know-how geht verloren. Die Kosten für Rekrutierung, Einarbeitung und der Produktivitätsverlust während der Einarbeitungsphase belasten Ihr Unternehmen zusätzlich. Die Unternehmenskultur leidet unter der ständigen Fluktuation.',
+  },
+  {
+    title: 'Verschenkte Steuerpotenziale',
+    description: 'Vorteile bleiben ungenutzt und belasten Ihre Personalkosten.',
+    details:
+      'Steuerliche Spielräume bleiben ungenutzt, während andere Unternehmen davon profitieren. Sie verschenken Möglichkeiten, Mitarbeitende steueroptimiert zu vergüten und zahlen unnötig hohe Lohnnebenkosten. Ihre Konkurrenz nutzt diese Vorteile bereits strategisch.',
+  },
+];
 
-  const painPoints = [
-    'Sie erhalten deutlich weniger qualifizierte Bewerbungen als benötigt.',
-    'Mitarbeitende wechseln nach einigen Jahren zu größeren Arbeitgebern.',
-    'Vereinzelte Benefits existieren, werden aber kaum aktiv genutzt.',
-    'Unsicherheit, was steuerlich sinnvoll oder rechtlich zulässig ist.',
-    'Benefits werden in Stellenanzeigen oder Gesprächen nur unklar kommuniziert.',
-  ];
-
-  const impacts = [
-    {
-      title: 'Längere Vakanzzeiten',
-      description: 'Offene Stellen bleiben länger unbesetzt und bremsen Wachstum.',
-      details:
-        'Kritische Positionen bleiben monatelang unbesetzt, Projekte verzögern sich, und das bestehende Team muss Mehrarbeit leisten. Die Wettbewerbsfähigkeit Ihres Unternehmens leidet, während qualifizierte Bewerber sich für attraktivere Arbeitgeber entscheiden.',
-    },
-    {
-      title: 'Steigende Gehaltskosten',
-      description: 'Höhere Löhne ohne echten Attraktivitätsgewinn führen zu unnötigen Kosten.',
-      details:
-        'Immer höhere Gehälter ohne spürbaren Attraktivitätsgewinn gegenüber Wettbewerbern. Die Personalkosten steigen kontinuierlich, ohne dass sich die Position Ihres Unternehmens als attraktiver Arbeitgeber verbessert. Dies führt zu einer Kostenspirale ohne nachhaltigen Nutzen.',
-    },
-    {
-      title: 'Höhere Fluktuation',
-      description: 'Gut qualifizierte Mitarbeitende orientieren sich schneller um.',
-      details:
-        'Langjährige Mitarbeitende verlassen das Unternehmen, wertvolles Know-how geht verloren. Die Kosten für Rekrutierung, Einarbeitung und der Produktivitätsverlust während der Einarbeitungsphase belasten Ihr Unternehmen zusätzlich. Die Unternehmenskultur leidet unter der ständigen Fluktuation.',
-    },
-    {
-      title: 'Verschenkte Steuerpotenziale',
-      description: 'Vorteile bleiben ungenutzt und belasten Ihre Personalkosten.',
-      details:
-        'Steuerliche Spielräume bleiben ungenutzt, während andere Unternehmen davon profitieren. Sie verschenken Möglichkeiten, Mitarbeitende steueroptimiert zu vergüten und zahlen unnötig hohe Lohnnebenkosten. Ihre Konkurrenz nutzt diese Vorteile bereits strategisch.',
-    },
-  ];
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-  };
+function ImpactAccordion({ impact }: { impact: (typeof impacts)[number] }) {
+  const [open, setOpen] = useState(false);
+  const reduced = useReducedMotion();
+  const id = useId();
+  const panelId = `${id}-panel`;
+  const buttonId = `${id}-button`;
 
   return (
-    <motion.section
-      id="realitaetscheck"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="py-24 px-4 sm:px-6 lg:px-10 relative overflow-hidden bg-bright-snow"
+    <motion.div
+      variants={reduced ? STATIC_VARIANTS : staggerChild}
+      className={cn(
+        'overflow-hidden rounded-xl2 border bg-surface transition-colors duration-300',
+        open ? 'border-ink-200 shadow-card' : 'border-ink-100 shadow-soft hover:border-ink-200',
+      )}
     >
-      {/* Pattern positioning - adjust these values:
-          - bottom: distance from bottom edge (e.g., 0px, 20px, 40px)
-          - left: distance from left edge (e.g., 0px, 20px, 40px)
-          - opacity: visibility (0.05 = 5%, 0.1 = 10%, 0.2 = 20%)
-          - width/height: size in pixels (e.g., w-64 = 256px, w-96 = 384px, w-[500px] = 500px)
-      */}
-      <div
-        className="absolute pointer-events-none"
-        style={{
-          bottom: '-58px',
-          left: '0px',
-          opacity: 0.8
-        }}
-      >
-        <img
-          src={pattern3}
-          alt=""
-          className="object-contain"
-          style={{ width: '384px', height: '384px' }}
-        />
-      </div>
-      <div className="max-w-7xl mx-auto relative">
-        <div className="grid lg:grid-cols-[1fr_auto_1fr] gap-12 lg:gap-0">
-          <motion.div
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.3 }}
-            className="space-y-8"
-          >
-            <motion.div variants={item} className="space-y-4">
-              <p className="text-subheading text-subheading uppercase">
-                Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?
-              </p>
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight text-black">
-                Realitätscheck: Ihre aktuelle Ausgangslage
-              </h2>
-              <p className="text-base lg:text-lg text-black/70 leading-relaxed">
-                Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber
-                kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt.
-              </p>
-            </motion.div>
-
-            <ul className="space-y-4">
-              {painPoints.map((point, index) => (
-                <motion.li key={index} variants={item} className="flex gap-3 items-start">
-                  <div className="flex-shrink-0 mt-1">
-                    <div className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center">
-                      <X size={16} className="text-white" strokeWidth={3} />
-                    </div>
-                  </div>
-                  <p className="text-base lg:text-lg leading-relaxed text-black/80">
-                    {point}
-                  </p>
-                </motion.li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="w-px bg-black/10 mx-8 hidden lg:block"
+      <h4>
+        {/* aria-expanded / aria-controls were missing entirely — the accordion
+            was invisible to screen readers. */}
+        <button
+          id={buttonId}
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls={panelId}
+          className="flex w-full items-start justify-between gap-5 p-6 text-left transition-colors hover:bg-ink-50/60"
+        >
+          <span className="flex-1">
+            {/* An accent rule stands in for a step number — the brief fixes the
+                site's copy, so no new visible text is introduced. */}
+            <span className="flex items-center gap-3">
+              <span
+                aria-hidden="true"
+                className={cn(
+                  'h-4 w-[3px] shrink-0 rounded-full transition-colors duration-300',
+                  open ? 'bg-ink-600' : 'bg-ink-200',
+                )}
+              />
+              <span className="text-h4 text-content-strong">{impact.title}</span>
+            </span>
+            <span className="mt-2 block pl-[1.4rem] text-small leading-relaxed text-content">
+              {impact.description}
+            </span>
+          </span>
+          <ChevronDown
+            size={20}
+            aria-hidden="true"
+            className={cn(
+              'mt-1 shrink-0 text-ink-400 transition-transform duration-300 ease-entrance',
+              open && 'rotate-180',
+            )}
           />
+        </button>
+      </h4>
 
-          <motion.div
-            variants={container}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.3 }}
-            className="space-y-8"
-          >
-            <motion.div variants={item} className="space-y-4">
-              <p className="text-subheading text-subheading uppercase">
-                Wenn sich nichts ändert …
-              </p>
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-semibold leading-tight text-black">
-                Mögliche Folgen für Ihr Unternehmen
-              </h3>
-              <p className="text-base lg:text-lg text-black/70 leading-relaxed">
-                Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der
-                Verlust qualifizierter Mitarbeitender an die Konkurrenz.
-              </p>
-            </motion.div>
-
-            <div className="space-y-4">
-              {impacts.map((impact, index) => (
-                <motion.div
-                  key={index}
-                  variants={item}
-                  className="bg-white border border-black/10 rounded-xl shadow-sm transition-all duration-300 overflow-hidden"
-                >
-                  <button
-                    onClick={() => setExpandedCard(expandedCard === index ? null : index)}
-                    className="w-full p-6 text-left hover:bg-gray-50 transition-colors"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h4 className="text-xl font-semibold text-black mb-2">
-                          {impact.title}
-                        </h4>
-                        <p className="text-base leading-relaxed text-black/70">
-                          {impact.description}
-                        </p>
-                      </div>
-                      <ChevronDown
-                        size={24}
-                        className={`flex-shrink-0 text-black/40 transition-transform duration-300 ${
-                          expandedCard === index ? 'rotate-180' : ''
-                        }`}
-                      />
-                    </div>
-                  </button>
-
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      height: expandedCard === index ? 'auto' : 0,
-                      opacity: expandedCard === index ? 1 : 0,
-                    }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                    className="overflow-hidden"
-                  >
-                    <div className="px-6 pb-6 pt-0">
-                      <div className="border-t border-black/10 pt-4">
-                        <p className="text-base leading-relaxed text-black/70">
-                          {impact.details}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+      <motion.div
+        id={panelId}
+        role="region"
+        aria-labelledby={buttonId}
+        initial={false}
+        animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
+        transition={reduced ? { duration: 0 } : transition(0.32)}
+        className="overflow-hidden"
+      >
+        <div className="px-6 pb-6">
+          <div className="border-t border-ink-100 pt-4">
+            <p className="text-small leading-relaxed text-content">{impact.details}</p>
+          </div>
         </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+export default function RealitaetscheckSection() {
+  const reduced = useReducedMotion();
+  const container = reduced ? STATIC_VARIANTS : staggerVariants();
+  const item = reduced ? STATIC_VARIANTS : staggerChild;
+
+  return (
+    <Section id="realitaetscheck" tone="subtle" size="lg">
+      <img
+        src={pattern3}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-16 -left-16 w-80 select-none opacity-[0.55] lg:w-96"
+      />
+
+      <div className="relative grid gap-14 lg:grid-cols-2 lg:gap-20">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={VIEWPORT}
+        >
+          <motion.div variants={item}>
+            <Eyebrow>Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?</Eyebrow>
+            <h2 className="mt-5 max-w-[18ch]">Realitätscheck: Ihre aktuelle Ausgangslage</h2>
+            <p className="mt-5 max-w-measure text-lead text-content">
+              Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber
+              kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt.
+            </p>
+          </motion.div>
+
+          {/*
+            Was a stack of solid red-500 circles with an X — visually the
+            loudest thing on the page. A quiet danger-toned marker carries the
+            same meaning without shouting.
+          */}
+          <ul className="mt-10 space-y-px overflow-hidden rounded-xl2 border border-ink-100 bg-surface shadow-soft">
+            {painPoints.map((point) => (
+              <motion.li
+                variants={item}
+                key={point}
+                className="flex items-start gap-4 border-b border-ink-100 px-5 py-4 last:border-b-0"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger-surface text-danger"
+                >
+                  <Minus size={14} strokeWidth={2.75} />
+                </span>
+                <p className="text-small leading-relaxed text-content">{point}</p>
+              </motion.li>
+            ))}
+          </ul>
+        </motion.div>
+
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={VIEWPORT}
+        >
+          <motion.div variants={item}>
+            <Eyebrow>Wenn sich nichts ändert …</Eyebrow>
+            <h3 className="mt-5 max-w-[18ch] text-h2">Mögliche Folgen für Ihr Unternehmen</h3>
+            <p className="mt-5 max-w-measure text-lead text-content">
+              Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der
+              Verlust qualifizierter Mitarbeitender an die Konkurrenz.
+            </p>
+          </motion.div>
+
+          <div className="mt-10 space-y-3">
+            {impacts.map((impact) => (
+              <ImpactAccordion key={impact.title} impact={impact} />
+            ))}
+          </div>
+        </motion.div>
       </div>
-    </motion.section>
+    </Section>
   );
 }
