@@ -117,6 +117,46 @@ check(
   await page.locator('#vorname').isVisible().catch(() => false),
 );
 
+console.log('\n5. Missing `position` column must not lose the lead');
+await page.unroute('**/rest/v1/contact_submissions*');
+const attempts = [];
+await page.route('**/rest/v1/contact_submissions*', async (route) => {
+  const body = JSON.parse(route.request().postData() || 'null');
+  attempts.push(Array.isArray(body) ? body[0] : body);
+  if (attempts.length === 1) {
+    // What PostgREST returns when the migration has not been applied.
+    return route.fulfill({
+      status: 400,
+      contentType: 'application/json',
+      headers: { 'access-control-allow-origin': '*' },
+      body: JSON.stringify({
+        code: 'PGRST204',
+        message: "Could not find the 'position' column of 'contact_submissions' in the schema cache",
+      }),
+    });
+  }
+  return route.fulfill({
+    status: 201,
+    contentType: 'application/json',
+    headers: { 'access-control-allow-origin': '*' },
+    body: '[]',
+  });
+});
+await page.goto(`${BASE}/kontakt`, { waitUntil: 'load' });
+await page.waitForTimeout(700);
+for (const [name, value] of Object.entries(values)) await page.fill(`#${name}`, value);
+await page.selectOption('#mitarbeiteranzahl', '21-50');
+await page.click('button[type="submit"]');
+await page.waitForTimeout(1800);
+
+check('first attempt includes position', attempts[0]?.position === values.position);
+check('retried without position', attempts.length === 2 && !('position' in (attempts[1] ?? {})));
+check('core fields survive the retry', attempts[1]?.email === values.email && attempts[1]?.firma === values.firma);
+check(
+  'visitor still sees success',
+  await page.locator('text=Vielen Dank für Ihre Anfrage!').isVisible().catch(() => false),
+);
+
 await browser.close();
 
 const failed = results.filter((r) => !r.ok);

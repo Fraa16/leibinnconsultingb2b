@@ -1,6 +1,14 @@
 import LegalLayout, { LegalBlock, Placeholder } from '../components/LegalLayout';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function ImpressumPage() {
+  useDocumentMeta({
+    title: 'Impressum — Leibinn Consulting',
+    description: 'Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).',
+    path: '/impressum',
+    noindex: true,
+  });
+
   return (
     <LegalLayout title="Impressum" intro="Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).">
       <LegalBlock heading="Diensteanbieter">

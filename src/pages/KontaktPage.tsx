@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Check, CheckCircle2, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import Container from '../components/ui/Container';
@@ -37,6 +38,13 @@ export default function KontaktPage() {
   const [honeypot, setHoneypot] = useState('');
   const reduced = useReducedMotion();
 
+  useDocumentMeta({
+    title: 'Kontakt & Erstgespräch — Leibinn Consulting',
+    description:
+      'Kostenloses Erstgespräch für Ihr Benefit-System: ehrliche Einschätzung, konkrete Ansatzpunkte und ein klares Bild, ob eine Zusammenarbeit sinnvoll ist.',
+    path: '/kontakt',
+  });
+
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
@@ -64,13 +72,21 @@ export default function KontaktPage() {
 
     setStatus('submitting');
     try {
-      const { error } = await supabase.from('contact_submissions').insert([
-        {
-          ...form,
-          position: form.position || null,
-          nachricht: form.nachricht || null,
-        },
-      ]);
+      const { position, ...core } = form;
+      const row = { ...core, nachricht: form.nachricht || null };
+
+      let { error } = await supabase
+        .from('contact_submissions')
+        .insert([{ ...row, position: position || null }]);
+
+      // `position` arrives with a migration in this change. If that migration
+      // has not been applied to the project yet, PostgREST rejects the whole
+      // row over the unknown column — so fall back to inserting without it
+      // rather than losing the lead.
+      if (error && /position/i.test(`${error.message} ${error.details ?? ''}`)) {
+        console.warn('contact_submissions.position missing — run the migration. Retrying without it.');
+        ({ error } = await supabase.from('contact_submissions').insert([row]));
+      }
       if (error) throw error;
 
       setForm(EMPTY);

@@ -1,3 +1,4 @@
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import HeroSection from '../components/HeroSection';
@@ -11,6 +12,13 @@ import UeberUnsSection from '../components/UeberUnsSection';
 import FinalCTASection from '../components/FinalCTASection';
 
 export default function HomePage() {
+  useDocumentMeta({
+    title: 'Leibinn Consulting — Benefit-Systeme für den Mittelstand',
+    description:
+      'Strukturierte Benefit-Systeme für kleine und mittelständische Unternehmen mit 5 bis 200 Mitarbeitenden — steuerlich optimiert, verwaltungsarm und spürbar wirksam.',
+    path: '/',
+  });
+
   return (
     <div className="min-h-screen bg-surface">
       <Navigation />

@@ -1,6 +1,14 @@
 import LegalLayout, { LegalBlock, Placeholder } from '../components/LegalLayout';
+import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function DatenschutzPage() {
+  useDocumentMeta({
+    title: 'Datenschutzerklärung — Leibinn Consulting',
+    description: 'Informationen zur Verarbeitung personenbezogener Daten nach Art. 13 und 14 DSGVO.',
+    path: '/datenschutz',
+    noindex: true,
+  });
+
   return (
     <LegalLayout
       title="Datenschutzerklärung"
