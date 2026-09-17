@@ -20,7 +20,7 @@ export default function HomePage() {
   });
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-canvas">
       <Navigation />
       <main id="inhalt">
         <HeroSection />

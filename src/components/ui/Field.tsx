@@ -17,10 +17,7 @@ type FieldProps = {
 export default function Field({ id, label, children, className }: FieldProps) {
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="mb-1.5 block text-eyebrow normal-case tracking-normal text-content-strong/80"
-      >
+      <label htmlFor={id} className="mb-2 block text-small font-medium text-content-strong">
         {label}
       </label>
       {children}

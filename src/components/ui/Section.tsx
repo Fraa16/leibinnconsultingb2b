@@ -5,47 +5,55 @@ import Container from './Container';
 type SectionProps = {
   children: ReactNode;
   id?: string;
-  /** Background surface. `ink` is the dark navy treatment. */
-  tone?: 'base' | 'subtle' | 'muted' | 'ink';
-  /** Vertical rhythm. */
-  size?: 'sm' | 'md' | 'lg';
+  /** Surface. `ink` and `inkDeep` are the dark anchors that break the rhythm. */
+  tone?: 'canvas' | 'panel' | 'raised' | 'ink' | 'inkDeep';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   width?: 'shell' | 'content' | 'narrow';
-  /** Set false to lay out the inner content yourself. */
   contained?: boolean;
+  /** Hairline above the section — stitches adjacent light sections together. */
+  divided?: boolean;
   className?: string;
   innerClassName?: string;
 };
 
 const TONES = {
-  base: 'bg-surface',
-  subtle: 'bg-surface-subtle',
-  muted: 'bg-surface-muted',
-  ink: 'bg-ink-900 text-white',
+  canvas: 'bg-canvas text-content',
+  panel: 'bg-panel text-content',
+  raised: 'bg-raised text-content',
+  ink: 'bg-ink-900 text-white/70',
+  inkDeep: 'bg-ink-950 text-white/70',
 } as const;
 
+// Premium templates breathe. These are deliberately larger than the defaults.
 const SIZES = {
-  sm: 'py-14 md:py-18',
-  md: 'py-18 md:py-24 lg:py-28',
+  sm: 'py-16 md:py-20',
+  md: 'py-20 md:py-28 lg:py-32',
   lg: 'py-24 md:py-32 lg:py-40',
+  xl: 'py-28 md:py-40 lg:py-52',
 } as const;
 
-/**
- * Standard page section: owns the background rhythm and vertical spacing that
- * were previously re-declared inline on every section with eight different
- * padding combinations.
- */
 export default function Section({
   children,
   id,
-  tone = 'base',
-  size = 'md',
+  tone = 'canvas',
+  size = 'lg',
   width = 'content',
   contained = true,
+  divided = false,
   className,
   innerClassName,
 }: SectionProps) {
   return (
-    <section id={id} className={cn('relative overflow-hidden', TONES[tone], SIZES[size], className)}>
+    <section
+      id={id}
+      className={cn(
+        'relative overflow-hidden',
+        TONES[tone],
+        SIZES[size],
+        divided && 'border-t border-line',
+        className,
+      )}
+    >
       {contained ? (
         <Container width={width} className={cn('relative', innerClassName)}>
           {children}

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { useSiteNav } from '../hooks/useSiteNav';
 import { cn } from '../lib/cn';
-import Container from './ui/Container';
+import Logo from './ui/Logo';
 
 const NAV_LINKS = [
   { label: 'Startseite', id: 'hero' },
@@ -15,16 +15,21 @@ const NAV_LINKS = [
 
 const CTA = { label: 'Kontakt', id: 'kontakt' };
 
+/**
+ * Floating navigation bar.
+ *
+ * Previously a full-bleed white strip pinned to the top edge, which is the
+ * default and reads as such. Insetting it as a bordered, rounded bar gives the
+ * page a frame and matches the pill language used by the eyebrows and buttons.
+ */
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('hero');
+  const [activeSection, setActiveSection] = useState('hero');
   const { goTo } = useSiteNav();
   const location = useLocation();
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
-  // rAF-throttled and passive — the original listener ran unthrottled on every
-  // scroll event and blocked the scroll thread.
   useEffect(() => {
     let frame = 0;
     const onScroll = () => {
@@ -42,7 +47,6 @@ export default function Navigation() {
     };
   }, []);
 
-  // Scroll spy: marks the section currently in view.
   useEffect(() => {
     if (location.pathname !== '/') return;
     const sections = NAV_LINKS.map((l) => document.getElementById(l.id)).filter(
@@ -63,7 +67,6 @@ export default function Navigation() {
     return () => observer.disconnect();
   }, [location.pathname]);
 
-  // Close the drawer on Escape and return focus to its trigger.
   useEffect(() => {
     if (!isMenuOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -76,7 +79,6 @@ export default function Navigation() {
     return () => document.removeEventListener('keydown', onKey);
   }, [isMenuOpen]);
 
-  // Never leave the drawer open across a navigation.
   useEffect(() => setIsMenuOpen(false), [location.pathname]);
 
   const handleNav = (id: string) => {
@@ -87,26 +89,21 @@ export default function Navigation() {
   const isHome = location.pathname === '/';
 
   return (
-    <header
-      className={cn(
-        'fixed inset-x-0 top-0 z-50 transition-all duration-300 ease-entrance',
-        isScrolled || isMenuOpen
-          ? 'bg-white/92 shadow-soft backdrop-blur-xl'
-          : 'bg-white/70 backdrop-blur-md',
-      )}
-    >
-      <Container width="shell">
-        <nav className="flex h-20 items-center justify-between" aria-label="Hauptnavigation">
-          <Link
-            to="/"
-            className="flex items-center gap-2.5 text-h4 font-semibold tracking-tight text-ink-800
-                       transition-colors hover:text-ink-600"
-          >
-            <span aria-hidden="true" className="h-5 w-[3px] rounded-full bg-ice-300" />
-            Leibinn Consulting
+    <div className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-5">
+      <header
+        className={cn(
+          'mx-auto max-w-shell rounded-[1.75rem] border transition-all duration-300 ease-entrance',
+          isScrolled || isMenuOpen
+            ? 'border-line bg-panel/85 shadow-nav backdrop-blur-xl'
+            : 'border-transparent bg-panel/55 backdrop-blur-md',
+        )}
+      >
+        <nav className="flex h-16 items-center justify-between pl-5 pr-3 sm:pl-6" aria-label="Hauptnavigation">
+          <Link to="/" className="shrink-0">
+            <Logo />
           </Link>
 
-          <div className="hidden items-center gap-1 md:flex">
+          <div className="hidden items-center gap-0.5 lg:flex">
             {NAV_LINKS.map((link) => {
               const active = isHome && activeSection === link.id;
               return (
@@ -115,71 +112,65 @@ export default function Navigation() {
                   onClick={() => handleNav(link.id)}
                   aria-current={active ? 'true' : undefined}
                   className={cn(
-                    'relative rounded-lg px-3.5 py-2 text-small font-medium transition-colors',
-                    active ? 'text-ink-600' : 'text-content hover:text-ink-600',
+                    'rounded-full px-3.5 py-2 text-small font-medium transition-colors duration-200',
+                    active
+                      ? 'bg-ink-50 text-ink-700'
+                      : 'text-content hover:bg-ink-50/70 hover:text-content-strong',
                   )}
                 >
                   {link.label}
-                  <span
-                    aria-hidden="true"
-                    className={cn(
-                      'absolute inset-x-3.5 -bottom-0.5 h-px origin-left rounded-full bg-ink-600 transition-transform duration-300 ease-entrance',
-                      active ? 'scale-x-100' : 'scale-x-0',
-                    )}
-                  />
                 </button>
               );
             })}
-
-            <button
-              onClick={() => handleNav(CTA.id)}
-              className="ml-3 rounded-xl bg-ink-600 px-5 py-2.5 text-small font-medium text-white
-                         shadow-[0_4px_16px_rgba(42,45,124,0.26)] transition-all duration-200 ease-entrance
-                         hover:-translate-y-0.5 hover:bg-ink-700 hover:shadow-[0_8px_24px_rgba(42,45,124,0.34)]
-                         active:translate-y-0"
-            >
-              {CTA.label}
-            </button>
           </div>
 
-          <button
-            ref={menuButtonRef}
-            className="-mr-2 rounded-lg p-2 text-ink-800 transition-colors hover:text-ink-600 md:hidden"
-            onClick={() => setIsMenuOpen((open) => !open)}
-            aria-label="Menü"
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </nav>
-      </Container>
-
-      <div
-        id="mobile-menu"
-        hidden={!isMenuOpen}
-        className="border-t border-ink-100 bg-white/97 backdrop-blur-xl md:hidden"
-      >
-        <Container width="shell" className="space-y-1 py-4">
-          {NAV_LINKS.map((link) => (
+          <div className="flex items-center gap-2">
             <button
-              key={link.id}
-              onClick={() => handleNav(link.id)}
-              className="block w-full rounded-lg px-3 py-3 text-left text-small font-medium text-content
-                         transition-colors hover:bg-surface-subtle hover:text-ink-600"
+              onClick={() => handleNav(CTA.id)}
+              className="group hidden items-center gap-1.5 rounded-full bg-ink-600 px-5 py-2.5 text-small
+                         font-medium text-white shadow-ink transition-colors duration-200 hover:bg-ink-700 sm:inline-flex"
             >
-              {link.label}
+              {CTA.label}
+              <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-0.5" />
             </button>
-          ))}
-          <button
-            onClick={() => handleNav(CTA.id)}
-            className="mt-2 block w-full rounded-xl bg-ink-600 px-3 py-3 text-center text-small
-                       font-medium text-white transition-colors hover:bg-ink-700"
-          >
-            {CTA.label}
-          </button>
-        </Container>
-      </div>
-    </header>
+
+            <button
+              ref={menuButtonRef}
+              className="grid h-10 w-10 place-items-center rounded-full border border-line bg-panel
+                         text-content-strong transition-colors hover:bg-raised lg:hidden"
+              onClick={() => setIsMenuOpen((open) => !open)}
+              aria-label="Menü"
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+            >
+              {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
+          </div>
+        </nav>
+
+        <div id="mobile-menu" hidden={!isMenuOpen} className="lg:hidden">
+          <div className="mx-3 mb-3 space-y-1 border-t border-line pt-3">
+            {NAV_LINKS.map((link) => (
+              <button
+                key={link.id}
+                onClick={() => handleNav(link.id)}
+                className="block w-full rounded-xl px-3 py-2.5 text-left text-small font-medium
+                           text-content transition-colors hover:bg-raised hover:text-content-strong"
+              >
+                {link.label}
+              </button>
+            ))}
+            <button
+              onClick={() => handleNav(CTA.id)}
+              className="mt-2 flex w-full items-center justify-center gap-1.5 rounded-full bg-ink-600
+                         px-3 py-3 text-small font-medium text-white transition-colors hover:bg-ink-700"
+            >
+              {CTA.label}
+              <ArrowRight size={15} />
+            </button>
+          </div>
+        </div>
+      </header>
+    </div>
   );
 }

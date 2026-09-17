@@ -3,23 +3,15 @@
 /**
  * Leibinn Consulting design system.
  *
- * One palette: a cold navy spine (`ink`) with a single ice accent (`ice`).
- * Every brand hex from the original config survives as a named step, so the
- * identity is unchanged — the ramp just fills the gaps that forced 87
- * hardcoded hex values into the components.
+ * Structure comes from hairline borders, not drop shadows. Shadows are
+ * reserved for things that genuinely float (the nav, the form card); every
+ * other surface is defined by a 1px line and a flat fill. That is the single
+ * biggest difference between a considered layout and a default Tailwind one.
  *
- *   ink-600  #2A2D7C  was `true-cobalt` / `primary`      — identity + CTAs
- *   ink-700  #202266  was the Venn / final-CTA gradient
- *   ink-800  #15174F  was `deep-navy` / `primary.dark`
- *   ink-900  #0B0C39  was `deep-navy.dark`
- *   ink-950  #000022  was `prussian-blue`
- *   ice-300  #A1CEE5  was `icy-blue` / `secondary`
- *   ice-400  #75AED4  was the final-CTA check icons
- *
- * Contrast, measured against #FFFFFF:
- *   ink-600  11.9:1  ✓ any text
- *   ice-300   1.7:1  ✗ never text on light — accents, borders and fills only
- *                      (on ink-800 it is 9.9:1, which is where it belongs)
+ * The navy identity is unchanged — ink-600 #2A2D7C is still the brand and
+ * every original hex survives as a named step. The neutrals around it were
+ * retuned: the old greys were muddy next to the navy, so they now carry a
+ * slight cool cast that belongs to the same family.
  */
 
 // 375px → 1440px fluid interpolation
@@ -37,46 +29,53 @@ export default {
     extend: {
       colors: {
         ink: {
-          50: '#F4F6FB',
-          100: '#E6EAF5',
-          200: '#C7D0E8',
-          300: '#9AA8D2',
-          400: '#6473AE',
-          500: '#3D4590',
-          600: '#2A2D7C',
+          50: '#F2F4FA',
+          100: '#E3E7F3',
+          200: '#C5CCE6',
+          300: '#98A3CE',
+          400: '#6472AC',
+          500: '#3D458F',
+          600: '#2A2D7C', // brand cobalt — identity + primary actions
           700: '#202266',
-          800: '#15174F',
+          800: '#15174F', // deep navy
           900: '#0B0C39',
-          950: '#000022',
+          950: '#050621', // darkest anchor — footer
         },
         ice: {
-          50: '#F2F9FC',
-          100: '#E3F1F8',
-          200: '#C7E3F1',
-          300: '#A1CEE5',
+          50: '#F1F8FC',
+          100: '#E2F0F8',
+          200: '#C4E2F0',
+          300: '#A1CEE5', // brand ice
           400: '#75AED4',
           500: '#4F92BE',
           600: '#3B7BA4',
         },
-        // Surfaces — consolidates #F9F9F9 / #F7F7F7 / #F9FAFB / #eef5f9 /
-        // #F3F6FB / #E7EDF8 / #E2E7E8 into three deliberate steps.
-        surface: {
-          DEFAULT: '#FFFFFF',
-          subtle: '#F9F9F9',
-          muted: '#EEF2F8',
+
+        // Surfaces. `canvas` is the page, `panel` sits on it, `raised` is the
+        // subtle step used inside panels.
+        canvas: '#F5F6F9',
+        panel: '#FFFFFF',
+        raised: '#FAFBFD',
+
+        // Hairlines — the primary structural device.
+        line: {
+          DEFAULT: '#E6E9F0',
+          strong: '#D3D8E4',
+          onInk: 'rgba(255,255,255,0.10)',
+          onInkStrong: 'rgba(255,255,255,0.18)',
         },
-        // Text — replaces the text-black/70|/80 alpha hack with solid,
-        // blue-tinted values that stay consistent across backgrounds.
+
         content: {
-          strong: '#151829',
-          DEFAULT: '#454A61',
-          muted: '#6E7389',
-          subtle: '#9095A8',
+          strong: '#0D1022',
+          DEFAULT: '#565C6E',
+          muted: '#868CA0',
+          faint: '#A9AEBE',
         },
+
         success: { DEFAULT: '#12795A', surface: '#E7F4EF' },
         danger: { DEFAULT: '#A8322A', surface: '#FBEDEB' },
 
-        /* ── Back-compat aliases so existing markup keeps compiling ── */
+        /* ── Back-compat aliases ── */
         'bright-snow': '#F9F9F9',
         'icy-blue': '#A1CEE5',
         'true-cobalt': '#2A2D7C',
@@ -84,7 +83,7 @@ export default {
         'prussian-blue': '#000022',
         primary: { DEFAULT: '#2A2D7C', dark: '#15174F' },
         secondary: { DEFAULT: '#A1CEE5', light: '#F9F9F9' },
-        background: { light: '#F9F9F9', alternate: '#FFFFFF' },
+        surface: { DEFAULT: '#FFFFFF', subtle: '#F5F6F9', muted: '#EDF0F6' },
       },
 
       fontFamily: {
@@ -95,40 +94,43 @@ export default {
         signature: ['"Alex Brush"', 'cursive'],
       },
 
-      // Fluid scale — the old `44` was a fixed 2.75rem at every viewport.
+      /*
+       * Wider contrast between the extremes than before: bigger headlines,
+       * smaller and greyer body, and a genuinely tiny tracked label. Timid
+       * type contrast was a large part of why the old build read flat.
+       */
       fontSize: {
-        eyebrow: ['0.75rem', { lineHeight: '1.4', letterSpacing: '0.14em', fontWeight: '500' }],
-        small: ['0.9375rem', { lineHeight: '1.6', letterSpacing: '-0.006em' }],
-        body: ['1.0625rem', { lineHeight: '1.65', letterSpacing: '-0.01em' }],
-        lead: [fluid(17, 20), { lineHeight: '1.6', letterSpacing: '-0.012em', fontWeight: '300' }],
-        h4: [fluid(18, 22), { lineHeight: '1.35', letterSpacing: '-0.014em', fontWeight: '600' }],
-        h3: [fluid(22, 30), { lineHeight: '1.25', letterSpacing: '-0.018em', fontWeight: '600' }],
-        h2: [fluid(28, 42), { lineHeight: '1.18', letterSpacing: '-0.022em', fontWeight: '600' }],
-        h1: [fluid(34, 52), { lineHeight: '1.1', letterSpacing: '-0.026em', fontWeight: '600' }],
-        display: [fluid(40, 64), { lineHeight: '1.06', letterSpacing: '-0.03em', fontWeight: '600' }],
+        label: ['0.6875rem', { lineHeight: '1.3', letterSpacing: '0.13em', fontWeight: '600' }],
+        small: ['0.9375rem', { lineHeight: '1.65', letterSpacing: '-0.006em' }],
+        body: ['1.0313rem', { lineHeight: '1.7', letterSpacing: '-0.009em' }],
+        lead: [fluid(17, 20), { lineHeight: '1.6', letterSpacing: '-0.014em', fontWeight: '300' }],
+        h4: [fluid(18, 21), { lineHeight: '1.35', letterSpacing: '-0.018em', fontWeight: '600' }],
+        h3: [fluid(22, 30), { lineHeight: '1.22', letterSpacing: '-0.023em', fontWeight: '600' }],
+        h2: [fluid(30, 50), { lineHeight: '1.1', letterSpacing: '-0.032em', fontWeight: '600' }],
+        h1: [fluid(36, 60), { lineHeight: '1.06', letterSpacing: '-0.036em', fontWeight: '600' }],
+        display: [fluid(40, 68), { lineHeight: '1.04', letterSpacing: '-0.04em', fontWeight: '600' }],
 
         /* ── Back-compat ── */
+        eyebrow: ['0.6875rem', { lineHeight: '1.3', letterSpacing: '0.13em', fontWeight: '600' }],
+        subheading: ['0.9rem', { lineHeight: '160%', fontWeight: '300' }],
         18: ['1.125rem', { lineHeight: '140%', letterSpacing: '-0.0125em', fontWeight: '300' }],
         44: ['2.75rem', { lineHeight: '120%', letterSpacing: '-0.01em', fontWeight: '600' }],
-        subheading: ['0.9rem', { lineHeight: '160%', fontWeight: '300' }],
       },
 
       maxWidth: {
-        shell: '1600px',   // navigation + hero
-        content: '1280px', // standard section width
-        measure: '68ch',   // prose line length
+        shell: '1440px',
+        content: '1240px',
+        measure: '64ch',
       },
 
-      // Navy-tinted elevation. Black shadows over a cold palette read muddy.
+      // Only for things that actually float.
       boxShadow: {
-        soft: '0 1px 2px rgba(21,23,79,0.04), 0 4px 12px rgba(21,23,79,0.06)',
-        card: '0 2px 4px rgba(21,23,79,0.04), 0 12px 32px rgba(21,23,79,0.08)',
-        lift: '0 8px 16px rgba(21,23,79,0.06), 0 24px 56px rgba(21,23,79,0.12)',
-        float: '0 16px 32px rgba(21,23,79,0.10), 0 40px 80px rgba(21,23,79,0.16)',
-        'inner-hairline': 'inset 0 0 0 1px rgba(21,23,79,0.07)',
+        nav: '0 1px 2px rgba(13,16,34,0.04), 0 8px 24px rgba(13,16,34,0.06)',
+        float: '0 2px 4px rgba(13,16,34,0.03), 0 18px 48px rgba(13,16,34,0.10)',
+        ink: '0 10px 30px rgba(42,45,124,0.22)',
       },
 
-      borderRadius: { xl2: '1.25rem', xl3: '1.75rem', xl4: '2.5rem' },
+      borderRadius: { xl2: '0.875rem', xl3: '1.25rem', xl4: '1.75rem' },
 
       spacing: { 18: '4.5rem', 88: '22rem', 104: '26rem', 112: '28rem', 128: '32rem' },
       lineHeight: { body: '140%', heading: '120%' },

@@ -1,10 +1,9 @@
 import { useState, useId } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ChevronDown, Minus } from 'lucide-react';
-import pattern3 from '../patterns/3.png';
+import { Plus, Minus } from 'lucide-react';
 import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT, transition } from '../lib/motion';
 import Section from './ui/Section';
-import Eyebrow from './ui/Eyebrow';
+import SectionHead from './ui/SectionHead';
 import { cn } from '../lib/cn';
 
 const painPoints = [
@@ -42,75 +41,63 @@ const impacts = [
   },
 ];
 
-function ImpactAccordion({ impact }: { impact: (typeof impacts)[number] }) {
+function ImpactRow({ impact }: { impact: (typeof impacts)[number] }) {
   const [open, setOpen] = useState(false);
   const reduced = useReducedMotion();
   const id = useId();
-  const panelId = `${id}-panel`;
-  const buttonId = `${id}-button`;
 
   return (
-    <motion.div
-      variants={reduced ? STATIC_VARIANTS : staggerChild}
-      className={cn(
-        'overflow-hidden rounded-xl2 border bg-surface transition-colors duration-300',
-        open ? 'border-ink-200 shadow-card' : 'border-ink-100 shadow-soft hover:border-ink-200',
-      )}
-    >
+    <div className="border-t border-line first:border-t-0">
       <h4>
-        {/* aria-expanded / aria-controls were missing entirely — the accordion
-            was invisible to screen readers. */}
         <button
-          id={buttonId}
+          id={`${id}-button`}
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
-          aria-controls={panelId}
-          className="flex w-full items-start justify-between gap-5 p-6 text-left transition-colors hover:bg-ink-50/60"
+          aria-controls={`${id}-panel`}
+          className="group flex w-full items-start justify-between gap-5 py-5 text-left"
         >
           <span className="flex-1">
-            {/* An accent rule stands in for a step number — the brief fixes the
-                site's copy, so no new visible text is introduced. */}
-            <span className="flex items-center gap-3">
-              <span
-                aria-hidden="true"
-                className={cn(
-                  'h-4 w-[3px] shrink-0 rounded-full transition-colors duration-300',
-                  open ? 'bg-ink-600' : 'bg-ink-200',
-                )}
-              />
-              <span className="text-h4 text-content-strong">{impact.title}</span>
+            <span
+              className={cn(
+                'block text-h4 transition-colors duration-200',
+                open ? 'text-ink-600' : 'text-content-strong group-hover:text-ink-600',
+              )}
+            >
+              {impact.title}
             </span>
-            <span className="mt-2 block pl-[1.4rem] text-small leading-relaxed text-content">
+            <span className="mt-1.5 block text-small leading-relaxed text-content">
               {impact.description}
             </span>
           </span>
-          <ChevronDown
-            size={20}
+
+          <span
             aria-hidden="true"
             className={cn(
-              'mt-1 shrink-0 text-ink-400 transition-transform duration-300 ease-entrance',
-              open && 'rotate-180',
+              'mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-colors duration-200',
+              open
+                ? 'border-ink-600 bg-ink-600 text-white'
+                : 'border-line text-content-muted group-hover:border-ink-300 group-hover:text-ink-600',
             )}
-          />
+          >
+            {open ? <Minus size={13} strokeWidth={2.5} /> : <Plus size={13} strokeWidth={2.5} />}
+          </span>
         </button>
       </h4>
 
       <motion.div
-        id={panelId}
+        id={`${id}-panel`}
         role="region"
-        aria-labelledby={buttonId}
+        aria-labelledby={`${id}-button`}
         initial={false}
         animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
         transition={reduced ? { duration: 0 } : transition(0.32)}
         className="overflow-hidden"
       >
-        <div className="px-6 pb-6">
-          <div className="border-t border-ink-100 pt-4">
-            <p className="text-small leading-relaxed text-content">{impact.details}</p>
-          </div>
-        </div>
+        <p className="max-w-measure pb-6 pr-10 text-small leading-relaxed text-content">
+          {impact.details}
+        </p>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -120,76 +107,58 @@ export default function RealitaetscheckSection() {
   const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <Section id="realitaetscheck" tone="subtle" size="lg">
-      <img
-        src={pattern3}
-        alt=""
-        aria-hidden="true"
-        className="pointer-events-none absolute -bottom-16 -left-16 w-80 select-none opacity-[0.55] lg:w-96"
-      />
+    <Section id="realitaetscheck" tone="canvas" size="lg">
+      <motion.div
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={VIEWPORT}
+        className="overflow-hidden rounded-xl4 border border-line bg-panel"
+      >
+        <div className="grid divide-y divide-line lg:grid-cols-2 lg:divide-x lg:divide-y-0">
+          <motion.div variants={item} className="p-7 sm:p-10 lg:p-12">
+            <SectionHead
+              eyebrow="Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?"
+              title="Realitätscheck: Ihre aktuelle Ausgangslage"
+              body="Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt."
+              titleWidth="max-w-[16ch]"
+            />
 
-      <div className="relative grid gap-14 lg:grid-cols-2 lg:gap-20">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={VIEWPORT}
-        >
-          <motion.div variants={item}>
-            <Eyebrow>Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?</Eyebrow>
-            <h2 className="mt-5 max-w-[18ch]">Realitätscheck: Ihre aktuelle Ausgangslage</h2>
-            <p className="mt-5 max-w-measure text-lead text-content">
-              Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber
-              kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt.
-            </p>
+            {/*
+              A quiet numbered ledger. The original rendered these as solid
+              red circles with an X, which was the loudest thing on the page
+              and read as an error state rather than a diagnostic.
+            */}
+            <ul className="mt-9">
+              {painPoints.map((point) => (
+                <li key={point} className="flex items-start gap-4 border-t border-line py-4">
+                  <span
+                    aria-hidden="true"
+                    className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ice-400"
+                  />
+                  <p className="text-small leading-relaxed text-content">{point}</p>
+                </li>
+              ))}
+            </ul>
           </motion.div>
 
-          {/*
-            Was a stack of solid red-500 circles with an X — visually the
-            loudest thing on the page. A quiet danger-toned marker carries the
-            same meaning without shouting.
-          */}
-          <ul className="mt-10 space-y-px overflow-hidden rounded-xl2 border border-ink-100 bg-surface shadow-soft">
-            {painPoints.map((point) => (
-              <motion.li
-                variants={item}
-                key={point}
-                className="flex items-start gap-4 border-b border-ink-100 px-5 py-4 last:border-b-0"
-              >
-                <span
-                  aria-hidden="true"
-                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-danger-surface text-danger"
-                >
-                  <Minus size={14} strokeWidth={2.75} />
-                </span>
-                <p className="text-small leading-relaxed text-content">{point}</p>
-              </motion.li>
-            ))}
-          </ul>
-        </motion.div>
+          <motion.div variants={item} className="bg-raised p-7 sm:p-10 lg:p-12">
+            <SectionHead
+              eyebrow="Wenn sich nichts ändert …"
+              title="Mögliche Folgen für Ihr Unternehmen"
+              body="Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der Verlust qualifizierter Mitarbeitender an die Konkurrenz."
+              as="h3"
+              titleWidth="max-w-[16ch]"
+            />
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          whileInView="show"
-          viewport={VIEWPORT}
-        >
-          <motion.div variants={item}>
-            <Eyebrow>Wenn sich nichts ändert …</Eyebrow>
-            <h3 className="mt-5 max-w-[18ch] text-h2">Mögliche Folgen für Ihr Unternehmen</h3>
-            <p className="mt-5 max-w-measure text-lead text-content">
-              Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der
-              Verlust qualifizierter Mitarbeitender an die Konkurrenz.
-            </p>
+            <div className="mt-8">
+              {impacts.map((impact) => (
+                <ImpactRow key={impact.title} impact={impact} />
+              ))}
+            </div>
           </motion.div>
-
-          <div className="mt-10 space-y-3">
-            {impacts.map((impact) => (
-              <ImpactAccordion key={impact.title} impact={impact} />
-            ))}
-          </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </Section>
   );
 }

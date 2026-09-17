@@ -3,33 +3,35 @@ import { cn } from '../../lib/cn';
 
 type EyebrowProps = {
   children: ReactNode;
-  /** `onInk` for use on the dark navy sections. */
   tone?: 'default' | 'onInk';
-  /** Draws the short accent rule before the label. */
-  rule?: boolean;
   className?: string;
 };
 
 /**
- * The kicker above a section heading.
+ * Section kicker, as a bordered pill with a status dot.
  *
- * The old markup expressed this four different ways — `text-subheading
- * text-subheading uppercase`, `text-sm font-medium text-primary tracking-wide
- * uppercase`, `text-xs tracking-[0.2em] uppercase text-white/60`, and an
- * inline flex with a hand-built accent bar.
+ * Previously this was a bare tracked caption, which is what a default build
+ * produces. Giving it an outline and a dot turns it into a deliberate object
+ * and gives every section head the same recognisable opening beat.
  */
-export default function Eyebrow({ children, tone = 'default', rule = true, className }: EyebrowProps) {
-  const color = tone === 'onInk' ? 'text-ice-300' : 'text-ink-600';
+export default function Eyebrow({ children, tone = 'default', className }: EyebrowProps) {
+  const onInk = tone === 'onInk';
 
   return (
-    <p className={cn('flex items-center gap-2.5 text-eyebrow uppercase', color, className)}>
-      {rule && (
-        <span
-          aria-hidden="true"
-          className={cn('h-4 w-[3px] shrink-0 rounded-full', tone === 'onInk' ? 'bg-ice-300' : 'bg-ink-600')}
-        />
+    <span
+      className={cn(
+        'inline-flex items-center gap-2 rounded-full border py-1.5 pl-2.5 pr-3.5 text-label uppercase',
+        onInk
+          ? 'border-line-onInkStrong bg-white/[0.06] text-ice-200'
+          : 'border-line bg-panel text-ink-600',
+        className,
       )}
-      <span>{children}</span>
-    </p>
+    >
+      <span
+        aria-hidden="true"
+        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', onInk ? 'bg-ice-300' : 'bg-ice-400')}
+      />
+      {children}
+    </span>
   );
 }

@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Check, ArrowRight } from 'lucide-react';
 import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
 import Section from './ui/Section';
-import Eyebrow from './ui/Eyebrow';
+import SectionHead from './ui/SectionHead';
 import Button from './ui/Button';
 
 const assurances = [
@@ -11,80 +11,83 @@ const assurances = [
   'Persönliche Begleitung von Cedrik Leibinn – vom ersten Schritt bis zur Umsetzung',
 ];
 
+/**
+ * Full-bleed dark close. Previously a navy card floating on a light section,
+ * which made the page end on a weak, unresolved note; running it edge to edge
+ * into the footer gives the scroll a proper landing.
+ */
 export default function FinalCTASection() {
   const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.15);
+  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.12);
   const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <Section tone="subtle" size="md">
+    <Section tone="ink" size="xl">
+      <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-32 bottom-[-12rem] h-[34rem] w-[34rem] rounded-full"
+        style={{
+          background:
+            'radial-gradient(circle, rgba(161,206,229,0.12) 0%, rgba(161,206,229,0.03) 45%, transparent 70%)',
+        }}
+      />
+
       <motion.div
         variants={container}
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT}
-        className="relative overflow-hidden rounded-xl3 shadow-float"
-        style={{
-          background: 'linear-gradient(120deg, #15174F 0%, #202266 48%, #0B0C39 100%)',
-        }}
+        className="relative grid items-center gap-12 lg:grid-cols-[1fr_0.72fr] lg:gap-20"
       >
-        {/* Depth: a soft ice bloom in the corner rather than a flat gradient. */}
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(161,206,229,0.20) 0%, rgba(161,206,229,0.05) 45%, transparent 70%)',
-          }}
-        />
-
-        <div className="relative grid gap-10 p-7 sm:p-10 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-14 lg:p-14">
-          <div>
-            <motion.div variants={item}>
-              <Eyebrow tone="onInk">BEREIT FÜR DEN NÄCHSTEN SCHRITT?</Eyebrow>
-              <h2 className="mt-5 max-w-[20ch] text-white">
-                Lassen Sie uns Ihr Benefit-System auf Mittelstands-Niveau bringen
-              </h2>
-              <p className="mt-5 max-w-measure text-lead text-white/75">
-                In einem ersten Gespräch schauen wir gemeinsam auf Ihre aktuelle Situation und Ihre Ziele. Sie erhalten eine ehrliche Einschätzung, konkrete Ansatzpunkte und ein Gefühl dafür, wie ein strukturiertes Benefit-System in Ihrem Unternehmen aussehen kann.
-              </p>
-            </motion.div>
-
-            <ul className="mt-8 space-y-3">
-              {assurances.map((line) => (
-                <motion.li variants={item} key={line} className="flex items-start gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-ice-300/20 text-ice-300"
-                  >
-                    <Check size={12} strokeWidth={3} />
-                  </span>
-                  <p className="text-small leading-relaxed text-white/75">{line}</p>
-                </motion.li>
-              ))}
-            </ul>
-          </div>
-
-          <motion.div
-            variants={item}
-            className="rounded-xl2 border border-white/12 bg-white/[0.07] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.35)] backdrop-blur-sm sm:p-7"
-          >
-            <p className="text-h4 text-white">Kostenloses Erstgespräch mit Cedrik Leibinn</p>
-            <p className="mt-3 text-small leading-relaxed text-white/70">
-              Wir melden uns innerhalb von 24 Stunden mit einem Terminvorschlag – persönlich, ohne Vertriebsschleifen.
-            </p>
-
-            {/* Was a raw <a href="/kontakt">, which forced a full document
-                reload and threw away the SPA's state. */}
-            <Button to="/kontakt" variant="onInk" fullWidth className="mt-6" icon={<ArrowRight size={16} />}>
-              Erstgespräch sichern
-            </Button>
-
-            <p className="mt-3.5 text-center text-eyebrow normal-case tracking-normal text-white/55">
-              Unverbindlich &amp; kostenlos – Ihr Erstgespräch für ein strukturiertes Benefit-System.
-            </p>
+        <div>
+          <motion.div variants={item}>
+            <SectionHead
+              eyebrow="BEREIT FÜR DEN NÄCHSTEN SCHRITT?"
+              title="Lassen Sie uns Ihr Benefit-System auf Mittelstands-Niveau bringen"
+              body="In einem ersten Gespräch schauen wir gemeinsam auf Ihre aktuelle Situation und Ihre Ziele. Sie erhalten eine ehrliche Einschätzung, konkrete Ansatzpunkte und ein Gefühl dafür, wie ein strukturiertes Benefit-System in Ihrem Unternehmen aussehen kann."
+              tone="onInk"
+              titleWidth="max-w-[19ch]"
+            />
           </motion.div>
+
+          <ul className="mt-10 space-y-px border-t border-line-onInk">
+            {assurances.map((line) => (
+              <motion.li
+                variants={item}
+                key={line}
+                className="flex items-start gap-3.5 border-b border-line-onInk py-4"
+              >
+                <span
+                  aria-hidden="true"
+                  className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ice-300/15 text-ice-300"
+                >
+                  <Check size={11} strokeWidth={3} />
+                </span>
+                <p className="text-small leading-relaxed text-white/65">{line}</p>
+              </motion.li>
+            ))}
+          </ul>
         </div>
+
+        <motion.div
+          variants={item}
+          className="rounded-xl4 border border-line-onInkStrong bg-white/[0.05] p-7 backdrop-blur-sm sm:p-9"
+        >
+          <p className="text-h3 text-white">Kostenloses Erstgespräch mit Cedrik Leibinn</p>
+          <p className="mt-4 text-small leading-relaxed text-white/60">
+            Wir melden uns innerhalb von 24 Stunden mit einem Terminvorschlag – persönlich, ohne Vertriebsschleifen.
+          </p>
+
+          {/* Was a raw <a href>, which forced a full document reload. */}
+          <Button to="/kontakt" variant="onInk" size="lg" fullWidth className="mt-8" icon={<ArrowRight size={16} />}>
+            Erstgespräch sichern
+          </Button>
+
+          <p className="mt-4 border-t border-line-onInk pt-4 text-center text-small text-white/45">
+            Unverbindlich &amp; kostenlos – Ihr Erstgespräch für ein strukturiertes Benefit-System.
+          </p>
+        </motion.div>
       </motion.div>
     </Section>
   );

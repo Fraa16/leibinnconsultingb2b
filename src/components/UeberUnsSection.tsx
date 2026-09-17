@@ -4,23 +4,42 @@ import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib
 import Section from './ui/Section';
 import Image from './ui/Image';
 
+/**
+ * Editorial split: the portrait runs flush to the panel edge rather than
+ * sitting inside it as a rounded card with a caption underneath.
+ */
 export default function UeberUnsSection() {
   const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.1, 0.15);
+  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.1, 0.12);
   const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <Section id="ueber-uns" tone="subtle" size="lg">
+    <Section id="ueber-uns" tone="canvas" size="lg">
       <motion.div
         variants={container}
         initial="hidden"
         whileInView="show"
         viewport={VIEWPORT}
-        className="overflow-hidden rounded-xl4 bg-surface p-7 shadow-card sm:p-10 lg:p-16"
+        className="overflow-hidden rounded-xl4 border border-line bg-panel"
       >
-        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)] lg:gap-16">
-          <motion.div variants={item}>
-            <h2 className="max-w-[16ch]">Benefits, die funktionieren</h2>
+        <div className="grid lg:grid-cols-[0.8fr_1fr]">
+          <motion.figure variants={item} className="relative m-0 border-b border-line lg:border-b-0 lg:border-r">
+            <Image
+              image={portraitImage}
+              alt="Cedrik Leibinn"
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="aspect-[4/3] w-full object-cover object-top sm:aspect-[16/9] lg:aspect-auto lg:h-full lg:min-h-[34rem]"
+            />
+            <figcaption
+              className="absolute bottom-4 left-4 rounded-full border border-white/20 bg-ink-950/70
+                         px-3.5 py-1.5 text-label uppercase text-white/85 backdrop-blur-sm"
+            >
+              Gründer &amp; Geschäftsführer
+            </figcaption>
+          </motion.figure>
+
+          <motion.div variants={item} className="p-7 sm:p-10 lg:p-14">
+            <h2 className="max-w-[14ch]">Benefits, die funktionieren</h2>
 
             <div className="mt-8 space-y-5">
               <p className="max-w-measure text-lead text-content">
@@ -40,30 +59,18 @@ export default function UeberUnsSection() {
               </p>
             </div>
 
-            <div className="mt-10 border-t border-ink-100 pt-6">
-              <p className="text-small text-content-muted">Herzliche Grüße</p>
-              {/* Alex Brush is registered in Tailwind now, so this no longer
-                  needs an inline style pointing at the raw CSS variable. */}
-              <p className="mt-1 font-signature text-[2rem] leading-none text-ink-600">
-                Cedrik Leibinn
-              </p>
-            </div>
-          </motion.div>
-
-          <motion.div variants={item} className="w-full lg:justify-self-end">
-            <figure className="mx-auto w-full max-w-md">
-              <div className="overflow-hidden rounded-xl3 border border-ink-100 bg-ink-50 shadow-lift">
-                <Image
-                  image={portraitImage}
-                  alt="Cedrik Leibinn"
-                  sizes="(min-width: 1024px) 28rem, (min-width: 640px) 28rem, 100vw"
-                  className="aspect-[3/4] w-full object-cover"
-                />
+            <div className="mt-10 flex items-end justify-between gap-6 border-t border-line pt-7">
+              <div>
+                <p className="text-small text-content-muted">Herzliche Grüße</p>
+                <p className="mt-1 font-signature text-[2.25rem] leading-none text-ink-700">
+                  Cedrik Leibinn
+                </p>
               </div>
-              <figcaption className="mt-4 text-center text-small text-content-muted">
-                Gründer &amp; Geschäftsführer
-              </figcaption>
-            </figure>
+              <span
+                aria-hidden="true"
+                className="hidden h-px flex-1 bg-line sm:block"
+              />
+            </div>
           </motion.div>
         </div>
       </motion.div>

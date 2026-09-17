@@ -10,7 +10,6 @@ type CommonProps = {
   variant?: Variant;
   size?: Size;
   className?: string;
-  /** Renders a trailing icon that nudges right on hover. */
   icon?: ReactNode;
   fullWidth?: boolean;
 };
@@ -22,35 +21,21 @@ type ButtonProps = CommonProps & {
   disabled?: boolean;
 };
 
-type LinkProps = CommonProps & {
-  to: string;
-  onClick?: () => void;
-};
+type LinkProps = CommonProps & { to: string; onClick?: () => void };
 
 /*
- * The brand cobalt drives every call to action.
- *
- * The Bolt build had drifted onto #016FB9 — a bright azure used 19 times that
- * appears nowhere in the brand palette and reads cold-generic next to the
- * navy. Consolidating on ink-600 means the whole page resolves to one system,
- * and the ice accent is freed up to do contrast work on the dark sections.
+ * Pill buttons, matching the pill eyebrow — one shape language across the
+ * whole page. The brand cobalt carries every primary action.
  */
 const VARIANTS: Record<Variant, string> = {
-  primary:
-    'bg-ink-600 text-white shadow-[0_4px_20px_rgba(42,45,124,0.28)] ' +
-    'hover:bg-ink-700 hover:shadow-[0_10px_30px_rgba(42,45,124,0.36)] hover:-translate-y-0.5 ' +
-    'active:translate-y-0 active:bg-ink-800',
+  primary: 'bg-ink-600 text-white shadow-ink hover:bg-ink-700 active:bg-ink-800',
   secondary:
-    'border border-ink-600/25 text-ink-600 bg-transparent ' +
-    'hover:bg-ink-600/[0.06] hover:border-ink-600/40',
-  onInk:
-    'bg-white text-ink-800 shadow-[0_8px_28px_rgba(0,0,0,0.28)] ' +
-    'hover:bg-ice-50 hover:-translate-y-0.5 active:translate-y-0',
+    'border border-line-strong bg-panel text-content-strong hover:border-ink-300 hover:bg-raised',
+  onInk: 'bg-white text-ink-900 hover:bg-ice-50',
   onInkGhost:
-    'border border-white/30 text-white bg-white/[0.07] ' +
-    'hover:bg-white/[0.14] hover:border-white/45',
+    'border border-line-onInkStrong bg-white/[0.06] text-white hover:bg-white/[0.13] hover:border-white/30',
   link:
-    'text-content-strong underline-offset-[6px] decoration-1 underline decoration-content-strong/30 ' +
+    'text-content-strong underline decoration-line-strong decoration-1 underline-offset-[7px] ' +
     'hover:text-ink-600 hover:decoration-ink-600 px-0 py-0 rounded-none',
 };
 
@@ -61,9 +46,9 @@ const SIZES: Record<Size, string> = {
 
 function classes(variant: Variant, size: Size, fullWidth?: boolean, className?: string) {
   return cn(
-    'group inline-flex items-center justify-center gap-2 rounded-xl font-medium',
-    'transition-all duration-200 ease-entrance',
-    'disabled:opacity-50 disabled:pointer-events-none',
+    'group inline-flex items-center justify-center gap-2 font-medium',
+    variant !== 'link' && 'rounded-full',
+    'transition-all duration-200 ease-entrance disabled:opacity-50 disabled:pointer-events-none',
     variant !== 'link' && SIZES[size],
     VARIANTS[variant],
     fullWidth && 'w-full',
@@ -72,9 +57,7 @@ function classes(variant: Variant, size: Size, fullWidth?: boolean, className?: 
 }
 
 function Icon({ icon }: { icon: ReactNode }) {
-  return (
-    <span className="transition-transform duration-200 group-hover:translate-x-0.5">{icon}</span>
-  );
+  return <span className="transition-transform duration-200 group-hover:translate-x-0.5">{icon}</span>;
 }
 
 export default function Button(props: ButtonProps | LinkProps) {

@@ -9,21 +9,19 @@
 
   html {
     scroll-behavior: smooth;
-    /* Sticky header is h-20 (80px); keeps anchored sections clear of it. */
-    scroll-padding-top: 6rem;
+    scroll-padding-top: 7rem;
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-surface-subtle font-sans text-body font-light text-content antialiased;
+    @apply bg-canvas font-sans text-body font-light text-content antialiased;
     text-rendering: optimizeLegibility;
   }
 
   /*
-   * Tailwind Preflight resets headings to `font-size: inherit`. The previous
-   * config re-declared a size for h1 only, so h2–h6 silently rendered at body
-   * size unless every single element carried its own class. These restore a
-   * real scale, so markup only needs a size class when it wants to deviate.
+   * Tailwind Preflight resets headings to `font-size: inherit`, so the scale
+   * is declared here. Markup only needs a size class when it deliberately
+   * deviates from the default step.
    */
   h1 { @apply text-h1 text-content-strong; }
   h2 { @apply text-h2 text-content-strong; }
@@ -31,16 +29,14 @@
   h4 { @apply text-h4 text-content-strong; }
   h5, h6 { @apply text-body font-semibold text-content-strong; }
 
-  /* One visible focus treatment for every interactive element. */
   :focus-visible {
-    @apply outline-none ring-2 ring-ink-600 ring-offset-2 ring-offset-white rounded-sm;
+    @apply outline-none ring-2 ring-ink-600 ring-offset-2 ring-offset-canvas rounded-sm;
   }
 
   ::selection {
     @apply bg-ink-600 text-white;
   }
 
-  /* Form controls inherit the type system rather than the UA default. */
   input, textarea, select, button {
     font: inherit;
     letter-spacing: inherit;
@@ -53,22 +49,36 @@
     font-weight: 400;
   }
 
-  /* Hairline that fades out at both ends — used as a section divider. */
+  /*
+   * Faint blueprint grid. Used at low opacity behind dark sections to give
+   * them some structure instead of a flat fill.
+   */
+  .grid-lines {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .grid-lines-light {
+    background-image:
+      linear-gradient(to right, rgba(13, 16, 34, 0.032) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(13, 16, 34, 0.032) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  /* Hairline that fades out at both ends. */
   .rule-fade {
     background-image: linear-gradient(
       to right,
       transparent,
-      theme('colors.ink.200') 15%,
-      theme('colors.ink.200') 85%,
+      theme('colors.line.strong') 12%,
+      theme('colors.line.strong') 88%,
       transparent
     );
   }
 }
 
-/*
- * Respect the OS reduced-motion setting. framer-motion is driven separately
- * via useReducedMotion(); this covers CSS transitions and the scroll behaviour.
- */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

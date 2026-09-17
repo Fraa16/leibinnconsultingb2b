@@ -3,8 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Star, Link2, HeartPulse, Users } from 'lucide-react';
 import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT, transition } from '../lib/motion';
 import Section from './ui/Section';
-import Eyebrow from './ui/Eyebrow';
-import Card from './ui/Card';
+import SectionHead from './ui/SectionHead';
 import { cn } from '../lib/cn';
 
 type SegmentId = 'attraktivitaet' | 'bindung' | 'gesundheit' | 'kultur';
@@ -17,7 +16,6 @@ const segments = [
       'Ihre Benefits machen auf einen Blick sichtbar, warum sich qualifizierte Bewerbende für Ihr Unternehmen entscheiden sollten.',
     color: '#2A2D7C',
     icon: Star,
-    corner: 'tl',
   },
   {
     id: 'bindung' as SegmentId,
@@ -26,7 +24,6 @@ const segments = [
       'Regelmäßig spürbare Vorteile stärken Loyalität und reduzieren Fluktuation – gerade bei leistungstragenden Mitarbeitenden.',
     color: '#15174F',
     icon: Link2,
-    corner: 'tr',
   },
   {
     id: 'gesundheit' as SegmentId,
@@ -35,7 +32,6 @@ const segments = [
       'Moderne Gesundheitsangebote entlasten Teams, reduzieren Ausfälle und erhöhen langfristig die Leistungsfähigkeit.',
     color: '#202266',
     icon: HeartPulse,
-    corner: 'br',
   },
   {
     id: 'kultur' as SegmentId,
@@ -44,11 +40,9 @@ const segments = [
       'Benefits transportieren Haltung und Wertschätzung – und stärken damit das Wir-Gefühl in Ihrer Organisation.',
     color: '#0B0C39',
     icon: Users,
-    corner: 'bl',
   },
 ];
 
-/** Paths keyed by segment so a hovered label can highlight its own petal. */
 const PATHS: Record<SegmentId, string> = {
   attraktivitaet:
     'M790.09 397.363c-77.281-122.695-256.68-122.633-333.906 0-53.73-101.582-3.926-228.254 104.683-266.058 40.008-14.032 84.535-14.028 124.535 0 108.594 37.77 158.426 164.515 104.688 266.058m0 0',
@@ -63,7 +57,7 @@ const PATHS: Record<SegmentId, string> = {
 function BenefitVennDiagram({ active }: { active: SegmentId | null }) {
   return (
     <svg
-      viewBox="380 100 700 620"
+      viewBox="390 110 680 600"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="xMidYMid meet"
       role="img"
@@ -76,125 +70,99 @@ function BenefitVennDiagram({ active }: { active: SegmentId | null }) {
           d={PATHS[s.id]}
           fill={s.color}
           className="transition-opacity duration-300 ease-entrance"
-          opacity={active === null || active === s.id ? 1 : 0.22}
+          opacity={active === null || active === s.id ? 1 : 0.16}
         />
       ))}
     </svg>
   );
 }
 
-const CORNER_CLASSES: Record<string, string> = {
-  tl: 'lg:col-start-1 lg:row-start-1 lg:items-start lg:text-left',
-  tr: 'lg:col-start-3 lg:row-start-1 lg:items-end lg:text-right',
-  bl: 'lg:col-start-1 lg:row-start-3 lg:items-start lg:text-left',
-  br: 'lg:col-start-3 lg:row-start-3 lg:items-end lg:text-right',
-};
-
 export default function WarumBenefitsSection() {
   const [active, setActive] = useState<SegmentId | null>(null);
   const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.15);
+  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.08, 0.12);
   const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <Section id="warum-benefits" tone="base" size="lg">
-      {/* Cool radial wash behind the diagram, replacing the stacked
-          before:/after: pseudo-element gradients on the old wrapper. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[46rem] w-[46rem] -translate-x-1/2 -translate-y-1/2"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(42,45,124,0.09) 0%, rgba(42,45,124,0.03) 42%, transparent 70%)',
-        }}
-      />
-
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={VIEWPORT}
-        className="relative"
-      >
-        <motion.div variants={item} className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">Warum moderne Benefits unverzichtbar sind</Eyebrow>
-          <h2 className="mt-5">Die vier zentralen Wirkungsbereiche moderner Benefits</h2>
-          <p className="mx-auto mt-5 max-w-measure text-lead text-content">
-            Benefits erfüllen heute weit mehr als nur eine symbolische Funktion. Sie wirken gleichzeitig auf
-            Attraktivität, Bindung, Gesundheit und Kultur – und prägen damit das tägliche Erleben der Mitarbeitenden.
-            Ein klares Benefit-System stärkt jede dieser Ebenen messbar.
-          </p>
+    <Section id="warum-benefits" tone="canvas" size="lg">
+      <motion.div variants={container} initial="hidden" whileInView="show" viewport={VIEWPORT}>
+        <motion.div variants={item}>
+          <SectionHead
+            eyebrow="Warum moderne Benefits unverzichtbar sind"
+            title="Die vier zentralen Wirkungsbereiche moderner Benefits"
+            body="Benefits erfüllen heute weit mehr als nur eine symbolische Funktion. Sie wirken gleichzeitig auf Attraktivität, Bindung, Gesundheit und Kultur – und prägen damit das tägliche Erleben der Mitarbeitenden. Ein klares Benefit-System stärkt jede dieser Ebenen messbar."
+            align="center"
+            titleWidth="max-w-[22ch]"
+          />
         </motion.div>
 
-        {/* Mobile / tablet: stacked cards. */}
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:hidden">
-          {segments.map((segment) => (
-            <motion.div variants={item} key={segment.id}>
-              <Card padding="md" className="h-full">
-                <div className="flex items-center gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-                    style={{ backgroundColor: segment.color }}
-                  >
-                    <segment.icon className="h-4 w-4 text-white" />
-                  </span>
-                  <h3 className="text-h4">{segment.label}</h3>
-                </div>
-                <p className="mt-3 text-small leading-relaxed text-content">{segment.description}</p>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-
         {/*
-          Desktop: a 3×3 grid puts each label in the quadrant matching its
-          petal. The original placed them with absolute corners plus hardcoded
-          ±100px transforms, which broke as soon as a label wrapped.
+          The diagram is the section's one graphic moment, so it gets a panel
+          of its own. The four fields sit underneath as a ledger — the same
+          pattern used in the Ansatz section, so the page has a vocabulary.
         */}
-        <div className="mt-14 hidden lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-[auto_auto_auto] lg:items-center lg:gap-x-8 lg:gap-y-10">
-          {segments.map((segment) => (
+        <motion.div
+          variants={item}
+          className="mt-14 overflow-hidden rounded-xl4 border border-line bg-panel"
+        >
+          <div className="relative grid place-items-center px-6 py-12 sm:py-16">
+            <div
+              aria-hidden="true"
+              className="grid-lines-light pointer-events-none absolute inset-0"
+            />
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute h-[26rem] w-[26rem] rounded-full"
+              style={{
+                background:
+                  'radial-gradient(circle, rgba(42,45,124,0.10) 0%, rgba(42,45,124,0.03) 45%, transparent 70%)',
+              }}
+            />
             <motion.div
-              variants={item}
-              key={segment.id}
-              onMouseEnter={() => setActive(segment.id)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(segment.id)}
-              onBlur={() => setActive(null)}
-              tabIndex={0}
-              className={cn(
-                'flex flex-col gap-3 rounded-xl2 p-3 transition-opacity duration-300',
-                CORNER_CLASSES[segment.corner],
-                active !== null && active !== segment.id && 'opacity-45',
-              )}
+              initial={reduced ? false : { opacity: 0, scale: 0.94 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={VIEWPORT}
+              transition={reduced ? { duration: 0 } : transition(0.75)}
+              className="relative aspect-square w-full max-w-[22rem] sm:max-w-[26rem]"
             >
-              <span
-                aria-hidden="true"
-                className="inline-flex h-11 w-11 items-center justify-center rounded-full shadow-soft transition-transform duration-300 ease-entrance"
-                style={{
-                  backgroundColor: segment.color,
-                  transform: active === segment.id ? 'scale(1.08)' : 'scale(1)',
-                }}
-              >
-                <segment.icon className="h-5 w-5 text-white" />
-              </span>
-              <h3 className="text-h4">{segment.label}</h3>
-              <p className="max-w-[34ch] text-small leading-relaxed text-content">
-                {segment.description}
-              </p>
+              <BenefitVennDiagram active={active} />
             </motion.div>
-          ))}
+          </div>
 
-          <motion.div
-            initial={reduced ? false : { opacity: 0, scale: 0.94 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={VIEWPORT}
-            transition={reduced ? { duration: 0 } : transition(0.75)}
-            className="col-start-2 row-start-1 row-span-3 mx-auto aspect-square w-full max-w-lg self-center"
-          >
-            <BenefitVennDiagram active={active} />
-          </motion.div>
-        </div>
+          <div className="grid divide-y divide-line border-t border-line sm:grid-cols-2 sm:divide-y-0 lg:grid-cols-4">
+            {segments.map((segment, i) => (
+              <div
+                key={segment.id}
+                onMouseEnter={() => setActive(segment.id)}
+                onMouseLeave={() => setActive(null)}
+                onFocus={() => setActive(segment.id)}
+                onBlur={() => setActive(null)}
+                tabIndex={0}
+                className={cn(
+                  'p-6 transition-colors duration-300 lg:p-7',
+                  'sm:border-line',
+                  i % 2 === 1 && 'sm:border-l',
+                  'lg:border-l lg:first:border-l-0',
+                  i === 2 && 'sm:border-t sm:border-line lg:border-t-0',
+                  i === 3 && 'sm:border-t sm:border-line lg:border-t-0',
+                  active === segment.id && 'bg-raised',
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-lg"
+                  style={{ backgroundColor: segment.color }}
+                >
+                  <segment.icon className="h-4 w-4 text-white" strokeWidth={2} />
+                </span>
+                <h3 className="mt-4 text-h4">{segment.label}</h3>
+                <p className="mt-2.5 text-small leading-relaxed text-content">
+                  {segment.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </motion.div>
     </Section>
   );

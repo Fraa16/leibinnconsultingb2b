@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Hammer, Heart, Briefcase, ShoppingBag, Cog, FileText } from 'lucide-react';
 import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
 import Section from './ui/Section';
-import Card from './ui/Card';
+import SectionHead from './ui/SectionHead';
 
 const industries = [
   {
@@ -45,40 +45,49 @@ const industries = [
 
 export default function BranchenSection() {
   const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.07, 0.12);
+  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.06, 0.1);
   const item = reduced ? STATIC_VARIANTS : staggerChild;
 
   return (
-    <Section id="branchen" tone="base" size="lg">
+    <Section id="branchen" tone="canvas" size="lg">
       <motion.div variants={container} initial="hidden" whileInView="show" viewport={VIEWPORT}>
-        <motion.div variants={item} className="mx-auto max-w-3xl text-center">
-          <h2>Lösungen, die zu Ihrer Branche passen</h2>
-          <p className="mx-auto mt-5 max-w-measure text-lead text-content">
-            Jede Branche hat ihre eigenen Herausforderungen. Wir entwickeln Benefit-Systeme,
-            die zur Realität Ihrer Mitarbeitenden passen.
-          </p>
+        <motion.div variants={item}>
+          <SectionHead
+            title="Lösungen, die zu Ihrer Branche passen"
+            body="Jede Branche hat ihre eigenen Herausforderungen. Wir entwickeln Benefit-Systeme, die zur Realität Ihrer Mitarbeitenden passen."
+            align="center"
+            titleWidth="max-w-[20ch]"
+          />
         </motion.div>
 
-        <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {/*
+          Shared-border grid: the wrapper's background shows through a 1px gap,
+          so the cells read as one ruled table rather than six floating cards.
+        */}
+        <motion.div
+          variants={item}
+          className="mt-14 grid gap-px overflow-hidden rounded-xl4 border border-line bg-line
+                     sm:grid-cols-2 lg:grid-cols-3"
+        >
           {industries.map((industry) => (
-            <motion.div variants={item} key={industry.title}>
-              <Card interactive padding="lg" className="group h-full">
-                <span
-                  aria-hidden="true"
-                  className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-xl
-                             bg-gradient-to-br from-ink-600/[0.10] to-ice-300/25 text-ink-600
-                             transition-colors duration-300 group-hover:from-ink-600 group-hover:to-ink-700 group-hover:text-white"
-                >
-                  <industry.icon size={22} strokeWidth={1.75} />
-                </span>
-                <h3 className="text-h4">{industry.title}</h3>
-                <p className="mt-3 text-small leading-relaxed text-content">
-                  {industry.description}
-                </p>
-              </Card>
-            </motion.div>
+            <div
+              key={industry.title}
+              className="group bg-panel p-7 transition-colors duration-300 hover:bg-raised lg:p-8"
+            >
+              <span
+                aria-hidden="true"
+                className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line
+                           bg-canvas text-ink-600 transition-colors duration-300
+                           group-hover:border-ink-600 group-hover:bg-ink-600 group-hover:text-white"
+              >
+                <industry.icon size={19} strokeWidth={1.75} />
+              </span>
+
+              <h3 className="mt-6 text-h4">{industry.title}</h3>
+              <p className="mt-3 text-small leading-relaxed text-content">{industry.description}</p>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </motion.div>
     </Section>
   );

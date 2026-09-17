@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useSiteNav } from '../hooks/useSiteNav';
 import Container from './ui/Container';
+import Logo from './ui/Logo';
 
 const NAV_LINKS = [
   { label: 'Startseite', id: 'hero' },
@@ -14,27 +15,25 @@ export default function Footer() {
   const { goTo } = useSiteNav();
 
   return (
-    <footer id="footer" className="bg-ink-950 text-white">
+    <footer id="footer" className="border-t border-line-onInk bg-ink-950 text-white">
       <Container width="shell" className="py-16 md:py-20">
-        <div className="grid gap-12 md:grid-cols-[1.4fr_1fr] md:gap-16">
+        <div className="grid gap-12 md:grid-cols-[1.5fr_1fr] md:gap-20">
           <div>
-            <h3 className="flex items-center gap-2.5 text-h4 font-semibold tracking-tight text-white">
-              <span aria-hidden="true" className="h-5 w-[3px] rounded-full bg-ice-300" />
-              Leibinn Consulting
-            </h3>
-            <p className="mt-4 max-w-sm text-small leading-relaxed text-white/55">
+            <Logo onInk />
+
+            <p className="mt-5 max-w-sm text-small leading-relaxed text-white/50">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>
           </div>
 
           <nav aria-label="Footer-Navigation">
-            <h4 className="text-eyebrow uppercase text-ice-300">Navigation</h4>
-            <ul className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3">
+            <h4 className="text-label uppercase text-white/40">Navigation</h4>
+            <ul className="mt-6 space-y-px">
               {NAV_LINKS.map((link) => (
-                <li key={link.id}>
+                <li key={link.id} className="border-b border-line-onInk last:border-b-0">
                   <button
                     onClick={() => goTo(link.id)}
-                    className="text-small text-white/65 transition-colors hover:text-white"
+                    className="w-full py-2.5 text-left text-small text-white/60 transition-colors hover:text-white"
                   >
                     {link.label}
                   </button>
@@ -44,19 +43,17 @@ export default function Footer() {
           </nav>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-5 border-t border-white/10 pt-7 sm:flex-row sm:items-center">
-          <p className="text-small text-white/45">
+        <div className="mt-16 flex flex-col items-start justify-between gap-5 border-t border-line-onInk pt-7 sm:flex-row sm:items-center">
+          <p className="text-small text-white/35">
             © {new Date().getFullYear()} Leibinn Consulting. Alle Rechte vorbehalten.
           </p>
-          {/*
-            These were <button> elements with no onClick — inert, although both
-            pages are legally required for a German commercial site.
-          */}
+          {/* Both were inert <button> elements, although both pages are
+              legally required for a German commercial site. */}
           <div className="flex gap-7">
-            <Link to="/impressum" className="text-small text-white/45 transition-colors hover:text-white">
+            <Link to="/impressum" className="text-small text-white/35 transition-colors hover:text-white">
               Impressum
             </Link>
-            <Link to="/datenschutz" className="text-small text-white/45 transition-colors hover:text-white">
+            <Link to="/datenschutz" className="text-small text-white/35 transition-colors hover:text-white">
               Datenschutz
             </Link>
           </div>

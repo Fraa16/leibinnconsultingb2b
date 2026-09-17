@@ -3,25 +3,32 @@ import { cn } from '../../lib/cn';
 
 type CardProps = {
   children: ReactNode;
-  /** `glass` is the frosted treatment used over patterned backgrounds. */
-  tone?: 'base' | 'glass' | 'ink';
-  /** Adds hover lift — only for cards that are themselves interactive. */
+  tone?: 'panel' | 'raised' | 'ink' | 'ghost';
+  /** Restrained hover: the border and fill shift, nothing lifts or glows. */
   interactive?: boolean;
   padding?: 'sm' | 'md' | 'lg' | 'none';
   className?: string;
 };
 
 const TONES = {
-  base: 'bg-surface border border-ink-100 shadow-soft',
-  glass: 'bg-white/55 backdrop-blur-xl border border-white/70 shadow-card',
-  ink: 'bg-white/[0.06] border border-white/12 backdrop-blur-sm',
+  panel: 'bg-panel border border-line',
+  raised: 'bg-raised border border-line',
+  ink: 'bg-white/[0.04] border border-line-onInk',
+  ghost: 'bg-transparent border border-line',
 } as const;
 
 const PADDING = { none: '', sm: 'p-5', md: 'p-6 md:p-7', lg: 'p-7 md:p-9' } as const;
 
+/**
+ * Flat, bordered surface.
+ *
+ * The previous version leaned on drop shadows and a frosted-glass variant,
+ * which is what made the grids read as generic. Structure here comes from the
+ * hairline; depth is deliberately absent.
+ */
 export default function Card({
   children,
-  tone = 'base',
+  tone = 'panel',
   interactive = false,
   padding = 'md',
   className,
@@ -33,7 +40,7 @@ export default function Card({
         TONES[tone],
         PADDING[padding],
         interactive &&
-          'transition-all duration-300 ease-entrance hover:-translate-y-1 hover:shadow-lift hover:border-ice-300/60',
+          'transition-colors duration-300 ease-entrance hover:border-line-strong hover:bg-raised',
         className,
       )}
     >
