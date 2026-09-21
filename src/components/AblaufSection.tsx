@@ -1,96 +1,89 @@
-import AnimatedSection from './AnimatedSection';
+import Section from './ui/Section';
+import SectionHeading from './ui/SectionHeading';
+import Reveal from './ui/Reveal';
+import CTAButton from './ui/CTAButton';
 
 const processSteps = [
   {
-    stepNumber: 1,
     title: 'Analyse & Standortbestimmung',
     text: 'Im Erstgespräch erfassen wir Ihre aktuelle Situation, Ihre Ziele und Herausforderungen. Wir analysieren, welche Benefits bereits existieren und wo Optimierungspotenzial liegt.',
   },
   {
-    stepNumber: 2,
     title: 'Konzeption & Budgetrahmen',
     text: 'Wir entwickeln ein maßgeschneidertes Benefit-System, das zu Ihrer Branche, Ihren Mitarbeitenden und Ihrem Budget passt. Sie erhalten eine klare Übersicht über Kosten und erwartete Effekte.',
   },
   {
-    stepNumber: 3,
     title: 'Umsetzung & Kommunikation',
     text: 'Gemeinsam setzen wir das Benefit-System um und entwickeln eine Kommunikationsstrategie für interne und externe Zielgruppen. Ihre Mitarbeitenden und Bewerbende erfahren klar, was Sie bieten.',
   },
   {
-    stepNumber: 4,
     title: 'Feinschliff & Weiterentwicklung',
     text: 'Nach der Einführung begleiten wir Sie bei der Optimierung. Wir passen das System an neue Anforderungen an und stellen sicher, dass es langfristig wirksam bleibt.',
   },
 ];
 
 export default function AblaufSection() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-  };
-
   return (
-    <section id="ablauf" className="bg-bright-snow py-16 md:py-20">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between mb-10 md:mb-12">
-          <AnimatedSection delay={0.1}>
-            <h2 className="text-3xl md:text-4xl font-semibold text-black">
-              So arbeiten wir gemeinsam – Schritt für Schritt
-            </h2>
-          </AnimatedSection>
-        </div>
+    <Section id="ablauf" tone="dark" className="mt-3 md:mt-5">
+      <div className="lc-inner">
+        <SectionHeading
+          eyebrow="Wie wir arbeiten"
+          title="So arbeiten wir gemeinsam"
+          titleMuted="– Schritt für Schritt"
+        />
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-10">
-          {processSteps.map((step, index) => (
-            <AnimatedSection key={index} delay={0.3 + index * 0.1}>
-              <div className="group relative px-8 py-10 flex flex-col gap-4">
-                <div
-                  className="absolute -top-9 right-4 text-[200px] md:text-[220px] lg:text-[180px] leading-none font-bold pointer-events-none select-none transition-transform duration-250 ease-out group-hover:-translate-y-0.5"
-                  style={{
-                    backgroundImage: 'linear-gradient(to bottom, #2A2D7C 0%, #2A2D7C 66%, transparent 100%)',
-                    WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    backgroundClip: 'text',
-                    opacity: 0.2,
-                  }}
-                >
-                  {step.stepNumber}
-                </div>
+        {/* Timeline: a single centre rail on desktop with steps alternating
+            either side; a left rail on mobile. The old version stacked four
+            cards each with a 200px number bleeding out of its own box. */}
+        <ol className="relative mt-20 md:mt-24">
+          {/* The rail */}
+          <span
+            aria-hidden="true"
+            className="absolute left-[7px] top-2 bottom-2 w-px bg-white/15 md:left-1/2 md:-translate-x-1/2"
+          />
 
-                <div className="relative z-10">
-                  <h3 className="text-xl md:text-2xl font-semibold text-black mb-3 leading-tight">
-                    {step.title}
-                  </h3>
+          {processSteps.map((step, i) => {
+            const isRight = i % 2 === 1;
+            return (
+              <li key={step.title} className="relative pb-14 last:pb-0">
+                {/* Node */}
+                <span
+                  aria-hidden="true"
+                  className={`absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-navy-deep md:left-1/2 md:-translate-x-1/2 ${
+                    i === 0 ? 'bg-white' : 'bg-white/45'
+                  }`}
+                />
 
-                  <p className="text-sm md:text-base text-black/70 leading-relaxed">
-                    {step.text}
-                  </p>
-                </div>
-              </div>
-            </AnimatedSection>
-          ))}
-        </div>
+                <Reveal delay={i * 0.06}>
+                  <div
+                    className={`pl-10 md:w-[calc(50%-3rem)] md:pl-0 ${
+                      isRight ? 'md:ml-auto md:pl-12 md:text-left' : 'md:mr-auto md:pr-12 md:text-right'
+                    }`}
+                  >
+                    <span className="t-small block tabular-nums text-white/55">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3 className="t-h3 mt-2 text-white">{step.title}</h3>
+                    <p
+                      className={`t-body mt-3 text-white/60 ${
+                        isRight ? 'md:mr-auto' : 'md:ml-auto'
+                      } md:max-w-sm`}
+                    >
+                      {step.text}
+                    </p>
+                  </div>
+                </Reveal>
+              </li>
+            );
+          })}
+        </ol>
 
-        <AnimatedSection delay={0.7}>
-          <div className="mt-12 flex justify-center">
-            <button
-              onClick={() => scrollToSection('kontakt')}
-              className="group inline-flex items-center gap-2 text-black font-medium text-lg hover:text-primary transition-colors duration-300"
-            >
-              <span className="relative">
-                Unverbindliche Beratung anfragen
-                <span className="absolute bottom-0 left-0 w-full h-[1px] bg-black group-hover:bg-primary transition-colors duration-300"></span>
-              </span>
-              <span className="transform group-hover:translate-x-1 transition-transform duration-300">→</span>
-            </button>
-          </div>
-        </AnimatedSection>
+        <Reveal delay={0.1} className="mt-16 flex justify-center">
+          <CTAButton to="/kontakt" variant="ghost">
+            Unverbindliche Beratung anfragen
+          </CTAButton>
+        </Reveal>
       </div>
-    </section>
+    </Section>
   );
 }

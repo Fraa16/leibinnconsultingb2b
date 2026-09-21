@@ -1,64 +1,95 @@
-export default function Footer() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 80;
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - offset;
-      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-    }
-  };
+import { Link } from 'react-router-dom';
+import { useSmoothScroll } from '../hooks/useSmoothScroll';
 
-  const links = [
-    { label: 'Startseite', id: 'hero' },
-    { label: 'Ansatz', id: 'ansatz' },
-    { label: 'Branchen', id: 'branchen' },
-    { label: 'Über uns', id: 'ueber-uns' },
-    { label: 'Kontakt', id: 'kontakt' },
-  ];
+const sectionLinks = [
+  { label: 'Ansatz', id: 'ansatz' },
+  { label: 'Branchen', id: 'branchen' },
+  { label: 'Ablauf', id: 'ablauf' },
+  { label: 'Über uns', id: 'ueber-uns' },
+];
+
+const legalLinks = [
+  { label: 'Impressum', to: '/impressum' },
+  { label: 'Datenschutz', to: '/datenschutz' },
+];
+
+export default function Footer() {
+  const scrollTo = useSmoothScroll();
 
   return (
-    <footer id="footer" className="bg-bright-snow">
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid md:grid-cols-2 gap-8 mb-8">
+    <footer id="footer" className="relative overflow-hidden bg-canvas">
+      <div className="lc-inner pb-0 pt-24 md:pt-32">
+        <div className="grid gap-12 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <div>
-            <h3 className="text-xl font-semibold text-primary mb-2">
-              Leibinn Consulting
-            </h3>
-            <p className="text-black/60 text-sm">
+            <p className="t-h3">Leibinn Consulting</p>
+            <p className="t-body mt-3 max-w-xs text-ink-muted">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>
+            <Link to="/kontakt" className="lc-btn lc-btn-ghost mt-7">
+              Erstgespräch anfragen
+            </Link>
           </div>
 
-          <div>
-            <h4 className="text-sm font-semibold text-black/80 mb-3">Navigation</h4>
-            <div className="flex flex-wrap gap-4">
-              {links.map((link) => (
-                <button
-                  key={link.id}
-                  onClick={() => scrollToSection(link.id)}
-                  className="text-sm text-black/60 hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </button>
+          <nav aria-label="Seitenbereiche">
+            <h2 className="t-small font-medium text-ink">Navigation</h2>
+            <ul className="mt-4 space-y-2.5">
+              {sectionLinks.map((link) => (
+                <li key={link.id}>
+                  <a
+                    href={`/#${link.id}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      scrollTo(link.id);
+                    }}
+                    className="t-body inline-flex min-h-[24px] items-center text-ink-muted transition-colors hover:text-navy"
+                  >
+                    {link.label}
+                  </a>
+                </li>
               ))}
-            </div>
-          </div>
+              <li>
+                <Link to="/kontakt" className="t-body inline-flex min-h-[24px] items-center text-ink-muted transition-colors hover:text-navy">
+                  Kontakt
+                </Link>
+              </li>
+            </ul>
+          </nav>
+
+          <nav aria-label="Rechtliches">
+            <h2 className="t-small font-medium text-ink">Rechtliches</h2>
+            <ul className="mt-4 space-y-2.5">
+              {legalLinks.map((link) => (
+                <li key={link.to}>
+                  <Link
+                    to={link.to}
+                    className="t-body inline-flex min-h-[24px] items-center text-ink-muted transition-colors hover:text-navy"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </div>
 
-        <div className="border-t border-icy-blue/30 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p className="text-sm text-black/50">
+        <div className="lc-rule mt-16 flex flex-col gap-3 py-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="t-small text-ink-muted">
             © {new Date().getFullYear()} Leibinn Consulting. Alle Rechte vorbehalten.
           </p>
-          <div className="flex gap-4">
-            <button className="text-sm text-black/50 hover:text-primary transition-colors">
-              Impressum
-            </button>
-            <button className="text-sm text-black/50 hover:text-primary transition-colors">
-              Datenschutz
-            </button>
-          </div>
+          <p className="t-small text-ink-subtle">
+            Für Geschäftsführer:innen, Inhaber:innen und HR-Verantwortliche im deutschen Mittelstand
+          </p>
         </div>
+      </div>
+
+      {/* Oversized wordmark, clipped by the viewport edge. */}
+      <div aria-hidden="true" className="select-none overflow-hidden">
+        <p
+          className="whitespace-nowrap px-3 font-medium leading-[0.78] tracking-[-0.055em] text-navy-deep/[0.07]"
+          style={{ fontSize: 'clamp(4rem, 15.5vw, 15rem)' }}
+        >
+          Leibinn Consulting
+        </p>
       </div>
     </footer>
   );

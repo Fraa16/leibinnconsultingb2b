@@ -1,29 +1,293 @@
-@import url('https://fonts.googleapis.com/css2?family=Alex+Brush&display=swap');
+/* ============================================================
+   FONTS — self-hosted
+   Served from our own origin rather than fonts.gstatic.com. This
+   removes a render-blocking third-party request and, on a German
+   site, the GDPR exposure created by leaking visitor IPs to Google
+   (LG Munich I, 3 O 17493/20).
+   ============================================================ */
+
+/* DM Sans ships as a variable font, so one file covers 400-500. */
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('./fonts/dm-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url('./fonts/dm-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* Signature only — loaded lazily, it appears once near the page end. */
+@font-face {
+  font-family: 'Alex Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/alex-brush-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Alex Brush';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/alex-brush-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   LEIBINN CONSULTING — DESIGN SYSTEM
+   Palette is locked to the brand set. Do not introduce new hues.
+   ============================================================ */
+
 :root {
+  /* — Brand ink ————————————————————— */
+  --lc-navy:        #2A2D7C;  /* primary action / structure      */
+  --lc-navy-deep:   #15174F;  /* headings, dark section base     */
+  --lc-navy-black:  #0B0C39;  /* deepest dark sections           */
+  --lc-ice:         #A1CEE5;  /* accent on dark, eyebrows        */
+
+  /* — Neutrals —————————————————————— */
+  --lc-canvas:      #F9F9F9;  /* page canvas behind the blocks   */
+  --lc-surface:     #FFFFFF;  /* light section blocks            */
+
+  /* — Text (derived, never ad-hoc) ————————— */
+  --lc-ink:         #15174F;
+  --lc-ink-muted:   rgba(21, 23, 79, 0.64);   /* 5.0:1 on canvas — AA any size  */
+  --lc-ink-subtle:  rgba(21, 23, 79, 0.62);   /* 4.7:1 on canvas — AA any size  */
+  --lc-ink-display: rgba(21, 23, 79, 0.52);   /* 3.4:1 — AA large text only     */
+  --lc-on-dark:     rgba(255, 255, 255, 0.92);
+  --lc-on-dark-mut: rgba(255, 255, 255, 0.64);
+
+  /* — Geometry ——————————————————————— */
+  --lc-r-block:     32px;   /* section blocks    */
+  --lc-r-card:      20px;   /* cards / media     */
+  --lc-gutter:      12px;   /* canvas inset      */
+
   --font-signature: 'Alex Brush', cursive;
+}
+
+@media (min-width: 768px) {
+  :root { --lc-gutter: 20px; --lc-r-block: 40px; }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* offset for the floating nav when jumping to an anchor */
+    scroll-padding-top: 7rem;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply text-black/80 leading-body tracking-body font-light;
-    font-size: 1.125rem;
+    background-color: var(--lc-canvas);
+    color: var(--lc-ink);
+    font-feature-settings: 'ss01', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
-  h1 {
-    @apply font-semibold leading-heading tracking-heading;
-    font-size: 2.75rem;
+  /* Headings inherit the scale from utilities, never from defaults. */
+  h1, h2, h3, h4 {
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    text-wrap: balance;
   }
 
-  h2, h3, h4, h5, h6 {
-    @apply font-semibold leading-heading;
+  p { text-wrap: pretty; }
+
+  /* One consistent, visible focus ring across the whole site. */
+  :focus-visible {
+    outline: 2px solid var(--lc-navy);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  .on-dark :focus-visible { outline-color: var(--lc-ice); }
+
+  ::selection { background: var(--lc-ice); color: var(--lc-navy-deep); }
+}
+
+@layer components {
+
+  /* — Type scale ——————————————————————
+     Fluid, so it never needs per-breakpoint overrides.         */
+
+  .t-display {
+    font-size: clamp(2.125rem, 4.3vw, 3.625rem);
+    line-height: 1.0;
+    letter-spacing: -0.04em;
+    font-weight: 500;
+  }
+
+  .t-h2 {
+    font-size: clamp(1.875rem, 3.7vw, 3.25rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    font-weight: 500;
+  }
+
+  .t-h3 {
+    font-size: clamp(1.125rem, 1.45vw, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+  }
+
+  .t-lead {
+    font-size: clamp(1.0625rem, 1.25vw, 1.25rem);
+    line-height: 1.6;
+    letter-spacing: -0.011em;
+    font-weight: 400;
+  }
+
+  .t-body {
+    font-size: 1rem;
+    line-height: 1.68;
+    letter-spacing: -0.008em;
+    font-weight: 400;
+  }
+
+  .t-small {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+  }
+
+  /* Two-tone headline: the signature move of the reference. */
+  /* Only ever applied to display-size headings, where AA needs 3:1. */
+  .t-muted   { color: var(--lc-ink-display); }
+  .on-dark .t-muted { color: rgba(255, 255, 255, 0.42); }
+
+  /* — Canvas blocks ——————————————————— */
+
+  .lc-block {
+    border-radius: var(--lc-r-block);
+    margin-left: var(--lc-gutter);
+    margin-right: var(--lc-gutter);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .lc-inner {
+    max-width: 1240px;
+    margin-inline: auto;
+    padding-inline: clamp(1.25rem, 4vw, 4.5rem);
+  }
+
+  .lc-pad {
+    padding-block: clamp(4.5rem, 8.5vw, 8.5rem);
+  }
+
+  /* — Pill eyebrow ———————————————————— */
+
+  .lc-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    border: 1px solid rgba(21, 23, 79, 0.18);
+    padding: 0.4375rem 1.0625rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    line-height: 1.2;
+    color: var(--lc-ink-muted);
+    background: transparent;
+  }
+
+  .on-dark .lc-pill {
+    border-color: rgba(161, 206, 229, 0.32);
+    color: var(--lc-ice);
+  }
+
+  /* — Buttons ————————————————————————— */
+
+  .lc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 999px;
+    padding: 0.875rem 1.625rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    transition: background-color .22s ease, color .22s ease,
+                border-color .22s ease, transform .22s ease;
+    white-space: nowrap;
+  }
+
+  .lc-btn-primary {
+    background: var(--lc-navy);
+    color: #fff;
+  }
+  .lc-btn-primary:hover { background: var(--lc-navy-deep); }
+
+  .lc-btn-ghost {
+    border: 1px solid rgba(21, 23, 79, 0.2);
+    color: var(--lc-ink);
+  }
+  .lc-btn-ghost:hover {
+    border-color: var(--lc-navy);
+    background: rgba(42, 45, 124, 0.04);
+  }
+
+  .on-dark .lc-btn-primary { background: #fff; color: var(--lc-navy-deep); }
+  .on-dark .lc-btn-primary:hover { background: var(--lc-ice); }
+
+  .on-dark .lc-btn-ghost {
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #fff;
+  }
+  .on-dark .lc-btn-ghost:hover {
+    border-color: var(--lc-ice);
+    background: rgba(255, 255, 255, 0.07);
+  }
+
+  /* Arrow nudge, shared by every CTA. */
+  .lc-btn .lc-arrow { transition: transform .22s ease; }
+  .lc-btn:hover .lc-arrow { transform: translateX(3px); }
+
+  /* — Hero photograph ——————————————————
+     The block is always wider than the photo's 1.4 ratio on desktop, so
+     object-position's X axis is ignored there and only matters on narrow
+     screens — where 82% landed on the building instead of the subject. */
+  .hero-photo { object-position: 57% 18%; }
+  @media (min-width: 1024px) { .hero-photo { object-position: 70% 20%; } }
+
+  /* — Hairline rules ——————————————————— */
+  .lc-rule { border-top: 1px solid rgba(21, 23, 79, 0.1); }
+  .on-dark .lc-rule { border-top-color: rgba(255, 255, 255, 0.13); }
+}
+
+/* Respect the OS setting: kill all motion, keep everything visible. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
   }
 }

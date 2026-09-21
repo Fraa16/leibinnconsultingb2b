@@ -1,17 +1,63 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <title>Leibinn Consulting Benefit Landing</title>
-    <meta property="og:image" content="https://bolt.new/static/og_default.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:image" content="https://bolt.new/static/og_default.png">
-</head>
+
+    <title>Leibinn Consulting — Benefit-Systeme für den Mittelstand</title>
+    <meta
+      name="description"
+      content="Strukturierte Benefit-Systeme für kleine und mittelständische Unternehmen mit 5–200 Mitarbeitenden: steuerlich optimiert, verwaltungsarm und spürbar wirksam. Kostenloses Erstgespräch."
+    />
+    <meta name="author" content="Leibinn Consulting" />
+    <meta name="theme-color" content="#15174F" />
+    <link rel="canonical" href="https://leibinn-consulting.de/" />
+
+    <!-- Inline SVG favicon: no extra request, no default Vite logo. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315174F'/%3E%3Cpath d='M10 8.5h3.6v12.2h7.2V24H10z' fill='%23A1CEE5'/%3E%3C/svg%3E"
+    />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:site_name" content="Leibinn Consulting" />
+    <meta property="og:url" content="https://leibinn-consulting.de/" />
+    <meta property="og:title" content="Leibinn Consulting — Benefit-Systeme für den Mittelstand" />
+    <meta
+      property="og:description"
+      content="Vom Fachkräftemangel zum begehrten Arbeitgeber: strukturierte Benefit-Systeme für KMU mit 5–200 Mitarbeitenden."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Leibinn Consulting — Benefit-Systeme für den Mittelstand" />
+    <meta
+      name="twitter:description"
+      content="Vom Fachkräftemangel zum begehrten Arbeitgeber: strukturierte Benefit-Systeme für KMU mit 5–200 Mitarbeitenden."
+    />
+    <!-- TODO (client): add a real 1200x630 share image at /og-image.jpg and
+         uncomment. Until one exists, omitting it beats shipping a broken
+         or third-party default.
+    <meta property="og:image" content="https://leibinn-consulting.de/og-image.jpg" />
+    <meta name="twitter:image" content="https://leibinn-consulting.de/og-image.jpg" />
+    -->
+
+    <!-- Fonts are self-hosted; see the @font-face block in src/index.css. -->
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ProfessionalService",
+        "name": "Leibinn Consulting",
+        "description": "Strukturierte Benefit-Systeme für kleine und mittelständische Unternehmen mit 5–200 Mitarbeitenden.",
+        "url": "https://leibinn-consulting.de/",
+        "areaServed": { "@type": "Country", "name": "Deutschland" },
+        "founder": { "@type": "Person", "name": "Cedrik Leibinn" },
+        "knowsLanguage": "de",
+        "serviceType": "Benefit-Systeme und Mitarbeiterbindung"
+      }
+    </script>
+  </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>

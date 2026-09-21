@@ -1,0 +1,4 @@
+# SPA fallback (Netlify / Cloudflare Pages).
+# Without this, a hard refresh or a shared deep link to /kontakt,
+# /impressum or /datenschutz returns 404 instead of the app.
+/*  /index.html  200

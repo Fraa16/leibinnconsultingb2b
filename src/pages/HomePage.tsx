@@ -1,5 +1,6 @@
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
+import FloatingCTA from '../components/FloatingCTA';
 import HeroSection from '../components/HeroSection';
 import RealitaetscheckSection from '../components/RealitaetscheckSection';
 import AnsatzSection from '../components/AnsatzSection';
@@ -10,11 +11,25 @@ import VorteileSection from '../components/VorteileSection';
 import UeberUnsSection from '../components/UeberUnsSection';
 import FinalCTASection from '../components/FinalCTASection';
 
+/**
+ * Section order is also the light/dark rhythm:
+ * dark → dark → white → canvas → dark → canvas → white → canvas → dark.
+ */
 export default function HomePage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#E2E7E8' }}>
+    <>
+      <a
+        href="#inhalt"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60]
+                   focus:rounded-full focus:bg-navy-deep focus:px-5 focus:py-3
+                   focus:text-[0.9375rem] focus:text-white"
+      >
+        Zum Inhalt springen
+      </a>
+
       <Navigation />
-      <main>
+
+      <main id="inhalt">
         <HeroSection />
         <RealitaetscheckSection />
         <AnsatzSection />
@@ -25,7 +40,9 @@ export default function HomePage() {
         <UeberUnsSection />
         <FinalCTASection />
       </main>
+
       <Footer />
-    </div>
+      <FloatingCTA />
+    </>
   );
 }

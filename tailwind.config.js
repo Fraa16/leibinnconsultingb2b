@@ -3,33 +3,27 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      /* Locked brand palette. Anything not listed here is off-brand. */
       colors: {
-        white: '#FFFFFF',
-        'bright-snow': '#F9F9F9',
-        'icy-blue': '#A1CEE5',
-        'true-cobalt': '#2A2D7C',
-        'deep-navy': {
-          DEFAULT: '#15174F',
-          dark: '#0B0C39',
-        },
-        'prussian-blue': '#000022',
-        primary: {
+        navy: {
           DEFAULT: '#2A2D7C',
-          dark: '#15174F',
+          deep: '#15174F',
+          black: '#0B0C39',
         },
-        secondary: {
-          DEFAULT: '#A1CEE5',
-          light: '#F9F9F9',
+        ice: '#A1CEE5',
+        canvas: '#F9F9F9',
+
+        /* Semantic aliases so components never reach for a raw hex. */
+        ink: {
+          DEFAULT: 'var(--lc-ink)',
+          muted: 'var(--lc-ink-muted)',
+          subtle: 'var(--lc-ink-subtle)',
         },
-        background: {
-          light: '#F9F9F9',
-          alternate: '#FFFFFF',
-        },
-        subheading: '#2A2D7C',
       },
       fontFamily: {
         sans: [
           '"DM Sans"',
+          'ui-sans-serif',
           '-apple-system',
           'BlinkMacSystemFont',
           '"Segoe UI"',
@@ -39,29 +33,16 @@ export default {
           'sans-serif',
         ],
       },
-      fontSize: {
-        '18': ['1.125rem', { lineHeight: '140%', letterSpacing: '-0.0125em', fontWeight: '300' }],
-        '44': ['2.75rem', { lineHeight: '120%', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'subheading': ['0.9rem', { lineHeight: '160%', fontWeight: '300' }],
+      borderRadius: {
+        block: 'var(--lc-r-block)',
+        card: 'var(--lc-r-card)',
       },
-      spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '104': '26rem',
-        '112': '28rem',
-        '128': '32rem',
+      maxWidth: {
+        content: '1240px',
       },
-      lineHeight: {
-        'body': '140%',
-        'heading': '120%',
-      },
-      letterSpacing: {
-        'body': '-0.0125em',
-        'heading': '-0.01em',
-      },
-      fontWeight: {
-        'light': '300',
-        'semibold': '600',
+      transitionTimingFunction: {
+        /* One easing curve for the whole site. */
+        brand: 'cubic-bezier(0.22, 1, 0.36, 1)',
       },
     },
   },
