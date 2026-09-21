@@ -96,21 +96,13 @@ function BenefitVennDiagram({
       aria-label="Diagramm: vier ineinandergreifende Wirkungsbereiche moderner Benefits"
     >
       {segments.map((segment) => {
-        const isActive = activeId === segment.id;
-        const isDimmed = activeId !== null && !isActive;
+        const isDimmed = activeId !== null && activeId !== segment.id;
         return (
           <path
             key={segment.id}
             d={paths[segment.id]}
             fill={segment.color}
-            /* Hairline edge. The ice segment is only 1.6:1 against the
-               canvas, so without it the mark's outer boundary dissolves.
-               non-scaling-stroke keeps it exactly 1px at every rendered
-               size rather than scaling with the viewBox. */
-            stroke="rgba(21, 23, 79, 0.5)"
-            strokeWidth={1}
-            vectorEffect="non-scaling-stroke"
-            className={`venn-seg ${isActive ? 'is-active' : ''} ${isDimmed ? 'is-dimmed' : ''}`}
+            className={`venn-seg ${isDimmed ? 'is-dimmed' : ''}`}
             onMouseEnter={() => onHover(segment.id)}
             onMouseLeave={() => onHover(null)}
           />

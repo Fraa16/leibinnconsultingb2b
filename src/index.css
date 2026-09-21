@@ -278,20 +278,17 @@
 
 
   /* — Wirkungsbereiche: diagram <-> list link ——————
-     Hovering, focusing or tapping a row lifts its segment out of the
-     diagram and lets the other three recede, so the colour mapping
+     Hovering, focusing or tapping a row holds its segment at full
+     strength and lets the other three recede, so the colour mapping
      between the two is read rather than inferred. All motion is
      removed by the prefers-reduced-motion reset below; the colour and
      opacity states still apply, so the link survives without it. */
 
   .venn-seg {
     cursor: pointer;
-    transform-box: view-box;
-    transform-origin: 730px 410px;   /* centre of the viewBox */
-    transition: opacity .35s ease, transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity .35s ease;
   }
   .venn-seg.is-dimmed { opacity: 0.18; }
-  .venn-seg.is-active { transform: scale(1.05); }
 
   .venn-row {
     position: relative;
