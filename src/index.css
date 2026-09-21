@@ -276,6 +276,55 @@
   .hero-photo { object-position: 57% 18%; }
   @media (min-width: 1024px) { .hero-photo { object-position: 70% 20%; } }
 
+
+  /* — Wirkungsbereiche: diagram <-> list link ——————
+     Hovering, focusing or tapping a row lifts its segment out of the
+     diagram and lets the other three recede, so the colour mapping
+     between the two is read rather than inferred. All motion is
+     removed by the prefers-reduced-motion reset below; the colour and
+     opacity states still apply, so the link survives without it. */
+
+  .venn-seg {
+    cursor: pointer;
+    transform-box: view-box;
+    transform-origin: 730px 410px;   /* centre of the viewBox */
+    transition: opacity .35s ease, transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .venn-seg.is-dimmed { opacity: 0.18; }
+  .venn-seg.is-active { transform: scale(1.05); }
+
+  .venn-row {
+    position: relative;
+    display: block;
+    padding: 1.5rem 0.5rem 1.75rem 0;
+    border-top: 1px solid rgba(21, 23, 79, 0.1);
+  }
+
+  /* Colour bar that wipes across the row's rule when it becomes active. */
+  .venn-row::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    top: -1px;
+    height: 2px;
+    background: var(--seg);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .venn-row[aria-pressed='true']::after { transform: scaleX(1); }
+
+  .venn-row-inner {
+    display: block;
+    transition: transform .45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .venn-row[aria-pressed='true'] .venn-row-inner { transform: translateX(6px); }
+
+  .venn-dot { transition: box-shadow .35s ease; }
+  .venn-row[aria-pressed='true'] .venn-dot {
+    box-shadow: 0 0 0 6px var(--seg-soft);
+  }
+
   /* — Hairline rules ——————————————————— */
   .lc-rule { border-top: 1px solid rgba(21, 23, 79, 0.1); }
   .on-dark .lc-rule { border-top-color: rgba(255, 255, 255, 0.13); }
