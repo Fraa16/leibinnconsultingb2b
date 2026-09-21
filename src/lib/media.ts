@@ -13,6 +13,13 @@ import heroAvif900 from '../images/cedrik-hero-900.avif';
 import heroAvif1400 from '../images/cedrik-hero-1400.avif';
 import heroAvif1900 from '../images/cedrik-hero-1900.avif';
 import heroWebp900 from '../images/cedrik-hero-900.webp';
+
+import heroWideAvif1600 from '../images/cedrik-hero-wide-1600.avif';
+import heroWideAvif2200 from '../images/cedrik-hero-wide-2200.avif';
+import heroWideAvif3000 from '../images/cedrik-hero-wide-3000.avif';
+import heroWideWebp1600 from '../images/cedrik-hero-wide-1600.webp';
+import heroWideWebp2200 from '../images/cedrik-hero-wide-2200.webp';
+import heroWideWebp3000 from '../images/cedrik-hero-wide-3000.webp';
 import heroWebp1400 from '../images/cedrik-hero-1400.webp';
 import heroWebp1900 from '../images/cedrik-hero-1900.webp';
 
@@ -56,6 +63,21 @@ export const heroImage = set(
   5524, 3946,
 );
 
+/**
+ * Desktop hero plate.
+ *
+ * The block runs about 2:1 while the photograph is 1.4:1, so object-cover
+ * consumes the full image width and object-position's X axis has no effect
+ * there. This variant bakes 4341px of headroom onto the left instead, which
+ * moves the subject from 46% to 72% of the frame and clears him of the
+ * headline. The headroom sits under the 0.9+ navy scrim and is never seen.
+ */
+export const heroWideImage = set(
+  [[heroWideAvif1600, 1600], [heroWideAvif2200, 2200], [heroWideAvif3000, 3000]],
+  [[heroWideWebp1600, 1600], [heroWideWebp2200, 2200], [heroWideWebp3000, 3000]],
+  9865, 3946,
+);
+
 export const portraitImage = set(
   [[portraitAvif600, 600], [portraitAvif900, 900], [portraitAvif1200, 1200]],
   [[portraitWebp600, 600], [portraitWebp900, 900], [portraitWebp1200, 1200]],
@@ -71,6 +93,7 @@ export const gespraechImage = set(
 /** Smallest variant, used as the <img src> fallback. */
 export const fallbackSrc = {
   hero: heroWebp900,
+  heroWide: heroWideWebp1600,
   portrait: portraitWebp600,
   gespraech: gespraechWebp900,
 };

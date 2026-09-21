@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import Section from './ui/Section';
 import SectionHeading from './ui/SectionHeading';
 import Reveal from './ui/Reveal';
@@ -22,7 +23,70 @@ const processSteps = [
   },
 ];
 
+/**
+ * Drives the timeline from scroll position.
+ *
+ * The rail fills to wherever the viewport's vertical midpoint currently
+ * sits on it, and a step counts as reached once its dot has crossed that
+ * same midpoint — so the highlight is always exactly at the middle of the
+ * screen.
+ *
+ * The fill height is written straight to the node rather than held in
+ * state: it changes on every frame of a scroll, and re-rendering four
+ * steps that often is wasted work. `reached` is state, but only changes
+ * four times across the whole section.
+ */
+function useScrollProgress(stepCount: number) {
+  const railRef = useRef<HTMLDivElement>(null);
+  const fillRef = useRef<HTMLDivElement>(null);
+  const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [reached, setReached] = useState(-1);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      const rail = railRef.current;
+      if (!rail) return;
+
+      const rect = rail.getBoundingClientRect();
+      const midpoint = window.innerHeight / 2;
+
+      if (fillRef.current) {
+        const p = rect.height ? (midpoint - rect.top) / rect.height : 0;
+        fillRef.current.style.height = `${Math.min(1, Math.max(0, p)) * 100}%`;
+      }
+
+      let last = -1;
+      for (let i = 0; i < dotRefs.current.length; i++) {
+        const dot = dotRefs.current[i];
+        if (dot && dot.getBoundingClientRect().top <= midpoint) last = i;
+      }
+      // Returning the same value lets React skip the re-render entirely.
+      setReached((prev) => (prev === last ? prev : last));
+    };
+
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [stepCount]);
+
+  return { railRef, fillRef, dotRefs, reached };
+}
+
 export default function AblaufSection() {
+  const { railRef, fillRef, dotRefs, reached } = useScrollProgress(processSteps.length);
+
   return (
     <Section id="ablauf" tone="dark" className="mt-3 md:mt-5">
       <div className="lc-inner">
@@ -32,26 +96,33 @@ export default function AblaufSection() {
           titleMuted="– Schritt für Schritt"
         />
 
-        {/* Timeline: a single centre rail on desktop with steps alternating
-            either side; a left rail on mobile. The old version stacked four
-            cards each with a 200px number bleeding out of its own box. */}
         <ol className="relative mt-20 md:mt-24">
-          {/* The rail */}
-          <span
+          {/* Track, with the portion above the viewport midpoint filled. */}
+          <div
+            ref={railRef}
             aria-hidden="true"
             className="absolute left-[7px] top-2 bottom-2 w-px bg-white/15 md:left-1/2 md:-translate-x-1/2"
-          />
+          >
+            <div ref={fillRef} className="w-full bg-ice" style={{ height: '0%' }} />
+          </div>
 
           {processSteps.map((step, i) => {
             const isRight = i % 2 === 1;
+            const isReached = i <= reached;
+            const isCurrent = i === reached;
+
             return (
               <li key={step.title} className="relative pb-14 last:pb-0">
-                {/* Node */}
                 <span
+                  ref={(el) => {
+                    dotRefs.current[i] = el;
+                  }}
                   aria-hidden="true"
-                  className={`absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2 border-navy-deep md:left-1/2 md:-translate-x-1/2 ${
-                    i === 0 ? 'bg-white' : 'bg-white/45'
-                  }`}
+                  className={`absolute left-0 top-1.5 h-[15px] w-[15px] rounded-full border-2
+                              border-navy-deep transition-[background-color,box-shadow] duration-300
+                              md:left-1/2 md:-translate-x-1/2
+                              ${isReached ? 'bg-ice' : 'bg-white/30'}
+                              ${isCurrent ? 'shadow-[0_0_0_5px_rgba(161,206,229,0.22)]' : ''}`}
                 />
 
                 <Reveal delay={i * 0.06}>
@@ -60,7 +131,11 @@ export default function AblaufSection() {
                       isRight ? 'md:ml-auto md:pl-12 md:text-left' : 'md:mr-auto md:pr-12 md:text-right'
                     }`}
                   >
-                    <span className="t-small block tabular-nums text-white/55">
+                    <span
+                      className={`t-small block tabular-nums transition-colors duration-300 ${
+                        isReached ? 'text-ice' : 'text-white/55'
+                      }`}
+                    >
                       {String(i + 1).padStart(2, '0')}
                     </span>
                     <h3 className="t-h3 mt-2 text-white">{step.title}</h3>

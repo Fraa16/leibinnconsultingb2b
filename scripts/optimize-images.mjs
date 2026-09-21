@@ -22,6 +22,25 @@ const jobs = [
   { file: 'Kundengespräch.jpg', out: 'kundengespraech', widths: [900, 1400, 1900] },
 ];
 
+/* The desktop hero needs left headroom baked in — see heroWideImage in
+   src/lib/media.ts for why object-position cannot do this. */
+async function buildWideHero() {
+  const src = path.join(ORIG, 'cedrik-hero.avif');
+  if (!fs.existsSync(src)) return;
+  const meta = await sharp(src).metadata();
+  const H = meta.height, W = Math.round(H * 2.5), PAD = W - meta.width;
+  const bg = await sharp(src).resize(W, H, { fit: 'cover', position: 'right' }).blur(90).toBuffer();
+  const plate = await sharp(bg)
+    .composite([{ input: await sharp(src).toBuffer(), left: PAD, top: 0 }])
+    .toBuffer();
+  for (const width of [1600, 2200, 3000]) {
+    const base = sharp(plate).resize({ width, withoutEnlargement: true });
+    await base.clone().avif({ quality: 58, effort: 6 }).toFile(path.join(SRC, `cedrik-hero-wide-${width}.avif`));
+    await base.clone().webp({ quality: 76, effort: 5 }).toFile(path.join(SRC, `cedrik-hero-wide-${width}.webp`));
+    console.log(`  cedrik-hero-wide ${width}w written`);
+  }
+}
+
 for (const job of jobs) {
   const src = path.join(ORIG, job.file);
   if (!fs.existsSync(src)) {
@@ -40,3 +59,5 @@ for (const job of jobs) {
     console.log(`  ${width}w written`);
   }
 }
+
+await buildWideHero();

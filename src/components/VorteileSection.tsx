@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react';
 import Section from './ui/Section';
 import Pill from './ui/Pill';
 import Reveal from './ui/Reveal';
@@ -53,9 +54,6 @@ export default function VorteileSection() {
               Wir entwickeln Benefit-Konzepte speziell für kleine und mittlere Unternehmen – mit
               klarem Fokus auf Umsetzbarkeit, steuerlicher Sicherheit und messbarer Wirkung im Alltag.
             </p>
-            <CTAButton to="/kontakt" className="mt-8">
-              Jetzt Vorteile im Gespräch prüfen
-            </CTAButton>
           </Reveal>
         </div>
 
@@ -73,6 +71,22 @@ export default function VorteileSection() {
               </div>
             </Reveal>
           ))}
+
+          {/* Sixth cell. Five advantages in a three-column grid left the
+              bottom-right corner empty; the call to action fills it and
+              lands where someone has just finished reading the list. */}
+          <Reveal delay={0.1}>
+            <div className="lc-rule flex h-full flex-col py-8">
+              <ArrowRight className="h-4 w-4 text-navy" aria-hidden="true" />
+              <h3 className="t-h3 mt-4">Nächster Schritt</h3>
+              <p className="t-body mt-2.5 text-ink-muted">
+                Wir melden uns innerhalb von 24 Stunden mit einem Terminvorschlag.
+              </p>
+              <CTAButton to="/kontakt" className="mt-6 self-start">
+                Jetzt Vorteile im Gespräch prüfen
+              </CTAButton>
+            </div>
+          </Reveal>
         </div>
       </div>
     </Section>

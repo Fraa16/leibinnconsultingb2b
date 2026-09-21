@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Picture from './ui/Picture';
-import { heroImage, fallbackSrc } from '../lib/media';
+import { heroImage, heroWideImage, fallbackSrc } from '../lib/media';
 import { useSmoothScroll } from '../hooks/useSmoothScroll';
 
 export default function HeroSection() {
@@ -35,8 +35,8 @@ export default function HeroSection() {
           so there it gets its own band under the copy instead. */}
       <div className="absolute inset-0 hidden lg:block">
         <Picture
-          image={heroImage}
-          fallback={fallbackSrc.hero}
+          image={heroWideImage}
+          fallback={fallbackSrc.heroWide}
           alt="Cedrik Leibinn, Gründer von Leibinn Consulting"
           sizes="100vw"
           priority

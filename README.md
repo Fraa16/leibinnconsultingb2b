@@ -80,8 +80,14 @@ error together by id — always use them rather than a bare `<input>`.
 The client's camera masters live in `src/images/originals/` (~25 MB). They are
 **never imported**, so they never reach the bundle. What ships are the AVIF and
 WebP derivatives declared in `src/lib/media.ts` and served through `Picture`
-with a real `srcset` (~230 KB total). After replacing a master, re-run
-`npm run images`.
+with a real `srcset`. After replacing a master, re-run `npm run images`.
+
+The desktop hero is a special case. Its block runs about 2:1 while the
+photograph is 1.4:1, so `object-cover` consumes the full image width and
+`object-position`'s X axis has no effect there. `npm run images` therefore also
+builds `cedrik-hero-wide-*`, a 2.5:1 plate with blurred headroom composited on
+the left, which moves the subject from 46% to ~72% of the frame and clears him
+of the headline. The headroom renders under the navy scrim and is never seen.
 
 ## Before going live
 
