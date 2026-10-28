@@ -7,11 +7,12 @@
  *   node scripts/copyguard.mjs <out-file> [baseUrl]
  *
  * Uses innerText rather than raw text nodes, so wrapping a phrase in <strong>
- * or splitting a paragraph does not register as a copy change — only the words
- * themselves matter. Captured at both a mobile and a desktop viewport, since
- * some blocks only render at one breakpoint.
+ * or splitting a paragraph does not register as a copy change — only the
+ * words matter. Captured at a mobile and a desktop viewport, since some
+ * blocks render at only one breakpoint.
  */
 import { chromium } from 'playwright';
+import { launchOptions } from './chrome.mjs';
 import { writeFileSync } from 'node:fs';
 
 const OUT = process.argv[2];
@@ -22,41 +23,19 @@ const VIEWPORTS = [
   { width: 1440, height: 900 },
 ];
 
-const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
-});
-
+const browser = await chromium.launch(launchOptions());
 const found = new Set();
 
 for (const viewport of VIEWPORTS) {
   const page = await browser.newPage({ viewport });
 
-  for (const route of ROUTES) {
-    await page.goto(BASE + route, { waitUntil: 'load' });
-    await page.waitForTimeout(700);
-
-    // Open every disclosure so collapsed copy is captured too. Submitting the
-    // contact form is explicitly avoided.
-    for (const button of await page.$$('button')) {
-      try {
-        const label = ((await button.innerText()) || '').trim();
-        if (/anfragen|sichern|senden|absenden/i.test(label)) continue;
-        await button.click({ timeout: 250 });
-      } catch {
-        /* not clickable at this breakpoint */
-      }
-    }
-    await page.waitForTimeout(500);
-
+  const capture = async () => {
     const texts = await page.evaluate(() => {
       const out = [];
-      // innerText reflects rendering: it merges inline elements and skips
-      // anything display:none at this viewport.
       for (const line of (document.body.innerText || '').split('\n')) {
         const s = line.replace(/\s+/g, ' ').trim();
         if (s) out.push(s);
       }
-      // Attribute copy is invisible to innerText but still user-facing.
       for (const el of document.querySelectorAll('[placeholder]')) {
         if (el.placeholder?.trim()) out.push('@placeholder: ' + el.placeholder.trim());
       }
@@ -73,8 +52,59 @@ for (const viewport of VIEWPORTS) {
       }
       return out;
     });
-
     texts.forEach((t) => found.add(t));
+  };
+
+  for (const route of ROUTES) {
+    await page.goto(BASE + route, { waitUntil: 'load' });
+    await page.waitForTimeout(700);
+    await capture();
+
+    /*
+     * Deterministic pass: strip every `hidden` attribute so collapsed panels
+     * are readable regardless of single-open behaviour. Clicking alone is
+     * flaky — one missed click silently looks like deleted copy.
+     */
+    await page.evaluate(() => {
+      document.querySelectorAll('[hidden]').forEach((el) => el.removeAttribute('hidden'));
+    });
+    await page.waitForTimeout(120);
+    await capture();
+
+    /*
+     * Disclosures are re-queried on every iteration: accordions here are
+     * single-open, and each click re-renders the list, so handles collected
+     * up front go stale and the later panels would never be read.
+     */
+    const disclosures = page.locator('button[aria-expanded]');
+    const disclosureCount = await disclosures.count();
+    for (let i = 0; i < disclosureCount; i++) {
+      try {
+        const button = disclosures.nth(i);
+        await button.scrollIntoViewIfNeeded({ timeout: 900 });
+        await button.click({ timeout: 900 });
+        await page.waitForTimeout(160);
+        await capture();
+      } catch {
+        /* not reachable at this breakpoint */
+      }
+    }
+
+    // Then anything else that swaps visible content: tabs, toggles, carousels.
+    const others = page.locator('button:not([aria-expanded]), [role="radio"]');
+    const otherCount = await others.count();
+    for (let i = 0; i < otherCount; i++) {
+      try {
+        const button = others.nth(i);
+        const label = ((await button.innerText()) || '').trim();
+        if (/anfragen|sichern|senden|absenden/i.test(label)) continue;
+        await button.click({ timeout: 600 });
+        await page.waitForTimeout(140);
+        await capture();
+      } catch {
+        /* not clickable at this breakpoint */
+      }
+    }
   }
 
   await page.close();

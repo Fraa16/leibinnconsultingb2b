@@ -70,6 +70,8 @@ export default function KontaktPage() {
 
     setStatus('submitting');
     try {
+      if (!supabase) throw new Error('Supabase is not configured');
+
       const { position, ...core } = form;
       const row = { ...core, nachricht: form.nachricht || null };
 

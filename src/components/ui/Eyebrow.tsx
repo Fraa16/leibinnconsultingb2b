@@ -8,30 +8,28 @@ type EyebrowProps = {
 };
 
 /**
- * Section kicker, as a bordered pill with a status dot.
+ * Section kicker: a short rule, then a small tracked caps label.
  *
- * Previously this was a bare tracked caption, which is what a default build
- * produces. Giving it an outline and a dot turns it into a deliberate object
- * and gives every section head the same recognisable opening beat.
+ * This is the brand's most recognisable signature — all three handoff
+ * siblings open every section with it (36×1.5px rule, 13px/600, .08em, gap
+ * 14px). It replaces the bordered pill used in the previous pass.
  */
 export default function Eyebrow({ children, tone = 'default', className }: EyebrowProps) {
   const onInk = tone === 'onInk';
 
   return (
-    <span
+    <p
       className={cn(
-        'inline-flex items-center gap-2 rounded-full border py-1.5 pl-2.5 pr-3.5 text-label uppercase',
-        onInk
-          ? 'border-line-onInkStrong bg-white/[0.06] text-ice-200'
-          : 'border-line bg-panel text-ink-600',
+        'flex items-center gap-3.5 text-label uppercase',
+        onInk ? 'text-ice-300' : 'text-ink-600',
         className,
       )}
     >
       <span
         aria-hidden="true"
-        className={cn('h-1.5 w-1.5 shrink-0 rounded-full', onInk ? 'bg-ice-300' : 'bg-ice-400')}
+        className={cn('h-[1.5px] w-9 shrink-0', onInk ? 'bg-ice-300' : 'bg-ink-600')}
       />
-      {children}
-    </span>
+      <span>{children}</span>
+    </p>
   );
 }

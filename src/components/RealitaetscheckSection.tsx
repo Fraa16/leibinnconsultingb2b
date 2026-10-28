@@ -1,10 +1,8 @@
-import { useState, useId } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
-import { Plus, Minus } from 'lucide-react';
-import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT, transition } from '../lib/motion';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
-import { cn } from '../lib/cn';
+import Reveal from './ui/Reveal';
+import Eyebrow from './ui/Eyebrow';
+import Accordion from './ui/Accordion';
 
 const painPoints = [
   'Sie erhalten deutlich weniger qualifizierte Bewerbungen als benötigt.',
@@ -41,124 +39,73 @@ const impacts = [
   },
 ];
 
-function ImpactRow({ impact }: { impact: (typeof impacts)[number] }) {
-  const [open, setOpen] = useState(false);
-  const reduced = useReducedMotion();
-  const id = useId();
-
-  return (
-    <div className="border-t border-line first:border-t-0">
-      <h4>
-        <button
-          id={`${id}-button`}
-          onClick={() => setOpen((o) => !o)}
-          aria-expanded={open}
-          aria-controls={`${id}-panel`}
-          className="group flex w-full items-start justify-between gap-5 py-5 text-left"
-        >
-          <span className="flex-1">
-            <span
-              className={cn(
-                'block text-h4 transition-colors duration-200',
-                open ? 'text-ink-600' : 'text-content-strong group-hover:text-ink-600',
-              )}
-            >
-              {impact.title}
-            </span>
-            <span className="mt-1.5 block text-small leading-relaxed text-content">
-              {impact.description}
-            </span>
-          </span>
-
-          <span
-            aria-hidden="true"
-            className={cn(
-              'mt-1 grid h-7 w-7 shrink-0 place-items-center rounded-full border transition-colors duration-200',
-              open
-                ? 'border-ink-600 bg-ink-600 text-white'
-                : 'border-line text-content-muted group-hover:border-ink-300 group-hover:text-ink-600',
-            )}
-          >
-            {open ? <Minus size={13} strokeWidth={2.5} /> : <Plus size={13} strokeWidth={2.5} />}
-          </span>
-        </button>
-      </h4>
-
-      <motion.div
-        id={`${id}-panel`}
-        role="region"
-        aria-labelledby={`${id}-button`}
-        initial={false}
-        animate={{ height: open ? 'auto' : 0, opacity: open ? 1 : 0 }}
-        transition={reduced ? { duration: 0 } : transition(0.32)}
-        className="overflow-hidden"
-      >
-        <p className="max-w-measure pb-6 pr-10 text-small leading-relaxed text-content">
-          {impact.details}
-        </p>
-      </motion.div>
-    </div>
-  );
-}
-
+/**
+ * Two beats, as the handoff structures its problem section: the situation set
+ * out as numbered columns divided by vertical rules, then the consequences on
+ * a dark card. Both keep the site's existing copy verbatim.
+ */
 export default function RealitaetscheckSection() {
-  const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants();
-  const item = reduced ? STATIC_VARIANTS : staggerChild;
-
   return (
-    <Section id="realitaetscheck" tone="canvas" size="lg">
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={VIEWPORT}
-        className="overflow-hidden rounded-xl4 border border-line bg-panel"
-      >
-        <div className="grid divide-y divide-line lg:grid-cols-2 lg:divide-x lg:divide-y-0">
-          <motion.div variants={item} className="p-7 sm:p-10 lg:p-12">
-            <SectionHead
-              eyebrow="Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?"
-              title="Realitätscheck: Ihre aktuelle Ausgangslage"
-              body="Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt."
-              titleWidth="max-w-[16ch]"
-            />
+    <Section id="realitaetscheck" tone="panel" size="lg">
+      <SectionHead
+        eyebrow="Trifft eines der folgenden Szenarien auf Ihr Unternehmen zu?"
+        title="Realitätscheck: Ihre aktuelle Ausgangslage"
+        lead="Viele mittelständische Unternehmen spüren den Fachkräftemangel täglich, haben aber kein klares Benefit-System, das potenzielle Mitarbeitende überzeugt."
+        titleWidth="max-w-[15ch]"
+      />
 
-            {/*
-              A quiet numbered ledger. The original rendered these as solid
-              red circles with an X, which was the loudest thing on the page
-              and read as an error state rather than a diagnostic.
-            */}
-            <ul className="mt-9">
-              {painPoints.map((point) => (
-                <li key={point} className="flex items-start gap-4 border-t border-line py-4">
-                  <span
-                    aria-hidden="true"
-                    className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-ice-400"
-                  />
-                  <p className="text-small leading-relaxed text-content">{point}</p>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+      {/* Five columns split by vertical hairlines; a stacked list on mobile. */}
+      <ol className="mt-[clamp(3rem,5vw,4.5rem)] grid border-t border-line md:grid-cols-2 lg:grid-cols-5">
+        {painPoints.map((point, i) => (
+          <Reveal
+            as="li"
+            key={point}
+            delay={i * 70}
+            className="border-b border-line px-0 py-7 md:px-6 md:first:pl-0 lg:border-b-0 lg:border-l
+                       lg:py-8 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0"
+          >
+            <span aria-hidden="true" className="tnum text-meta uppercase text-ink-600">
+              {String(i + 1).padStart(2, '0')}
+            </span>
+            <p className="mt-4 text-body text-content-strong" lang="de" style={{ hyphens: 'auto' }}>
+              {point}
+            </p>
+          </Reveal>
+        ))}
+      </ol>
 
-          <motion.div variants={item} className="bg-raised p-7 sm:p-10 lg:p-12">
-            <SectionHead
-              eyebrow="Wenn sich nichts ändert …"
-              title="Mögliche Folgen für Ihr Unternehmen"
-              body="Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der Verlust qualifizierter Mitarbeitender an die Konkurrenz."
-              as="h3"
-              titleWidth="max-w-[16ch]"
-            />
+      {/* Consequences, on the dark card the handoff uses for this beat. */}
+      <Reveal className="mt-[clamp(3rem,5vw,4.5rem)]">
+        <div className="relative overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] bg-ink-950 p-7 sm:p-10 lg:p-14">
+          <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
 
-            <div className="mt-8">
-              {impacts.map((impact) => (
-                <ImpactRow key={impact.title} impact={impact} />
-              ))}
+          <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-16">
+            <div>
+              <Eyebrow tone="onInk">Wenn sich nichts ändert …</Eyebrow>
+              <h3 className="mt-7 max-w-[14ch] text-h2 text-white">
+                Mögliche Folgen für Ihr Unternehmen
+              </h3>
+              <p className="mt-6 max-w-measure text-lead text-white/60">
+                Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der
+                Verlust qualifizierter Mitarbeitender an die Konkurrenz.
+              </p>
             </div>
-          </motion.div>
+
+            <Accordion
+              tone="onInk"
+              numbered
+              defaultOpen={null}
+              className="border-t border-line-onInk"
+              items={impacts.map((impact) => ({
+                id: impact.title,
+                title: impact.title,
+                meta: impact.description,
+                body: impact.details,
+              }))}
+            />
+          </div>
         </div>
-      </motion.div>
+      </Reveal>
     </Section>
   );
 }

@@ -18,12 +18,35 @@ function ScrollManager() {
 
   useEffect(() => {
     const target = (state as { scrollTo?: string } | null)?.scrollTo;
-    if (target) {
-      // Wait for the destination page to commit before measuring.
-      requestAnimationFrame(() => document.getElementById(target)?.scrollIntoView({ block: 'start' }));
+
+    if (!target) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
       return;
     }
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+
+    /*
+     * Re-align a few times rather than once. The homepage is long and its
+     * images load lazily, so content above the target can still grow after
+     * the first scroll and leave the section off-position. Each pass is a
+     * no-op once the layout has settled.
+     *
+     * The jump is instant, overriding the page's smooth `scroll-behavior`:
+     * after a route change the visitor expects to arrive, and gliding
+     * thousands of pixels takes well over a second.
+     */
+    const timers: number[] = [];
+    const align = () =>
+      document.getElementById(target)?.scrollIntoView({ block: 'start', behavior: 'instant' as ScrollBehavior });
+
+    const frame = requestAnimationFrame(() => {
+      align();
+      timers.push(window.setTimeout(align, 250), window.setTimeout(align, 700));
+    });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      timers.forEach(clearTimeout);
+    };
   }, [pathname, state]);
 
   return null;

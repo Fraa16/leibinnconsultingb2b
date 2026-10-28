@@ -4,6 +4,7 @@
  *   node scripts/test-nav.mjs [baseUrl]
  */
 import { chromium } from 'playwright';
+import { launchOptions } from './chrome.mjs';
 
 const BASE = process.argv[2] || 'http://localhost:4173';
 const results = [];
@@ -12,9 +13,7 @@ const check = (name, ok, detail = '') => {
   console.log(`${ok ? '  PASS' : '  FAIL'}  ${name}${detail ? ` — ${detail}` : ''}`);
 };
 
-const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
-});
+const browser = await chromium.launch(launchOptions());
 const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 
 const goHome = async () => {

@@ -1,32 +1,28 @@
-import { motion, useReducedMotion } from 'framer-motion';
-import type { ReactNode } from 'react';
-import { revealVariants, STATIC_VARIANTS, VIEWPORT, transition } from '../../lib/motion';
+import type { ElementType, ReactNode } from 'react';
+import { cn } from '../../lib/cn';
+import { useReveal } from '../../hooks/useReveal';
 
 type RevealProps = {
   children: ReactNode;
-  className?: string;
+  as?: ElementType;
+  /** Stagger within a group, in milliseconds. */
   delay?: number;
-  /** Render as a <section>/<li>/etc. instead of a <div>. */
-  as?: 'div' | 'section' | 'li' | 'article';
+  className?: string;
 };
 
 /**
- * Scroll-reveal wrapper. Replaces AnimatedSection, which animated
- * unconditionally — this one collapses to a no-op when the visitor has asked
- * for reduced motion.
+ * Scroll reveal wrapper, per the handoff: 24px rise, 0.8s, triggered once at
+ * 10% visibility. CSS-driven rather than framer-motion so it costs nothing on
+ * first paint and degrades to a no-op under prefers-reduced-motion.
  */
-export default function Reveal({ children, className, delay = 0, as = 'div' }: RevealProps) {
-  const reduced = useReducedMotion();
-  const Tag = motion[as];
+export default function Reveal({ children, as: Tag = 'div', delay = 0, className }: RevealProps) {
+  const ref = useReveal<HTMLDivElement>();
 
   return (
     <Tag
-      variants={reduced ? STATIC_VARIANTS : revealVariants}
-      initial="hidden"
-      whileInView="show"
-      viewport={VIEWPORT}
-      transition={reduced ? { duration: 0 } : transition(0.6, delay)}
-      className={className}
+      ref={ref}
+      className={cn('reveal', className)}
+      style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}
     </Tag>

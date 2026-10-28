@@ -9,6 +9,7 @@
  * in its final state immediately.
  */
 import { chromium } from 'playwright';
+import { launchOptions } from './chrome.mjs';
 import { mkdirSync } from 'node:fs';
 
 const [outDir, base, tag] = process.argv.slice(2);
@@ -25,9 +26,7 @@ const VIEWPORTS = [
 
 mkdirSync(outDir, { recursive: true });
 
-const browser = await chromium.launch({
-  executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome',
-});
+const browser = await chromium.launch(launchOptions());
 
 for (const [vpName, width, height] of VIEWPORTS) {
   const page = await browser.newPage({

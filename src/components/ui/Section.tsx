@@ -5,13 +5,14 @@ import Container from './Container';
 type SectionProps = {
   children: ReactNode;
   id?: string;
-  /** Surface. `ink` and `inkDeep` are the dark anchors that break the rhythm. */
+  /**
+   * `panel` and `raised` are inset rounded light panels; `ink` and `inkDeep`
+   * run full-bleed dark. The page alternates between them.
+   */
   tone?: 'canvas' | 'panel' | 'raised' | 'ink' | 'inkDeep';
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'sm' | 'md' | 'lg';
   width?: 'shell' | 'content' | 'narrow';
   contained?: boolean;
-  /** Hairline above the section — stitches adjacent light sections together. */
-  divided?: boolean;
   className?: string;
   innerClassName?: string;
 };
@@ -24,12 +25,13 @@ const TONES = {
   inkDeep: 'bg-ink-950 text-white/70',
 } as const;
 
-// Premium templates breathe. These are deliberately larger than the defaults.
+/** Light panels are inset from the page edge and rounded; dark ones are not. */
+const INSET = 'mx-[clamp(0.5rem,1.2vw,1rem)] rounded-[clamp(1.25rem,2.4vw,2rem)]';
+
 const SIZES = {
-  sm: 'py-16 md:py-20',
-  md: 'py-20 md:py-28 lg:py-32',
-  lg: 'py-24 md:py-32 lg:py-40',
-  xl: 'py-28 md:py-40 lg:py-52',
+  sm: 'py-[clamp(3.5rem,7vw,5rem)]',
+  md: 'py-[clamp(4.5rem,8vw,7rem)]',
+  lg: 'py-[clamp(6rem,10vw,9rem)]',
 } as const;
 
 export default function Section({
@@ -39,20 +41,15 @@ export default function Section({
   size = 'lg',
   width = 'content',
   contained = true,
-  divided = false,
   className,
   innerClassName,
 }: SectionProps) {
+  const isLightPanel = tone === 'panel' || tone === 'raised';
+
   return (
     <section
       id={id}
-      className={cn(
-        'relative overflow-hidden',
-        TONES[tone],
-        SIZES[size],
-        divided && 'border-t border-line',
-        className,
-      )}
+      className={cn('relative overflow-hidden', TONES[tone], SIZES[size], isLightPanel && INSET, className)}
     >
       {contained ? (
         <Container width={width} className={cn('relative', innerClassName)}>

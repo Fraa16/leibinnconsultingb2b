@@ -9,25 +9,35 @@
 
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 7rem;
+    /* The handoff scrolls anchors to offsetTop - 100 (84 on mobile). */
+    scroll-padding-top: 5.25rem;
     -webkit-text-size-adjust: 100%;
   }
 
+  @media (min-width: 768px) {
+    html { scroll-padding-top: 6.25rem; }
+  }
+
   body {
-    @apply bg-canvas font-sans text-body font-light text-content antialiased;
+    @apply bg-canvas font-sans text-body font-normal text-content antialiased;
     text-rendering: optimizeLegibility;
   }
 
   /*
-   * Tailwind Preflight resets headings to `font-size: inherit`, so the scale
-   * is declared here. Markup only needs a size class when it deliberately
-   * deviates from the default step.
+   * Preflight resets headings to `font-size: inherit`, so the scale lives
+   * here. `text-wrap: balance` on headlines and `pretty` on body text are
+   * part of the handoff spec.
    */
-  h1 { @apply text-h1 text-content-strong; }
-  h2 { @apply text-h2 text-content-strong; }
-  h3 { @apply text-h3 text-content-strong; }
+  h1 { @apply text-h1 text-content-strong; text-wrap: balance; }
+  h2 { @apply text-h2 text-content-strong; text-wrap: balance; }
+  h3 { @apply text-h3 text-content-strong; text-wrap: balance; }
   h4 { @apply text-h4 text-content-strong; }
   h5, h6 { @apply text-body font-semibold text-content-strong; }
+
+  p { text-wrap: pretty; }
+
+  /* Figures must not jitter while counting up. */
+  .tnum, [data-count] { font-variant-numeric: tabular-nums; }
 
   :focus-visible {
     @apply outline-none ring-2 ring-ink-600 ring-offset-2 ring-offset-canvas rounded-sm;
@@ -50,38 +60,96 @@
   }
 
   /*
-   * Faint blueprint grid. Used at low opacity behind dark sections to give
-   * them some structure instead of a flat fill.
+   * Reveal on scroll. Elements start shifted and fade in once 10% visible;
+   * `useReveal` adds `.is-revealed`. Honouring reduced motion is handled in
+   * the media query at the bottom, which neutralises the transform.
    */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1),
+      transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .reveal.is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Faint blueprint grid for the dark sections. */
   .grid-lines {
     background-image:
-      linear-gradient(to right, rgba(255, 255, 255, 0.055) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
-    background-size: 72px 72px;
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 80px 80px;
   }
 
   .grid-lines-light {
     background-image:
-      linear-gradient(to right, rgba(13, 16, 34, 0.032) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(13, 16, 34, 0.032) 1px, transparent 1px);
-    background-size: 72px 72px;
+      linear-gradient(to right, rgba(0, 0, 34, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 34, 0.03) 1px, transparent 1px);
+    background-size: 80px 80px;
   }
 
-  /* Hairline that fades out at both ends. */
-  .rule-fade {
-    background-image: linear-gradient(
-      to right,
-      transparent,
-      theme('colors.line.strong') 12%,
-      theme('colors.line.strong') 88%,
-      transparent
-    );
+  /*
+   * Range input. The track gradient is set inline per value; this styles the
+   * geometry and the thumb, which cannot be done with utilities.
+   */
+  .brand-range {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 999px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  .brand-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 24px;
+    width: 24px;
+    border-radius: 999px;
+    background: #15174F;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 0 5px rgba(161, 206, 229, 0.35);
+    cursor: grab;
+  }
+
+  .brand-range::-webkit-slider-thumb:active { cursor: grabbing; }
+
+  .brand-range::-moz-range-thumb {
+    height: 22px;
+    width: 22px;
+    border-radius: 999px;
+    background: #15174F;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 0 0 5px rgba(161, 206, 229, 0.35);
+    cursor: grab;
+  }
+
+  .brand-range::-moz-range-track { background: transparent; }
+
+  /* Accent wash used behind the big figures, standing in for the gold gradient. */
+  .accent-text {
+    background-image: linear-gradient(140deg, #A1CEE5 0%, #4F92BE 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 
   *,

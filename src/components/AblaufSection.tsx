@@ -1,8 +1,7 @@
-import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
+import { ArrowUpRight } from 'lucide-react';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
+import Reveal from './ui/Reveal';
 import Button from './ui/Button';
 
 const processSteps = [
@@ -28,52 +27,58 @@ const processSteps = [
   },
 ];
 
+/**
+ * Process, on the handoff's pattern: a narrow statement column beside a
+ * bordered list of steps, each opened by a pill badge carrying its ordinal.
+ */
 export default function AblaufSection() {
-  const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.12);
-  const item = reduced ? STATIC_VARIANTS : staggerChild;
-
   return (
-    <Section id="ablauf" tone="panel" size="lg" divided>
-      <motion.div variants={container} initial="hidden" whileInView="show" viewport={VIEWPORT}>
-        <motion.div variants={item}>
-          <SectionHead title="So arbeiten wir gemeinsam – Schritt für Schritt" titleWidth="max-w-[18ch]" />
-        </motion.div>
+    <Section id="ablauf" tone="canvas" size="lg">
+      {/*
+        The headline runs full width: at 46 characters it was breaking into
+        five lines when confined to a narrow sticky column.
+      */}
+      <SectionHead
+        title="So arbeiten wir gemeinsam – Schritt für Schritt"
+        titleWidth="max-w-[22ch]"
+        className="lg:!grid-cols-1"
+      />
 
-        {/*
-          A timeline rail with numbered nodes. The original rendered each step
-          number as a 200px ghost numeral bleeding out of its own card, which
-          fought the headings for attention and broke the grid.
-        */}
-        <div className="relative mt-16">
-          <div aria-hidden="true" className="rule-fade absolute inset-x-0 top-[1.125rem] hidden h-px lg:block" />
+      <div className="mt-[clamp(3rem,5vw,4.5rem)]">
+        <div>
+          <ol className="border-t border-line">
+            {processSteps.map((step, i) => (
+              <Reveal
+                as="li"
+                key={step.stepNumber}
+                delay={i * 80}
+                className="group border-b border-line py-8 lg:py-10"
+              >
+                <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-10">
+                  <span
+                    className="tnum inline-flex h-8 shrink-0 items-center rounded-full border border-ink-600/25
+                               bg-ink-600/[0.06] px-3.5 text-meta uppercase text-ink-700"
+                  >
+                    {String(step.stepNumber).padStart(2, '0')}
+                  </span>
 
-          <ol className="grid gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-8">
-            {processSteps.map((step) => (
-              <motion.li variants={item} key={step.stepNumber} className="relative">
-                <span
-                  className="relative z-10 grid h-9 w-9 place-items-center rounded-full border border-line
-                             bg-panel text-small font-semibold tabular-nums text-ink-600"
-                >
-                  {step.stepNumber}
-                </span>
-
-                <h3 className="mt-6 max-w-[15ch] text-h4">{step.title}</h3>
-                <p className="mt-3 max-w-[38ch] text-small leading-relaxed text-content">
-                  {step.text}
-                </p>
-              </motion.li>
+                  <div className="flex-1">
+                    <h3 className="max-w-[20ch] text-h3">{step.title}</h3>
+                    <p className="mt-3 max-w-measure text-body text-content">{step.text}</p>
+                  </div>
+                </div>
+              </Reveal>
             ))}
           </ol>
-        </div>
 
-        <motion.div variants={item} className="mt-14 border-t border-line pt-8">
-          {/* Previously scrolled to a #kontakt anchor that does not exist here. */}
-          <Button to="/kontakt" variant="secondary" size="lg" icon={<ArrowRight size={16} />}>
-            Unverbindliche Beratung anfragen
-          </Button>
-        </motion.div>
-      </motion.div>
+          <Reveal className="mt-10">
+            {/* Previously scrolled to a #kontakt anchor that does not exist here. */}
+            <Button to="/kontakt" variant="secondary" icon={<ArrowUpRight size={17} />}>
+              Unverbindliche Beratung anfragen
+            </Button>
+          </Reveal>
+        </div>
+      </div>
     </Section>
   );
 }

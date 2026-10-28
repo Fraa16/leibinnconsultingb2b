@@ -1,8 +1,7 @@
-import { motion, useReducedMotion } from 'framer-motion';
-import { Check, ArrowRight } from 'lucide-react';
-import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
+import { Check, ArrowUpRight } from 'lucide-react';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
+import Reveal from './ui/Reveal';
 import Button from './ui/Button';
 
 const assurances = [
@@ -11,52 +10,30 @@ const assurances = [
   'Persönliche Begleitung von Cedrik Leibinn – vom ersten Schritt bis zur Umsetzung',
 ];
 
-/**
- * Full-bleed dark close. Previously a navy card floating on a light section,
- * which made the page end on a weak, unresolved note; running it edge to edge
- * into the footer gives the scroll a proper landing.
- */
+/** Full-bleed dark close, running straight into the footer. */
 export default function FinalCTASection() {
-  const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.09, 0.12);
-  const item = reduced ? STATIC_VARIANTS : staggerChild;
-
   return (
-    <Section tone="ink" size="xl">
+    <Section id="termin" tone="ink" size="lg">
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -left-32 bottom-[-12rem] h-[34rem] w-[34rem] rounded-full"
-        style={{
-          background:
-            'radial-gradient(circle, rgba(161,206,229,0.12) 0%, rgba(161,206,229,0.03) 45%, transparent 70%)',
-        }}
-      />
 
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={VIEWPORT}
-        className="relative grid items-center gap-12 lg:grid-cols-[1fr_0.72fr] lg:gap-20"
-      >
+      <div className="relative grid items-start gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1fr_0.8fr]">
         <div>
-          <motion.div variants={item}>
-            <SectionHead
-              eyebrow="BEREIT FÜR DEN NÄCHSTEN SCHRITT?"
-              title="Lassen Sie uns Ihr Benefit-System auf Mittelstands-Niveau bringen"
-              body="In einem ersten Gespräch schauen wir gemeinsam auf Ihre aktuelle Situation und Ihre Ziele. Sie erhalten eine ehrliche Einschätzung, konkrete Ansatzpunkte und ein Gefühl dafür, wie ein strukturiertes Benefit-System in Ihrem Unternehmen aussehen kann."
-              tone="onInk"
-              titleWidth="max-w-[19ch]"
-            />
-          </motion.div>
+          <SectionHead
+            eyebrow="BEREIT FÜR DEN NÄCHSTEN SCHRITT?"
+            title="Lassen Sie uns Ihr Benefit-System auf Mittelstands-Niveau bringen"
+            lead="In einem ersten Gespräch schauen wir gemeinsam auf Ihre aktuelle Situation und Ihre Ziele. Sie erhalten eine ehrliche Einschätzung, konkrete Ansatzpunkte und ein Gefühl dafür, wie ein strukturiertes Benefit-System in Ihrem Unternehmen aussehen kann."
+            tone="onInk"
+            titleWidth="max-w-[16ch]"
+            className="lg:!grid-cols-1"
+          />
 
-          <ul className="mt-10 space-y-px border-t border-line-onInk">
-            {assurances.map((line) => (
-              <motion.li
-                variants={item}
+          <ul className="mt-10 border-t border-line-onInk">
+            {assurances.map((line, i) => (
+              <Reveal
+                as="li"
                 key={line}
-                className="flex items-start gap-3.5 border-b border-line-onInk py-4"
+                delay={i * 80}
+                className="flex items-start gap-4 border-b border-line-onInk py-4"
               >
                 <span
                   aria-hidden="true"
@@ -64,15 +41,15 @@ export default function FinalCTASection() {
                 >
                   <Check size={11} strokeWidth={3} />
                 </span>
-                <p className="text-small leading-relaxed text-white/65">{line}</p>
-              </motion.li>
+                <p className="text-small leading-relaxed text-white/60">{line}</p>
+              </Reveal>
             ))}
           </ul>
         </div>
 
-        <motion.div
-          variants={item}
-          className="rounded-xl4 border border-line-onInkStrong bg-white/[0.05] p-7 backdrop-blur-sm sm:p-9"
+        <Reveal
+          delay={160}
+          className="rounded-[clamp(1.25rem,2.4vw,1.75rem)] border border-line-onInkStrong bg-white/[0.05] p-7 sm:p-9"
         >
           <p className="text-h3 text-white">Kostenloses Erstgespräch mit Cedrik Leibinn</p>
           <p className="mt-4 text-small leading-relaxed text-white/60">
@@ -80,15 +57,15 @@ export default function FinalCTASection() {
           </p>
 
           {/* Was a raw <a href>, which forced a full document reload. */}
-          <Button to="/kontakt" variant="onInk" size="lg" fullWidth className="mt-8" icon={<ArrowRight size={16} />}>
+          <Button to="/kontakt" variant="onInk" size="xl" fullWidth className="mt-8" icon={<ArrowUpRight size={18} />}>
             Erstgespräch sichern
           </Button>
 
-          <p className="mt-4 border-t border-line-onInk pt-4 text-center text-small text-white/45">
+          <p className="mt-5 border-t border-line-onInk pt-5 text-small text-white/45">
             Unverbindlich &amp; kostenlos – Ihr Erstgespräch für ein strukturiertes Benefit-System.
           </p>
-        </motion.div>
-      </motion.div>
+        </Reveal>
+      </div>
     </Section>
   );
 }

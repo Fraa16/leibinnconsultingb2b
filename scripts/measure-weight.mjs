@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
+import { launchOptions } from './chrome.mjs';
 const [base, tag] = process.argv.slice(2);
-const b = await chromium.launch({ executablePath:'/opt/pw-browsers/chromium-1194/chrome-linux/chrome' });
+const b = await chromium.launch(launchOptions());
 const p = await b.newPage({ viewport:{width:1440,height:900} });
 let bytes = 0, imgBytes = 0, count = 0;
 p.on('response', async r => {

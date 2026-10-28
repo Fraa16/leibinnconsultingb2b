@@ -1,8 +1,7 @@
-import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import { staggerVariants, staggerChild, STATIC_VARIANTS, VIEWPORT } from '../lib/motion';
+import { ArrowUpRight } from 'lucide-react';
 import Section from './ui/Section';
 import Eyebrow from './ui/Eyebrow';
+import Reveal from './ui/Reveal';
 import Button from './ui/Button';
 
 const benefits = [
@@ -34,59 +33,45 @@ const benefits = [
 ];
 
 /**
- * Bento panel: the section head occupies the first cell of the grid as a navy
- * tile, and the five advantages fill the remaining five. Six cells, one ruled
- * block — rather than a heading floating above a row of shadowed cards.
+ * Bento panel: the section head occupies the first cell as a navy tile, and
+ * the five advantages fill the remaining five of a six-cell ruled grid.
  */
 export default function VorteileSection() {
-  const reduced = useReducedMotion();
-  const container = reduced ? STATIC_VARIANTS : staggerVariants(0.07, 0.1);
-  const item = reduced ? STATIC_VARIANTS : staggerChild;
-
   return (
-    <Section id="vorteile" tone="panel" size="lg" divided>
-      <motion.div
-        variants={container}
-        initial="hidden"
-        whileInView="show"
-        viewport={VIEWPORT}
-        className="grid gap-px overflow-hidden rounded-xl4 border border-line bg-line sm:grid-cols-2 lg:grid-cols-3"
-      >
-        <motion.div
-          variants={item}
-          className="relative flex flex-col justify-between bg-ink-800 p-7 lg:p-8"
-        >
+    <Section id="vorteile" tone="canvas" size="lg">
+      <div className="grid gap-px overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+        <Reveal className="relative flex flex-col justify-between bg-ink-950 p-7 lg:p-9">
           <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
           <div className="relative">
             <Eyebrow tone="onInk">Warum unser Ansatz wirkt</Eyebrow>
-            <h2 className="mt-6 max-w-[14ch] text-h3 text-white">
+            <h2 className="mt-7 max-w-[13ch] text-h3 text-white">
               Vorteile, die im Alltag Ihrer Mitarbeitenden ankommen
             </h2>
-            <p className="mt-4 text-small leading-relaxed text-white/60">
+            <p className="mt-5 text-small leading-relaxed text-white/55">
               Wir entwickeln Benefit-Konzepte speziell für kleine und mittlere Unternehmen – mit
               klarem Fokus auf Umsetzbarkeit, steuerlicher Sicherheit und messbarer Wirkung im Alltag.
             </p>
           </div>
 
-          <div className="relative mt-8">
+          <div className="relative mt-9">
             {/* Previously scrolled to a #kontakt anchor that resolved to nothing. */}
-            <Button to="/kontakt" variant="onInk" icon={<ArrowRight size={16} />}>
+            <Button to="/kontakt" variant="onInk" icon={<ArrowUpRight size={17} />}>
               Jetzt Vorteile im Gespräch prüfen
             </Button>
           </div>
-        </motion.div>
+        </Reveal>
 
-        {benefits.map((benefit) => (
-          <motion.div
-            variants={item}
+        {benefits.map((benefit, i) => (
+          <Reveal
             key={benefit.title}
-            className="bg-panel p-7 transition-colors duration-300 hover:bg-raised lg:p-8"
+            delay={(i + 1) * 60}
+            className="bg-panel p-7 transition-colors duration-300 hover:bg-raised lg:p-9"
           >
             <h3 className="text-h4">{benefit.title}</h3>
             <p className="mt-3 text-small leading-relaxed text-content">{benefit.description}</p>
-          </motion.div>
+          </Reveal>
         ))}
-      </motion.div>
+      </div>
     </Section>
   );
 }
