@@ -22,8 +22,17 @@ const IMAGES = [
   { in: 'cedrik-hero.avif', out: 'cedrik-hero', widths: [640, 960, 1280, 1920] },
   // Portrait card: capped at max-w-md (448px), 3:4 crop.
   { in: 'Cedrik-Leibinn.jpg', out: 'cedrik-portrait', widths: [448, 672, 896] },
-  // Meeting photo: clipped background panel inside a max-w-[1600px] card.
-  { in: 'Kundengespraech.jpg', out: 'kundengespraech', widths: [768, 1200, 1600] },
+  // Meeting photo: a letterbox band the full width of the content column, so
+  // it needs a derivative that still holds up on a 2x desktop display.
+  { in: 'Kundengespraech.jpg', out: 'kundengespraech', widths: [768, 1200, 1600, 2400] },
+  // Consequences card, inside a column that tops out near 620px.
+  { in: 'cedrik-fenster.jpg', out: 'cedrik-fenster', widths: [480, 720, 960] },
+  // Ablauf: the sticky column beside the steps, roughly 42vw.
+  { in: 'beratung-lounge.jpg', out: 'beratung-lounge', widths: [560, 840, 1120] },
+  // Kontakt: the panel beside the form.
+  { in: 'beratung-gespraech.jpg', out: 'beratung-gespraech', widths: [640, 960, 1280] },
+  // Closing CTA: full-bleed behind a heavy navy scrim, so quality can be low.
+  { in: 'frankfurt-skyline.webp', out: 'frankfurt-skyline', widths: [1024, 1600, 1920] },
 ];
 
 const AVIF = { quality: 52, effort: 6 };

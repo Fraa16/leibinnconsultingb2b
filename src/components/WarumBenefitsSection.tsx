@@ -1,60 +1,134 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import type { KeyboardEvent } from 'react';
 import { Star, Link2, HeartPulse, Users } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
+import Ornament from './ui/Ornament';
 import { cn } from '../lib/cn';
 
 type SegmentId = 'attraktivitaet' | 'bindung' | 'gesundheit' | 'kultur';
 
-const segments = [
+type Segment = {
+  id: SegmentId;
+  label: string;
+  description: string;
+  /** Degrees clockwise from twelve o'clock. */
+  angle: number;
+  colour: string;
+  icon: LucideIcon;
+};
+
+const SEGMENTS: Segment[] = [
   {
-    id: 'attraktivitaet' as SegmentId,
+    id: 'attraktivitaet',
     label: 'Arbeitgeberattraktivität',
     description:
       'Ihre Benefits machen auf einen Blick sichtbar, warum sich qualifizierte Bewerbende für Ihr Unternehmen entscheiden sollten.',
-    color: '#2A2D7C',
+    angle: 0,
+    colour: '#2A2D7C',
     icon: Star,
   },
   {
-    id: 'bindung' as SegmentId,
+    id: 'bindung',
     label: 'Mitarbeiterbindung',
     description:
       'Regelmäßig spürbare Vorteile stärken Loyalität und reduzieren Fluktuation – gerade bei leistungstragenden Mitarbeitenden.',
-    color: '#15174F',
+    angle: 90,
+    colour: '#15174F',
     icon: Link2,
   },
   {
-    id: 'gesundheit' as SegmentId,
+    id: 'gesundheit',
     label: 'Gesundheit & Wohlbefinden',
     description:
       'Moderne Gesundheitsangebote entlasten Teams, reduzieren Ausfälle und erhöhen langfristig die Leistungsfähigkeit.',
-    color: '#202266',
+    angle: 180,
+    colour: '#202266',
     icon: HeartPulse,
   },
   {
-    id: 'kultur' as SegmentId,
+    id: 'kultur',
     label: 'Teamkultur & Identifikation',
     description:
       'Benefits transportieren Haltung und Wertschätzung – und stärken damit das Wir-Gefühl in Ihrer Organisation.',
-    color: '#0B0C39',
+    angle: 270,
+    colour: '#0B0C39',
     icon: Users,
   },
 ];
 
-const PATHS: Record<SegmentId, string> = {
-  attraktivitaet:
-    'M790.09 397.363c-77.281-122.695-256.68-122.633-333.906 0-53.73-101.582-3.926-228.254 104.683-266.058 40.008-14.032 84.535-14.028 124.535 0 108.594 37.77 158.426 164.515 104.688 266.058m0 0',
-  bindung:
-    'M711.672 669.738c-101.613 53.711-228.32 3.914-266.14-104.656-14.024-39.969-14.024-84.457-.032-124.418 37.762-108.605 164.559-158.476 266.172-104.73-122.73 77.261-122.664 256.59 0 333.804m0 0',
-  gesundheit:
-    'M1005.863 502.277c.145 43.45-15.324 86.555-43.097 119.993v.003C907.94 689.5 811.305 710.234 733.707 671.48c-94.95-46.546-132.984-163.812-83.484-257.156 77.28 122.692 256.683 122.63 333.91 0 14.234 26.969 21.73 57.219 21.73 87.953m0 0',
-  kultur:
-    'M1005.305 308.852c-.461 142.168-150.739 232.613-276.66 166.902 122.73-77.262 122.66-256.598 0-333.805 125.894-65.754 276.277 24.863 276.66 166.903m0 0',
+/*
+ * Quatrefoil geometry. Four circles pushed off a shared centre by OFFSET, with
+ * a radius large enough that neighbours overlap and all four meet in the
+ * middle — which is the section's actual argument: the four areas are not
+ * separate programmes, they are one system seen from four sides.
+ */
+const VIEW = 420;
+const MID = VIEW / 2;
+const RADIUS = 118;
+const OFFSET = 80;
+const HUB = 40;
+
+const petalCentre = (angle: number) => {
+  const rad = ((angle - 90) * Math.PI) / 180;
+  return { cx: MID + OFFSET * Math.cos(rad), cy: MID + OFFSET * Math.sin(rad) };
 };
 
+/** Where the ordinal sits: out along the segment's own axis, clear of the hub. */
+const ordinalPoint = (angle: number) => {
+  const rad = ((angle - 90) * Math.PI) / 180;
+  const r = OFFSET + RADIUS * 0.56;
+  return { x: MID + r * Math.cos(rad), y: MID + r * Math.sin(rad) };
+};
+
+const ord = (i: number) => String(i + 1).padStart(2, '0');
+
+/**
+ * The four areas of effect, as a diagram you can work rather than look at.
+ *
+ * Selecting an area — from the list or by hitting its petal — brings that
+ * petal forward and recedes the others, so the shape answers "which of these
+ * am I reading about" without a legend. The list is the accessible control:
+ * real radio semantics, arrow-key navigation, every description in the
+ * document whatever is selected. The diagram is a pointer affordance layered
+ * on top of it, which is why it is hidden from assistive tech rather than
+ * duplicated into it.
+ */
 export default function WarumBenefitsSection() {
-  const [active, setActive] = useState<SegmentId | null>(null);
+  const [active, setActive] = useState<SegmentId>('attraktivitaet');
+  const [hovered, setHovered] = useState<SegmentId | null>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+
+  /** What the diagram shows: a hover preview wins over the committed choice. */
+  const shown = hovered ?? active;
+
+  const select = (id: SegmentId, focus = false) => {
+    setActive(id);
+    if (focus) {
+      listRef.current?.querySelector<HTMLButtonElement>(`[data-segment="${id}"]`)?.focus();
+    }
+  };
+
+  /*
+   * Radiogroup keys: arrows move and select, Home / End jump to the ends.
+   * Tab leaves the group, which is why only the checked row is tabbable.
+   */
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const index = SEGMENTS.findIndex((s) => s.id === active);
+    const last = SEGMENTS.length - 1;
+    let next: number | null = null;
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') next = index === last ? 0 : index + 1;
+    else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') next = index === 0 ? last : index - 1;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = last;
+
+    if (next === null) return;
+    event.preventDefault();
+    select(SEGMENTS[next].id, true);
+  };
 
   return (
     <Section id="warum-benefits" tone="canvas" size="lg">
@@ -66,68 +140,198 @@ export default function WarumBenefitsSection() {
         titleWidth="max-w-[20ch]"
       />
 
-      <Reveal className="mt-[clamp(3rem,5vw,4.5rem)]">
-        <div className="relative grid place-items-center py-6">
+      <div className="mt-[clamp(3rem,5vw,4.5rem)] grid items-center gap-[clamp(2.5rem,5vw,4.5rem)] lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)]">
+        <Reveal className="relative mx-auto w-full max-w-[30rem]">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute h-[26rem] w-[26rem] rounded-full"
+            className="pointer-events-none absolute inset-0 rounded-full"
             style={{
               background:
-                'radial-gradient(circle, rgba(42,45,124,0.10) 0%, rgba(42,45,124,0.03) 45%, transparent 70%)',
+                'radial-gradient(circle at 50% 50%, rgba(42,45,124,0.10) 0%, rgba(42,45,124,0.03) 46%, transparent 72%)',
             }}
           />
-          <svg
-            viewBox="390 110 680 600"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid meet"
-            role="img"
-            aria-label="Die vier zentralen Wirkungsbereiche moderner Benefits"
-            className="relative aspect-square w-full max-w-[20rem] sm:max-w-[24rem]"
-          >
-            {segments.map((s) => (
-              <path
-                key={s.id}
-                d={PATHS[s.id]}
-                fill={s.color}
-                className="transition-opacity duration-300 ease-brand"
-                opacity={active === null || active === s.id ? 1 : 0.14}
-              />
-            ))}
-          </svg>
-        </div>
-      </Reveal>
 
-      {/* The four fields as a ruled ledger, matching the Ansatz section. */}
-      <div className="mt-[clamp(2.5rem,4vw,4rem)] grid border-t border-line sm:grid-cols-2 lg:grid-cols-4">
-        {segments.map((segment, i) => (
-          <Reveal
-            key={segment.id}
-            delay={i * 70}
-            className={cn(
-              'border-b border-line py-7 transition-colors duration-300 sm:border-b-0 sm:px-6 sm:py-8',
-              'lg:border-l lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0 sm:first:pl-0',
-              active === segment.id && 'bg-panel',
-            )}
+          <svg
+            viewBox={`0 0 ${VIEW} ${VIEW}`}
+            aria-hidden="true"
+            className="relative block w-full"
           >
-            <div
-              onMouseEnter={() => setActive(segment.id)}
-              onMouseLeave={() => setActive(null)}
-              onFocus={() => setActive(segment.id)}
-              onBlur={() => setActive(null)}
-              tabIndex={0}
-            >
-              <span
-                aria-hidden="true"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl2"
-                style={{ backgroundColor: segment.color }}
-              >
-                <segment.icon className="h-[18px] w-[18px] text-white" strokeWidth={1.75} />
-              </span>
-              <h3 className="mt-5 text-h4">{segment.label}</h3>
-              <p className="mt-3 text-small leading-relaxed text-content">{segment.description}</p>
-            </div>
-          </Reveal>
-        ))}
+            <defs>
+              {SEGMENTS.map((segment) => {
+                const { cx, cy } = petalCentre(segment.angle);
+                return (
+                  <linearGradient
+                    key={segment.id}
+                    id={`petal-${segment.id}`}
+                    gradientUnits="userSpaceOnUse"
+                    x1={cx - RADIUS}
+                    y1={cy - RADIUS}
+                    x2={cx + RADIUS}
+                    y2={cy + RADIUS}
+                  >
+                    <stop offset="0" stopColor="#A1CEE5" />
+                    <stop offset="1" stopColor={segment.colour} />
+                  </linearGradient>
+                );
+              })}
+            </defs>
+
+            {/*
+              Painted with the selected petal last so it is both visually and
+              for hit-testing on top; without the reorder, clicks in an
+              overlap would land on whichever petal happened to come later.
+            */}
+            {[...SEGMENTS]
+              .sort((a, b) => Number(a.id === shown) - Number(b.id === shown))
+              .map((segment) => {
+                const { cx, cy } = petalCentre(segment.angle);
+                const point = ordinalPoint(segment.angle);
+                const on = segment.id === shown;
+                const index = SEGMENTS.indexOf(segment);
+
+                return (
+                  <g
+                    key={segment.id}
+                    role="presentation"
+                    onClick={() => select(segment.id, true)}
+                    onMouseEnter={() => setHovered(segment.id)}
+                    onMouseLeave={() => setHovered(null)}
+                    className="cursor-pointer transition-[transform,filter] duration-500 ease-brand"
+                    style={{
+                      // fill-box so each petal scales about its own centre
+                      // rather than the middle of the whole diagram.
+                      transformBox: 'fill-box',
+                      transformOrigin: 'center',
+                      transform: on ? 'scale(1.035)' : 'scale(1)',
+                      filter: on ? 'drop-shadow(0 16px 28px rgba(42,45,124,0.2))' : undefined,
+                    }}
+                  >
+                    <circle
+                      cx={cx}
+                      cy={cy}
+                      r={RADIUS}
+                      fill={on ? `url(#petal-${segment.id})` : 'rgba(42,45,124,0.07)'}
+                      fillOpacity={on ? 0.92 : 1}
+                      stroke={on ? 'transparent' : 'rgba(42,45,124,0.3)'}
+                      strokeWidth={1}
+                      style={{ mixBlendMode: on ? 'normal' : 'multiply' }}
+                      className="transition-[fill,stroke,fill-opacity] duration-500 ease-brand"
+                    />
+                    <text
+                      x={point.x}
+                      y={point.y}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      className="tnum transition-colors duration-500 ease-brand"
+                      style={{
+                        fontSize: 15,
+                        letterSpacing: '0.14em',
+                        fontWeight: 500,
+                        fill: on ? '#FFFFFF' : 'rgba(42,45,124,0.45)',
+                      }}
+                    >
+                      {ord(index)}
+                    </text>
+                  </g>
+                );
+              })}
+
+            {/* The hub: where all four overlap, and where the mark belongs. */}
+            <circle cx={MID} cy={MID} r={HUB} fill="#FFFFFF" />
+            <circle cx={MID} cy={MID} r={HUB} fill="none" stroke="rgba(42,45,124,0.14)" strokeWidth={1} />
+          </svg>
+
+          <Ornament
+            className="left-1/2 top-1/2 h-[2.6rem] w-[2.6rem] -translate-x-1/2 -translate-y-1/2 text-ink-600"
+            opacity={0.55}
+          />
+        </Reveal>
+
+        <div
+          ref={listRef}
+          role="radiogroup"
+          aria-label="Die vier zentralen Wirkungsbereiche moderner Benefits"
+          onKeyDown={onKeyDown}
+          className="border-t border-line"
+        >
+          {SEGMENTS.map((segment, i) => {
+            const on = segment.id === active;
+            return (
+              <Reveal key={segment.id} delay={i * 70}>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  data-segment={segment.id}
+                  tabIndex={on ? 0 : -1}
+                  onClick={() => select(segment.id)}
+                  onMouseEnter={() => setHovered(segment.id)}
+                  onMouseLeave={() => setHovered(null)}
+                  className={cn(
+                    'group relative flex w-full gap-5 border-b border-line py-6 pr-4 text-left',
+                    'transition-colors duration-300 ease-brand sm:gap-6 sm:py-7',
+                    on ? 'pl-5 sm:pl-6' : 'pl-0 hover:pl-3',
+                  )}
+                >
+                  {/* Accent rule rather than a filled row: the page is ruled, not carded. */}
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'absolute bottom-0 left-0 top-0 w-[2px] origin-center bg-ink-600',
+                      'transition-transform duration-300 ease-brand',
+                      on ? 'scale-y-100' : 'scale-y-0',
+                    )}
+                  />
+
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'mt-0.5 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl2 border',
+                      'transition-colors duration-300 ease-brand',
+                      on
+                        ? 'border-transparent text-white'
+                        : 'border-line bg-panel text-ink-600 group-hover:border-ink-300',
+                    )}
+                    style={on ? { backgroundColor: segment.colour } : undefined}
+                  >
+                    <segment.icon className="h-[18px] w-[18px]" strokeWidth={1.75} />
+                  </span>
+
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-baseline gap-3">
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          'tnum text-meta uppercase transition-colors duration-300',
+                          on ? 'text-ink-600' : 'text-content-faint',
+                        )}
+                      >
+                        {ord(i)}
+                      </span>
+                      <span
+                        className={cn(
+                          'text-h4 transition-colors duration-300',
+                          on ? 'text-content-strong' : 'text-content-strong/70',
+                        )}
+                      >
+                        {segment.label}
+                      </span>
+                    </span>
+
+                    <span
+                      className={cn(
+                        'mt-3 block max-w-measure text-small leading-relaxed transition-colors duration-300',
+                        on ? 'text-content' : 'text-content-muted',
+                      )}
+                    >
+                      {segment.description}
+                    </span>
+                  </span>
+                </button>
+              </Reveal>
+            );
+          })}
+        </div>
       </div>
     </Section>
   );

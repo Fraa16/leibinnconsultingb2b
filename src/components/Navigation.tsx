@@ -114,7 +114,7 @@ export default function Navigation() {
               : 'border-ink-950/[0.05] bg-panel/60 backdrop-blur-md',
           )}
         >
-          <Link to="/" className="shrink-0">
+          <Link to="/" className="shrink-0" aria-label="Leibinn Consulting — zur Startseite">
             <Logo />
           </Link>
 

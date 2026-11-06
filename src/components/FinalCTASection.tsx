@@ -1,8 +1,11 @@
 import { Check, ArrowUpRight } from 'lucide-react';
+import { skylineImage } from '../lib/images';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
 import Button from './ui/Button';
+import Image from './ui/Image';
+import Ornament from './ui/Ornament';
 
 const assurances = [
   'Speziell für kleine und mittlere Unternehmen mit 5–200 Mitarbeitenden',
@@ -14,7 +17,31 @@ const assurances = [
 export default function FinalCTASection() {
   return (
     <Section id="termin" tone="ink" size="lg">
+      {/*
+        The closing band carries a photograph instead of flat navy. It sits
+        under a heavy scrim — it is a backdrop, not a subject, and the type
+        over it has to stay at full contrast.
+      */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+        <Image
+          image={skylineImage}
+          alt=""
+          sizes="100vw"
+          wrapperClassName="absolute inset-0 block"
+          className="h-full w-full object-cover"
+          style={{ objectPosition: '50% 62%' }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(105deg, rgba(11,12,57,0.97) 0%, rgba(11,12,57,0.94) 46%, rgba(21,23,79,0.87) 100%)',
+          }}
+        />
+      </div>
+
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+      <Ornament className="-left-20 top-[-6rem] w-[36rem] text-ice-300" rotate={8} opacity={0.09} />
 
       <div className="relative grid items-start gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1fr_0.8fr]">
         <div>

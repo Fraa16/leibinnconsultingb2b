@@ -1,6 +1,7 @@
 import { ArrowUpRight } from 'lucide-react';
 import Section from './ui/Section';
 import Eyebrow from './ui/Eyebrow';
+import Ornament from './ui/Ornament';
 import Reveal from './ui/Reveal';
 import Button from './ui/Button';
 
@@ -42,6 +43,7 @@ export default function VorteileSection() {
       <div className="grid gap-px overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
         <Reveal className="relative flex flex-col justify-between bg-ink-950 p-7 lg:p-9">
           <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+          <Ornament className="-bottom-12 -right-16 w-[22rem] text-ice-300" rotate={-8} opacity={0.12} />
           <div className="relative">
             <Eyebrow tone="onInk">Warum unser Ansatz wirkt</Eyebrow>
             <h2 className="mt-7 max-w-[13ch] text-h3 text-white">

@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Check, X, ArrowUpRight } from 'lucide-react';
+import { meetingImage } from '../lib/images';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
 import Button from './ui/Button';
+import Image from './ui/Image';
 import SegmentedToggle from './ui/SegmentedToggle';
 import Slot from './ui/Slot';
 import { cn } from '../lib/cn';
@@ -47,7 +49,33 @@ export default function VergleichSection() {
         </div>
       </SectionHead>
 
+      {/*
+        A letterbox band between the head and the table. The comparison itself
+        is a grid of rules and ticks; without an image the section reads as a
+        spreadsheet dropped into the page.
+      */}
       <Reveal className="mt-[clamp(2.5rem,4vw,4rem)]">
+        <div className="relative overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] border border-line">
+          <Image
+            image={meetingImage}
+            // The photo's own alt from the original build; it travels with the
+            // picture rather than being rewritten for its new position.
+            alt="Kundengespräch - Modernes Benefit-System"
+            sizes="(min-width: 1536px) 1400px, 92vw"
+            className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0"
+            style={{
+              background:
+                'linear-gradient(to top, rgba(0,0,34,0.42) 0%, rgba(0,0,34,0.06) 42%, transparent 70%)',
+            }}
+          />
+        </div>
+      </Reveal>
+
+      <Reveal className="mt-[clamp(1.25rem,2vw,2rem)]">
         <div
           className={cn(
             'overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] border transition-colors duration-[350ms] ease-brand',

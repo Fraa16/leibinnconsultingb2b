@@ -51,6 +51,18 @@
     font: inherit;
     letter-spacing: inherit;
   }
+
+  /*
+   * Preflight's `[hidden] { display: none }` lives in this same base layer, so
+   * any display utility on the element — `flex` on the mobile menu overlay —
+   * is a later rule of equal specificity and wins. The overlay then sits over
+   * the whole page at every scroll position with the menu nominally closed.
+   * Forcing the attribute is the standard remedy; `until-found` is spared so
+   * find-in-page can still reveal content.
+   */
+  [hidden]:not([hidden='until-found']) {
+    display: none !important;
+  }
 }
 
 @layer components {

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import Section from './ui/Section';
+import Ornament from './ui/Ornament';
 import Reveal from './ui/Reveal';
 import Slot from './ui/Slot';
 import { cn } from '../lib/cn';
@@ -25,6 +26,7 @@ export default function StimmenSection() {
       <Reveal>
         <div className="relative overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] bg-ink-950 p-7 sm:p-10 lg:p-14">
           <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+          <Ornament className="-right-20 -top-16 w-[28rem] text-ice-300" rotate={-10} opacity={0.1} />
 
           <div className="relative flex min-h-[26rem] flex-col justify-between gap-10">
             <div className="flex items-center gap-4">

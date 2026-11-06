@@ -1,7 +1,8 @@
-import { meetingImage } from '../lib/images';
+import { gespraechImage } from '../lib/images';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Image from './ui/Image';
+import Ornament from './ui/Ornament';
 import Reveal from './ui/Reveal';
 
 /** Each bullet reads "Lead-in: body" — the lead-in carries the weight. */
@@ -22,6 +23,7 @@ export default function AnsatzSection() {
   return (
     <Section id="ansatz" tone="ink" size="lg">
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+      <Ornament className="-left-28 bottom-[-4rem] w-[34rem] text-ice-300" rotate={14} opacity={0.08} />
 
       <SectionHead
         eyebrow="Ein starkes Fundament für moderne Arbeitgeber"
@@ -49,9 +51,15 @@ export default function AnsatzSection() {
 
         <Reveal delay={140}>
           <div className="overflow-hidden rounded-[clamp(1.25rem,2.4vw,1.75rem)] border border-line-onInkStrong">
+            {/*
+              The boardroom photo that used to sit here is the same frame the
+              Vergleich band now carries, so it moved there — presenting the
+              system belongs beside the comparison — and this panel takes the
+              one-to-one conversation instead.
+            */}
             <Image
-              image={meetingImage}
-              alt="Kundengespräch - Modernes Benefit-System"
+              image={gespraechImage}
+              alt="Cedrik Leibinn im Erstgespräch mit einer Mandantin"
               sizes="(min-width: 1024px) 46vw, 100vw"
               className="aspect-[4/3] w-full object-cover"
             />

@@ -7,6 +7,8 @@ import Footer from '../components/Footer';
 import Container from '../components/ui/Container';
 import Eyebrow from '../components/ui/Eyebrow';
 import Field from '../components/ui/Field';
+import Image from '../components/ui/Image';
+import { gespraechImage } from '../lib/images';
 import { controlClasses } from '../lib/formStyles';
 import { supabase } from '../lib/supabase';
 import { STATIC_VARIANTS, VIEWPORT, staggerVariants, staggerChild } from '../lib/motion';
@@ -147,6 +149,20 @@ export default function KontaktPage() {
                 <p className="mt-7 text-small text-content-muted">
                   Ihre Anfrage ist unverbindlich und wird vertraulich behandelt.
                 </p>
+
+                {/*
+                  A form on one side and nothing but a list on the other reads
+                  as a transaction. The photograph puts a person at the other
+                  end of it before the visitor starts typing.
+                */}
+                <div className="mt-10 overflow-hidden rounded-xl4 border border-line bg-panel">
+                  <Image
+                    image={gespraechImage}
+                    alt="Cedrik Leibinn im Erstgespräch mit einer Mandantin"
+                    sizes="(min-width: 1024px) 44vw, 100vw"
+                    className="aspect-[16/10] w-full object-cover"
+                  />
+                </div>
               </motion.div>
 
               <motion.div

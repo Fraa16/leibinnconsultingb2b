@@ -59,3 +59,8 @@ function build(name: string, width: number, height: number): ResponsiveImage {
 export const heroImage = build('cedrik-hero', 5524, 3946);
 export const portraitImage = build('cedrik-portrait', 3807, 5710);
 export const meetingImage = build('kundengespraech', 5528, 3685);
+
+export const fensterImage = build('cedrik-fenster', 2000, 1428);
+export const loungeImage = build('beratung-lounge', 2000, 1333);
+export const gespraechImage = build('beratung-gespraech', 2000, 1333);
+export const skylineImage = build('frankfurt-skyline', 1920, 1080);

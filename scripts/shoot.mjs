@@ -38,16 +38,38 @@ for (const [vpName, width, height] of VIEWPORTS) {
     await page.goto(base + route, { waitUntil: 'load' });
     await page.waitForTimeout(600);
 
-    if (!reduced) {
-      // Walk down a viewport at a time, pausing long enough for the
-      // IntersectionObserver to fire and the reveal to play out.
-      const pages = await page.evaluate(() => Math.ceil(document.body.scrollHeight / window.innerHeight));
-      for (let i = 0; i <= pages; i++) {
-        await page.evaluate((i) => window.scrollTo(0, i * window.innerHeight), i);
-        await page.waitForTimeout(450);
-      }
-      await page.waitForTimeout(600);
+    /*
+     * Walk down a viewport at a time. Under --reduced the reveals need no
+     * settling, but the walk still has to happen: every image below the fold
+     * is loading="lazy", and a full-page screenshot does not wait for the
+     * decode it triggers — skipping the walk photographs empty frames.
+     */
+    const pages = await page.evaluate(() => Math.ceil(document.body.scrollHeight / window.innerHeight));
+    for (let i = 0; i <= pages; i++) {
+      await page.evaluate((i) => window.scrollTo(0, i * window.innerHeight), i);
+      await page.waitForTimeout(reduced ? 180 : 450);
     }
+    await page.evaluate(() => window.scrollTo(0, 0));
+    // Every <img> that started loading must also have finished. A broken one
+    // never fires `load`, so each wait is capped rather than left hanging.
+    await page.evaluate(
+      () =>
+        Promise.all(
+          [...document.images]
+            .filter((img) => !img.complete)
+            .map(
+              (img) =>
+                new Promise((done) => {
+                  const finish = () => done(undefined);
+                  img.addEventListener('load', finish, { once: true });
+                  img.addEventListener('error', finish, { once: true });
+                  setTimeout(finish, 5000);
+                }),
+            ),
+        ),
+      undefined,
+    );
+    await page.waitForTimeout(600);
 
     await page.screenshot({ path: `${outDir}/${tag}-${name}-${vpName}.png`, fullPage: true });
     console.log(`${tag}-${name}-${vpName}.png`);

@@ -1,8 +1,11 @@
+import { fensterImage } from '../lib/images';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
 import Eyebrow from './ui/Eyebrow';
 import Accordion from './ui/Accordion';
+import Image from './ui/Image';
+import Ornament from './ui/Ornament';
 
 const painPoints = [
   'Sie erhalten deutlich weniger qualifizierte Bewerbungen als benötigt.',
@@ -78,9 +81,14 @@ export default function RealitaetscheckSection() {
       <Reveal className="mt-[clamp(3rem,5vw,4.5rem)]">
         <div className="relative overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] bg-ink-950 p-7 sm:p-10 lg:p-14">
           <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+          <Ornament
+            className="-right-16 -top-24 w-[32rem] text-ice-300 lg:-right-24"
+            rotate={-12}
+            opacity={0.1}
+          />
 
           <div className="relative grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-16">
-            <div>
+            <div className="flex flex-col">
               <Eyebrow tone="onInk">Wenn sich nichts ändert …</Eyebrow>
               <h3 className="mt-7 max-w-[14ch] text-h2 text-white">
                 Mögliche Folgen für Ihr Unternehmen
@@ -89,6 +97,21 @@ export default function RealitaetscheckSection() {
                 Ohne strukturierte Benefits drohen steigende Kosten, längere Vakanzzeiten und der
                 Verlust qualifizierter Mitarbeitender an die Konkurrenz.
               </p>
+
+              {/*
+                The accordion beside this runs far taller than the three lines
+                of copy, which left most of the column empty on a wide screen.
+                The photo fills it and keeps the dark card from reading as a
+                slab of text.
+              */}
+              <div className="mt-10 hidden overflow-hidden rounded-[clamp(1rem,2vw,1.5rem)] border border-line-onInkStrong lg:mt-auto lg:block">
+                <Image
+                  image={fensterImage}
+                  alt="Cedrik Leibinn am Fenster mit Blick über die Stadt"
+                  sizes="(min-width: 1024px) 38vw, 100vw"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              </div>
             </div>
 
             <Accordion

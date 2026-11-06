@@ -9,6 +9,12 @@ type ImageProps = {
   /** The `sizes` hint — how wide the image renders at each breakpoint. */
   sizes: string;
   className?: string;
+  /**
+   * Classes for the <picture> itself. A <picture> is inline by default, so an
+   * <img> inside it cannot resolve a percentage height; a background image
+   * that has to fill its container needs the wrapper positioned too.
+   */
+  wrapperClassName?: string;
   style?: CSSProperties;
   /** Only the hero should be eager; everything else lazy-loads. */
   priority?: boolean;
@@ -21,9 +27,17 @@ type ImageProps = {
  * a 3807×5710 / 11.8 MB JPEG rendered into a 448px card, and 24.4 MB of
  * imagery on the homepage alone.
  */
-export default function Image({ image, alt, sizes, className, style, priority = false }: ImageProps) {
+export default function Image({
+  image,
+  alt,
+  sizes,
+  className,
+  wrapperClassName,
+  style,
+  priority = false,
+}: ImageProps) {
   return (
-    <picture>
+    <picture className={wrapperClassName}>
       <source type="image/avif" srcSet={image.avif} sizes={sizes} />
       <source type="image/webp" srcSet={image.webp} sizes={sizes} />
       <img

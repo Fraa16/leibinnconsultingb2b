@@ -3,7 +3,9 @@ import { ArrowUpRight } from 'lucide-react';
 import { useSiteNav } from '../hooks/useSiteNav';
 import Container from './ui/Container';
 import Logo from './ui/Logo';
+import Ornament from './ui/Ornament';
 import Reveal from './ui/Reveal';
+import { LOCKUP_NAME } from './ui/logo-paths';
 
 const NAV_LINKS = [
   { label: 'Startseite', id: 'hero' },
@@ -24,11 +26,12 @@ export default function Footer() {
   return (
     <footer id="footer" className="relative overflow-hidden bg-ink-950 text-white">
       <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
+      <Ornament className="-right-24 top-10 w-[30rem] text-ice-300" rotate={-6} opacity={0.08} />
 
       <Container className="relative pb-10 pt-[clamp(4.5rem,8vw,7rem)]">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
           <Reveal>
-            <Logo onInk />
+            <Logo onInk tagline />
             <p className="mt-8 max-w-[14ch] text-giant text-white">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>
@@ -76,21 +79,38 @@ export default function Footer() {
       </Container>
 
       {/*
-        Wordmark blown up and cropped to a sliver along the bottom edge, as in
-        the brand designs. Hidden from assistive tech since the name is
-        already announced by the logo above.
+        The wordmark itself — the brand's serif, not the UI face — blown up and
+        cropped to a sliver along the bottom edge, as the brand designs do.
+        Sized by height so the same share of the letterforms shows at every
+        width. Hidden from assistive tech: the name is already announced by
+        the logo above.
       */}
       <div
         aria-hidden="true"
-        className="relative h-[clamp(3.5rem,8vw,7rem)] select-none overflow-hidden"
+        className="relative h-[clamp(1.75rem,4.4vw,4.5rem)] select-none overflow-hidden"
       >
-        <span
-          className="accent-text absolute left-1/2 top-0 -translate-x-1/2 whitespace-nowrap
-                     font-medium leading-none tracking-[-0.055em] opacity-[0.22]"
-          style={{ fontSize: 'clamp(5rem,13vw,13rem)' }}
+        {/*
+          Full page width, height left to the artwork's own ratio, and the
+          band clipped to roughly two thirds of it — so the crop lands in the
+          same place at every width instead of eating the outer letters.
+        */}
+        <svg
+          viewBox="479 25 1521 106"
+          preserveAspectRatio="xMidYMin meet"
+          className="absolute inset-x-0 top-0 w-full"
         >
-          Leibinn Consulting
-        </span>
+          <defs>
+            <linearGradient id="footer-wordmark" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.26" />
+              <stop offset="1" stopColor="#A1CEE5" stopOpacity="0.10" />
+            </linearGradient>
+          </defs>
+          <g fill="url(#footer-wordmark)">
+            {LOCKUP_NAME.map((d) => (
+              <path key={d.length + d.slice(0, 24)} d={d} />
+            ))}
+          </g>
+        </svg>
       </div>
     </footer>
   );

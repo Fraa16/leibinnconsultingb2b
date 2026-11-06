@@ -1,8 +1,10 @@
 import { ArrowUpRight } from 'lucide-react';
+import { loungeImage } from '../lib/images';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
 import Button from './ui/Button';
+import Image from './ui/Image';
 
 const processSteps = [
   {
@@ -44,7 +46,25 @@ export default function AblaufSection() {
         className="lg:!grid-cols-1"
       />
 
-      <div className="mt-[clamp(3rem,5vw,4.5rem)]">
+      {/*
+        The photo holds a sticky column beside the steps. Four steps make a
+        tall list, and a column of nothing but rules reads as a document;
+        pinning the image keeps the people in view the whole way down it.
+      */}
+      <div className="mt-[clamp(3rem,5vw,4.5rem)] grid gap-[clamp(2.5rem,4vw,4rem)] lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)]">
+        <Reveal className="lg:sticky lg:top-28 lg:self-start">
+          <div className="overflow-hidden rounded-[clamp(1.25rem,2.4vw,1.75rem)] border border-line bg-panel">
+            <Image
+              image={loungeImage}
+              alt="Cedrik Leibinn im Beratungsgespräch mit einem Mandanten"
+              sizes="(min-width: 1024px) 34vw, 100vw"
+              // Kept near the master's own 3:2. A portrait crop of a wide
+              // two-shot cuts horizontally, and one of the two people with it.
+              className="aspect-[4/3] w-full object-cover"
+            />
+          </div>
+        </Reveal>
+
         <div>
           <ol className="border-t border-line">
             {processSteps.map((step, i) => (

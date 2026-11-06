@@ -115,13 +115,37 @@ console.log('\n7. Mobile menu');
 await page.setViewportSize({ width: 390, height: 844 });
 await goHome();
 const toggle = page.locator('button[aria-controls="mobile-menu"]');
+const panel = page.locator('#mobile-menu');
+
+/*
+ * The state is asserted on the panel as well as on the button. Checking only
+ * aria-expanded once passed while the overlay actually covered the page the
+ * whole time: Preflight's `[hidden] { display: none }` and Tailwind's `flex`
+ * utility are the same specificity, and the utility is written later.
+ */
 check('toggle starts collapsed', (await toggle.getAttribute('aria-expanded')) === 'false');
+check('panel starts hidden', !(await panel.isVisible()));
 await toggle.click();
 await page.waitForTimeout(400);
 check('toggle expands', (await toggle.getAttribute('aria-expanded')) === 'true');
+check('panel becomes visible', await panel.isVisible());
 await page.keyboard.press('Escape');
 await page.waitForTimeout(400);
 check('Escape closes it', (await toggle.getAttribute('aria-expanded')) === 'false');
+check('panel hidden again', !(await panel.isVisible()));
+
+// The same cascade trap applies to every collapsed accordion panel.
+await page.setViewportSize({ width: 1440, height: 900 });
+await goHome();
+const collapsedPanels = await page.locator('[role="region"][hidden]').count();
+const visibleCollapsed = await page
+  .locator('[role="region"][hidden]')
+  .evaluateAll((els) => els.filter((el) => getComputedStyle(el).display !== 'none').length);
+check(
+  'collapsed accordion panels are not rendered',
+  collapsedPanels > 0 && visibleCollapsed === 0,
+  `${collapsedPanels} collapsed, ${visibleCollapsed} still displayed`,
+);
 
 await browser.close();
 
