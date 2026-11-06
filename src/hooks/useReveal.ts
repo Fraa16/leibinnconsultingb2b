@@ -91,6 +91,40 @@ export function useCountUp(value: number, duration = 1500) {
   return { ref, current };
 }
 
+/**
+ * Follows `target` with a short eased tween instead of jumping to it, so a
+ * figure driven by a slider rolls to its new value. Snaps under reduced
+ * motion.
+ */
+export function useTweened(target: number, duration = 450) {
+  const [shown, setShown] = useState(target);
+  const fromRef = useRef(target);
+
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      setShown(target);
+      fromRef.current = target;
+      return;
+    }
+
+    const from = fromRef.current;
+    let frame = 0;
+    let start = 0;
+    const step = (now: number) => {
+      if (!start) start = now;
+      const p = Math.min((now - start) / duration, 1);
+      const value = from + (target - from) * easeOutCubic(p);
+      fromRef.current = value;
+      setShown(value);
+      if (p < 1) frame = requestAnimationFrame(step);
+    };
+    frame = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(frame);
+  }, [target, duration]);
+
+  return shown;
+}
+
 /** German number formatting, as the handoff specifies. */
 export const de = (n: number) => Math.round(n).toLocaleString('de-DE');
 export const euro = (n: number) => `${de(n)} €`;

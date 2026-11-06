@@ -21,15 +21,27 @@ const goHome = async () => {
   await page.waitForTimeout(700);
 };
 
-console.log('\n1. CTAs that previously pointed at a non-existent #kontakt');
-for (const label of ['Unverbindliche Beratung anfragen', 'Jetzt Vorteile im Gespräch prüfen']) {
+/*
+ * Every homepage CTA must land on /kontakt. Two of them once scrolled to a
+ * #kontakt anchor that did not exist, so a click did nothing at all; the
+ * list now covers each section's CTA, matched by its accessible name.
+ */
+console.log('\n1. Every homepage CTA reaches /kontakt');
+for (const name of [
+  'Kostenloses Erstgespräch sichern',
+  'Potenzial prüfen',
+  'Im Erstgespräch prüfen',
+  'Mit Schritt 1 starten',
+  'Frage stellen',
+  'Kostenloses Erstgespräch mit Cedrik Leibinn sichern',
+]) {
   await goHome();
-  const el = page.locator(`text=${label}`).first();
+  const el = page.getByRole('link', { name, exact: true }).first();
   await el.scrollIntoViewIfNeeded();
   await page.waitForTimeout(400);
   await el.click();
   await page.waitForTimeout(700);
-  check(`"${label}" reaches /kontakt`, new URL(page.url()).pathname === '/kontakt', page.url());
+  check(`"${name}" reaches /kontakt`, new URL(page.url()).pathname === '/kontakt', page.url());
 }
 
 console.log('\n2. Footer links');
@@ -134,17 +146,27 @@ await page.waitForTimeout(400);
 check('Escape closes it', (await toggle.getAttribute('aria-expanded')) === 'false');
 check('panel hidden again', !(await panel.isVisible()));
 
-// The same cascade trap applies to every collapsed accordion panel.
+/*
+ * Collapsed accordion panels animate shut, so they stay in the layout at zero
+ * height — but they must be invisible, which also takes them out of the tab
+ * order and the accessibility tree. Wait out the close transition first.
+ */
 await page.setViewportSize({ width: 1440, height: 900 });
 await goHome();
-const collapsedPanels = await page.locator('[role="region"][hidden]').count();
-const visibleCollapsed = await page
-  .locator('[role="region"][hidden]')
-  .evaluateAll((els) => els.filter((el) => getComputedStyle(el).display !== 'none').length);
+await page.waitForTimeout(800);
+const panelStates = await page.locator('[role="region"][data-state]').evaluateAll((els) =>
+  els.map((el) => ({
+    open: el.getAttribute('data-state') === 'open',
+    visible: getComputedStyle(el).visibility === 'visible',
+    height: el.getBoundingClientRect().height,
+  })),
+);
+const collapsed = panelStates.filter((p) => !p.open);
+const leaking = collapsed.filter((p) => p.visible || p.height > 1);
 check(
-  'collapsed accordion panels are not rendered',
-  collapsedPanels > 0 && visibleCollapsed === 0,
-  `${collapsedPanels} collapsed, ${visibleCollapsed} still displayed`,
+  'collapsed accordion panels are hidden and zero-height',
+  collapsed.length > 0 && leaking.length === 0,
+  `${collapsed.length} collapsed, ${leaking.length} still showing`,
 );
 
 await browser.close();

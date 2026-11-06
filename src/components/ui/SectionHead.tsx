@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cn } from '../../lib/cn';
 import Eyebrow from './Eyebrow';
 import Reveal from './Reveal';
+import SplitWords from './SplitWords';
 
 type SectionHeadProps = {
   eyebrow?: ReactNode;
@@ -17,10 +18,15 @@ type SectionHeadProps = {
   children?: ReactNode;
 };
 
+const delay = (ms: number) => ({ ['--d' as string]: `${ms}ms` }) as CSSProperties;
+
 /**
  * The handoff's standard section header: a two-column grid of
  * `minmax(0,1.5fr) minmax(0,1fr)`, eyebrow and H2 on the left, lead paragraph
- * on the right, bottom-aligned, gap clamp(40px,6vw,120px). Stacks on mobile.
+ * on the right, bottom-aligned. Stacks on mobile.
+ *
+ * One trigger, staged inside: the eyebrow rule draws, the headline rises
+ * word by word out of its own line boxes, then the lead and any controls.
  */
 export default function SectionHead({
   eyebrow,
@@ -35,32 +41,55 @@ export default function SectionHead({
 }: SectionHeadProps) {
   const onInk = tone === 'onInk';
 
+  const heading = (
+    <Tag
+      className={cn(
+        'a-words',
+        eyebrow ? 'mt-7' : undefined,
+        onInk ? 'text-white' : undefined,
+        Tag === 'h3' ? 'text-h2' : undefined,
+        titleWidth,
+      )}
+      style={delay(120)}
+    >
+      <SplitWords>{title}</SplitWords>
+    </Tag>
+  );
+
+  const leadParagraph = lead && (
+    <p
+      className={cn(
+        'a-rise max-w-measure text-lead',
+        align === 'center' && 'mt-6',
+        onInk ? 'text-white/65' : 'text-content',
+      )}
+      style={delay(380)}
+    >
+      {lead}
+    </p>
+  );
+
   if (align === 'center') {
     return (
-      <Reveal className={cn('mx-auto flex max-w-3xl flex-col items-center text-center', className)}>
+      <Reveal
+        variant="group"
+        className={cn('mx-auto flex max-w-3xl flex-col items-center text-center', className)}
+      >
         {eyebrow && <Eyebrow tone={tone}>{eyebrow}</Eyebrow>}
-        <Tag
-          className={cn(
-            eyebrow ? 'mt-7' : undefined,
-            onInk ? 'text-white' : undefined,
-            Tag === 'h3' ? 'text-h2' : undefined,
-            titleWidth,
-          )}
-        >
-          {title}
-        </Tag>
-        {lead && (
-          <p className={cn('mt-6 max-w-measure text-lead', onInk ? 'text-white/65' : 'text-content')}>
-            {lead}
-          </p>
+        {heading}
+        {leadParagraph}
+        {children && (
+          <div className="a-rise" style={delay(480)}>
+            {children}
+          </div>
         )}
-        {children}
       </Reveal>
     );
   }
 
   return (
     <Reveal
+      variant="group"
       className={cn(
         'grid items-end gap-x-[clamp(2.5rem,6vw,7.5rem)] gap-y-6',
         'lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]',
@@ -69,26 +98,17 @@ export default function SectionHead({
     >
       <div>
         {eyebrow && <Eyebrow tone={tone}>{eyebrow}</Eyebrow>}
-        <Tag
-          className={cn(
-            eyebrow ? 'mt-7' : undefined,
-            onInk ? 'text-white' : undefined,
-            Tag === 'h3' ? 'text-h2' : undefined,
-            titleWidth,
-          )}
-        >
-          {title}
-        </Tag>
+        {heading}
       </div>
 
       {(lead || children) && (
         <div>
-          {lead && (
-            <p className={cn('max-w-measure text-lead', onInk ? 'text-white/65' : 'text-content')}>
-              {lead}
-            </p>
+          {leadParagraph}
+          {children && (
+            <div className="a-rise" style={delay(480)}>
+              {children}
+            </div>
           )}
-          {children}
         </div>
       )}
     </Reveal>

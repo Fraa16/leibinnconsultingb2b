@@ -1,20 +1,20 @@
 import { useState } from 'react';
-import { Check, ArrowUpRight } from 'lucide-react';
+import { Check } from 'lucide-react';
 import Section from './ui/Section';
 import SectionHead from './ui/SectionHead';
 import Reveal from './ui/Reveal';
 import Button from './ui/Button';
 import RangeSlider from './ui/RangeSlider';
-import Slot from './ui/Slot';
-import { euro, de } from '../hooks/useReveal';
+import { euro, de, useTweened } from '../hooks/useReveal';
 import { cn } from '../lib/cn';
 
 /*
- * Statutory allowances. These are the figures the brand handoff specifies,
- * and they drive the result, so they are real rather than placeholders.
+ * Statutory allowances, current for 2026: the monthly Sachbezug limit
+ * (a Freigrenze, so a cent over makes the whole amount taxable) and the
+ * annual health-promotion allowance (a Freibetrag). Both are free of income
+ * tax and social contributions when paid on top of the agreed salary.
  *
- * They must be confirmed by a tax adviser before launch — the amounts and
- * their conditions change, and this tool states them to prospects.
+ * Re-check them each January; the tool states them to prospects.
  */
 const ALLOWANCES = [
   {
@@ -38,10 +38,11 @@ const PRESETS = [10, 25, 50, 100];
 /**
  * Steuerfrei-Rechner.
  *
- * Interaction and arithmetic are complete; the surrounding wording is marked
- * as slots for the client. Formula per the handoff:
  *   perHead = (health ? 600 : 0) + (sachbezug ? 50 × 12 : 0)
  *   total   = perHead × employees
+ *
+ * The total rolls to each new value rather than jumping, so moving the
+ * slider reads as the figure growing with the team.
  */
 export default function RechnerSection() {
   const [employees, setEmployees] = useState(40);
@@ -52,17 +53,16 @@ export default function RechnerSection() {
 
   const perHead = ALLOWANCES.reduce((sum, a) => sum + (enabled[a.id] ? a.perYear : 0), 0);
   const total = perHead * employees;
+  const shownTotal = useTweened(total);
 
   return (
-    <Section id="rechner" tone="ink" size="lg">
-      <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
-
+    <Section id="rechner" tone="ink" size="lg" className="ink-glow">
       <SectionHead
-        eyebrow={<Slot tone="onInk">Platzhalter: Eyebrow</Slot>}
-        title={<Slot tone="onInk">Platzhalter: Überschrift für den Rechner</Slot>}
-        lead={<Slot tone="onInk">Platzhalter: ein bis zwei Sätze, die den Rechner einordnen</Slot>}
+        eyebrow="Steuerfrei-Rechner"
+        title="So viel können Sie Ihrem Team steuerfrei geben"
+        lead="Zwei gesetzliche Spielräume, die viele Betriebe nicht voll nutzen. Stellen Sie Ihre Teamgröße ein und sehen Sie, was pro Jahr möglich ist."
         tone="onInk"
-        titleWidth="max-w-[22ch]"
+        titleWidth="max-w-[17ch]"
         className="relative"
       />
 
@@ -141,15 +141,15 @@ export default function RechnerSection() {
 
           {/* ── Result ── */}
           <div className="border-t border-line-onInkStrong bg-ink-950 p-7 sm:p-9 lg:border-l lg:border-t-0 lg:p-11">
-            <p className="text-meta uppercase text-white/45">
-              <Slot tone="onInk">Platzhalter: Label über dem Ergebnis</Slot>
+            <p className="text-meta uppercase text-white/45">Steuerfreies Potenzial pro Jahr</p>
+
+            <p className="accent-text tnum mt-6 whitespace-nowrap text-total" aria-live="polite">
+              {euro(shownTotal)}
             </p>
 
-            <p className="accent-text tnum mt-6 whitespace-nowrap text-total">{euro(total)}</p>
-
             <p className="mt-4 text-small text-white/55">
-              für <span className="tnum text-white">{de(employees)}</span> Mitarbeitende,{' '}
-              <Slot tone="onInk">Platzhalter: Zusatz</Slot>
+              für <span className="tnum text-white">{de(employees)}</span> Mitarbeitende. Kommt vollständig
+              netto an.
             </p>
 
             <dl className="mt-9 border-t border-line-onInk">
@@ -165,13 +165,19 @@ export default function RechnerSection() {
               </div>
             </dl>
 
-            <Button to="/kontakt" variant="onInk" size="xl" fullWidth className="mt-8" icon={<ArrowUpRight size={18} />}>
-              <Slot>Platzhalter: CTA</Slot>
+            {/* Short on purpose: it has to fit one line in this panel on a 375px phone. */}
+            <Button to="/kontakt" variant="onInk" size="xl" fullWidth className="mt-8">
+              Potenzial prüfen
             </Button>
 
+            {/*
+              The previous wording ended "vor Veröffentlichung steuerlich zu
+              prüfen" — a note meant for the client, which was showing to
+              visitors.
+            */}
             <p className="mt-5 text-small leading-relaxed text-white/40">
-              Vereinfachte Modellrechnung auf Basis der genannten Freibeträge. Keine Steuerberatung.
-              Beträge und Voraussetzungen sind vor Veröffentlichung steuerlich zu prüfen.
+              Vereinfachte Modellrechnung auf Basis der gesetzlichen Höchstbeträge. Keine
+              Steuerberatung; die Voraussetzungen im Einzelfall klären Sie mit Ihrer Steuerberatung.
             </p>
           </div>
         </div>

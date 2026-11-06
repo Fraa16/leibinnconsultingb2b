@@ -6,7 +6,7 @@
  *
  *   npm run og          (after `npm run logo`)
  *
- * Text is drawn with Instrument Sans, the site's face — librsvg resolves it
+ * Text is drawn with Instrument Sans, the site's face. librsvg resolves it
  * from the system font list, so the card is typeset in the brand rather than
  * in whatever the renderer falls back to.
  */
@@ -67,9 +67,9 @@ const overlay = Buffer.from(`
         letter-spacing="-1.9" fill="#A1CEE5">${esc('Arbeitgeber')}</text>
 
   <text x="72" y="452" font-family="Instrument Sans" font-size="21" font-weight="400"
-        letter-spacing="-0.3" fill="#FFFFFF" opacity="0.72">${esc('Strukturierte Benefit-Systeme für den Mittelstand —')}</text>
+        letter-spacing="-0.3" fill="#FFFFFF" opacity="0.72">${esc('Benefit-Systeme für den Mittelstand:')}</text>
   <text x="72" y="483" font-family="Instrument Sans" font-size="21" font-weight="400"
-        letter-spacing="-0.3" fill="#FFFFFF" opacity="0.72">${esc('steuerlich optimiert, verwaltungsarm, spürbar wirksam.')}</text>
+        letter-spacing="-0.3" fill="#FFFFFF" opacity="0.72">${esc('steuerlich sauber und einfach zu verwalten.')}</text>
 
   <rect x="72" y="528" width="140" height="2" fill="#A1CEE5" opacity="0.45"/>
   <text x="72" y="566" font-family="Instrument Sans" font-size="18" font-weight="500"

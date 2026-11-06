@@ -33,6 +33,9 @@ const IMAGES = [
   { in: 'beratung-gespraech.jpg', out: 'beratung-gespraech', widths: [640, 960, 1280] },
   // Closing CTA: full-bleed behind a heavy navy scrim, so quality can be low.
   { in: 'frankfurt-skyline.webp', out: 'frankfurt-skyline', widths: [1024, 1600, 1920] },
+  // Closing CTA: Cedrik cut out of photo 7 (rembg, birefnet-portrait model),
+  // cropped head to chest. Transparent; AVIF and WebP both keep the alpha.
+  { in: 'cedrik-cutout.png', out: 'cedrik-cutout', widths: [480, 720, 1000] },
 ];
 
 const AVIF = { quality: 52, effort: 6 };
@@ -50,7 +53,11 @@ mkdirSync(OUT, { recursive: true });
 let before = 0;
 let after = 0;
 
-for (const img of IMAGES) {
+// `npm run images -- cedrik-cutout` regenerates just the named outputs.
+const only = process.argv.slice(2);
+const selected = only.length ? IMAGES.filter((img) => only.includes(img.out)) : IMAGES;
+
+for (const img of selected) {
   const src = join(SRC, img.in);
   if (!existsSync(src)) {
     console.warn(`skip ${img.in} — not found in assets-source/`);

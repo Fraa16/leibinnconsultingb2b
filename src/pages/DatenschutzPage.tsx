@@ -3,7 +3,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function DatenschutzPage() {
   useDocumentMeta({
-    title: 'Datenschutzerklärung — Leibinn Consulting',
+    title: 'Datenschutzerklärung | Leibinn Consulting',
     description: 'Informationen zur Verarbeitung personenbezogener Daten nach Art. 13 und 14 DSGVO.',
     path: '/datenschutz',
     noindex: true,
@@ -40,7 +40,7 @@ export default function DatenschutzPage() {
       <LegalBlock heading="Server-Logfiles">
         <p>
           Beim Aufruf dieser Website werden automatisch Informationen verarbeitet, die Ihr Browser
-          übermittelt — insbesondere IP-Adresse, Datum und Uhrzeit der Anfrage, aufgerufene Seite,
+          übermittelt, insbesondere IP-Adresse, Datum und Uhrzeit der Anfrage, aufgerufene Seite,
           Referrer-URL sowie Browser- und Betriebssystemangaben. Rechtsgrundlage ist Art. 6 Abs. 1
           lit. f DSGVO; unser berechtigtes Interesse liegt im sicheren und stabilen Betrieb der
           Website. Speicherdauer: <Placeholder>Aufbewahrungsfrist</Placeholder>.
@@ -63,8 +63,7 @@ export default function DatenschutzPage() {
         <p>
           Die Übermittlung erfolgt verschlüsselt. Ihre Angaben werden gelöscht, sobald sie für die
           Zweckerreichung nicht mehr erforderlich sind und keine gesetzlichen
-          Aufbewahrungspflichten entgegenstehen —
-          spätestens <Placeholder>Löschfrist</Placeholder>.
+          Aufbewahrungspflichten entgegenstehen, spätestens <Placeholder>Löschfrist</Placeholder>.
         </p>
       </LegalBlock>
 
@@ -89,14 +88,14 @@ export default function DatenschutzPage() {
         </p>
         <p className="text-content-muted">
           Hinweis für die Umsetzung: Werden die Schriften stattdessen lokal ausgeliefert, entfällt
-          diese Verbindung — und dieser Abschnitt ist entsprechend zu streichen.
+          diese Verbindung, und dieser Abschnitt ist entsprechend zu streichen.
         </p>
       </LegalBlock>
 
       <LegalBlock heading="Cookies und Reichweitenmessung">
         <p>
           <Placeholder>
-            Anzugeben, sofern Cookies, Analyse- oder Marketing-Dienste eingesetzt werden — inklusive
+            Anzugeben, sofern Cookies, Analyse- oder Marketing-Dienste eingesetzt werden, inklusive
             Einwilligungsmanagement nach § 25 TDDDG
           </Placeholder>
         </p>

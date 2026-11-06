@@ -64,3 +64,5 @@ export const fensterImage = build('cedrik-fenster', 2000, 1428);
 export const loungeImage = build('beratung-lounge', 2000, 1333);
 export const gespraechImage = build('beratung-gespraech', 2000, 1333);
 export const skylineImage = build('frankfurt-skyline', 1920, 1080);
+/** Transparent: Cedrik cut out of his background, head to chest. */
+export const cutoutImage = build('cedrik-cutout', 1122, 925);

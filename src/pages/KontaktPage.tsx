@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ChangeEvent } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Check, CheckCircle2, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+import { Check, CheckCircle2, ArrowUpRight, Loader2, AlertCircle } from 'lucide-react';
 import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
@@ -15,9 +15,9 @@ import { STATIC_VARIANTS, VIEWPORT, staggerVariants, staggerChild } from '../lib
 import { cn } from '../lib/cn';
 
 const assurances = [
-  'Speziell für kleine und mittlere Unternehmen mit 5–200 Mitarbeitenden',
-  'Steuerlich durchdachte, alltagstaugliche Lösungen statt isolierter Einzelmaßnahmen',
-  'Persönliche Begleitung von Cedrik Leibinn – ohne anonyme Produkthotlines',
+  'Für Betriebe mit 5 bis 200 Mitarbeitenden',
+  'Ein durchdachtes System statt einzelner Extras',
+  'Persönlich mit Cedrik Leibinn, keine Hotline',
 ];
 
 const EMPTY = {
@@ -41,9 +41,9 @@ export default function KontaktPage() {
   const reduced = useReducedMotion();
 
   useDocumentMeta({
-    title: 'Kontakt & Erstgespräch — Leibinn Consulting',
+    title: 'Kontakt & Erstgespräch | Leibinn Consulting',
     description:
-      'Kostenloses Erstgespräch für Ihr Benefit-System: ehrliche Einschätzung, konkrete Ansatzpunkte und ein klares Bild, ob eine Zusammenarbeit sinnvoll ist.',
+      'Kostenloses Erstgespräch für Ihr Benefit-System. Sie bekommen eine ehrliche Einschätzung, konkrete Ansatzpunkte und Antwort innerhalb von 24 Stunden.',
     path: '/kontakt',
   });
 
@@ -85,7 +85,7 @@ export default function KontaktPage() {
       // applied yet, PostgREST rejects the whole row over the unknown column —
       // so fall back to inserting without it rather than losing the lead.
       if (error && /position/i.test(`${error.message} ${error.details ?? ''}`)) {
-        console.warn('contact_submissions.position missing — run the migration. Retrying without it.');
+        console.warn('contact_submissions.position missing: run the migration. Retrying without it.');
         ({ error } = await supabase.from('contact_submissions').insert([row]));
       }
       if (error) throw error;
@@ -106,14 +106,6 @@ export default function KontaktPage() {
       <Navigation />
       <main id="inhalt">
         <section className="relative overflow-hidden pb-24 pt-32 md:pb-32 md:pt-40">
-          <div
-            aria-hidden="true"
-            className="grid-lines-light pointer-events-none absolute inset-0"
-            style={{
-              maskImage: 'linear-gradient(to bottom, black, transparent 70%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, black, transparent 70%)',
-            }}
-          />
 
           <Container className="relative">
             <motion.div
@@ -129,7 +121,7 @@ export default function KontaktPage() {
                 <h1 className="mt-7 max-w-[15ch]">Kostenloses Erstgespräch für Ihr Benefit-System</h1>
 
                 <p className="mt-6 max-w-measure text-lead text-content">
-                  In einem unverbindlichen Erstgespräch prüfen wir gemeinsam, wie ein strukturiertes Benefit-System in Ihrem Unternehmen aussehen kann. Sie erhalten eine ehrliche Einschätzung, konkrete Ansatzpunkte und ein klares Bild, ob und wie eine Zusammenarbeit sinnvoll ist.
+                  Wir prüfen gemeinsam, wie ein Benefit-System in Ihrem Betrieb aussehen kann. Sie bekommen eine ehrliche Einschätzung und konkrete Ansatzpunkte und wissen danach, ob eine Zusammenarbeit für Sie sinnvoll ist.
                 </p>
 
                 <ul className="mt-10 space-y-px border-t border-line">
@@ -185,7 +177,7 @@ export default function KontaktPage() {
                       <Eyebrow>Ihre Anfrage</Eyebrow>
                       <h2 className="mt-4 text-h4">Lassen Sie uns über Ihr Benefit-System sprechen</h2>
                       <p className="mt-2.5 text-small leading-relaxed text-content">
-                        Füllen Sie das Formular in 2–3 Minuten aus. Wir melden uns innerhalb von 24 Stunden mit einem Vorschlag für Ihr Erstgespräch.
+                        Das Formular dauert zwei bis drei Minuten. Innerhalb von 24 Stunden bekommen Sie einen Terminvorschlag.
                       </p>
                     </div>
 
@@ -308,10 +300,10 @@ export default function KontaktPage() {
                           ) : (
                             <>
                               Erstgespräch anfragen
-                              <ArrowRight
-                                size={16}
+                              <ArrowUpRight
+                                size={17}
                                 aria-hidden="true"
-                                className="transition-transform duration-200 group-hover:translate-x-0.5"
+                                className="transition-transform duration-200 ease-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                               />
                             </>
                           )}

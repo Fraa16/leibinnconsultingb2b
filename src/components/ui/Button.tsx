@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { ArrowUpRight } from 'lucide-react';
 import { cn } from '../../lib/cn';
 
 type Variant = 'primary' | 'secondary' | 'onInk' | 'onInkGhost' | 'link';
@@ -40,7 +41,8 @@ const VARIANTS: Record<Variant, string> = {
 const SIZES: Record<Size, string> = {
   md: 'h-12 px-6 text-small',
   lg: 'h-[3.25rem] px-7 text-small',
-  xl: 'h-[3.875rem] px-8 text-body',
+  // A step smaller below sm, so the longest label stays on one line on a phone.
+  xl: 'h-[3.875rem] whitespace-nowrap px-6 text-small sm:px-8 sm:text-body',
 };
 
 function classes(variant: Variant, size: Size, fullWidth?: boolean, className?: string) {
@@ -55,19 +57,36 @@ function classes(variant: Variant, size: Size, fullWidth?: boolean, className?: 
   );
 }
 
+/*
+ * The arrow moves up and to the right on hover — the movement the navbar's
+ * Kontakt button set, applied to every pill so the site has one gesture for
+ * "this takes you somewhere". Exported for the few CTAs that are not built
+ * from this component (the nav, the mobile menu, the form's submit).
+ */
+export const ARROW_HOVER =
+  'transition-transform duration-200 ease-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5';
+
 function Icon({ icon }: { icon: ReactNode }) {
-  return <span className="transition-transform duration-200 group-hover:translate-x-0.5">{icon}</span>;
+  return (
+    <span aria-hidden="true" className={cn('inline-flex', ARROW_HOVER)}>
+      {icon}
+    </span>
+  );
 }
 
 export default function Button(props: ButtonProps | LinkProps) {
   const { children, variant = 'primary', size = 'lg', className, icon, fullWidth } = props;
   const cls = classes(variant, size, fullWidth, className);
 
+  // Every pill carries the arrow unless a caller passes `icon={null}`.
+  const glyph =
+    icon !== undefined ? icon : variant === 'link' ? null : <ArrowUpRight size={size === 'xl' ? 18 : 17} />;
+
   if ('to' in props && props.to) {
     return (
       <Link to={props.to} onClick={props.onClick} className={cls}>
         {children}
-        {icon && <Icon icon={icon} />}
+        {glyph && <Icon icon={glyph} />}
       </Link>
     );
   }
@@ -76,7 +95,7 @@ export default function Button(props: ButtonProps | LinkProps) {
   return (
     <button type={type} onClick={onClick} disabled={disabled} className={cls}>
       {children}
-      {icon && <Icon icon={icon} />}
+      {glyph && <Icon icon={glyph} />}
     </button>
   );
 }

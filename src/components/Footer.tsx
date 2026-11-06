@@ -3,36 +3,35 @@ import { ArrowUpRight } from 'lucide-react';
 import { useSiteNav } from '../hooks/useSiteNav';
 import Container from './ui/Container';
 import Logo from './ui/Logo';
-import Ornament from './ui/Ornament';
 import Reveal from './ui/Reveal';
 import { LOCKUP_NAME } from './ui/logo-paths';
 
 const NAV_LINKS = [
   { label: 'Startseite', id: 'hero' },
   { label: 'Ansatz', id: 'ansatz' },
+  { label: 'Rechner', id: 'rechner' },
   { label: 'Branchen', id: 'branchen' },
   { label: 'Über uns', id: 'ueber-uns' },
   { label: 'Kontakt', id: 'kontakt' },
 ];
 
 /**
- * Footer, on the handoff's pattern: a giant statement set in the display
- * size, link columns, and the wordmark blown up and cropped along the bottom
- * edge. The existing tagline carries the statement, so no copy is invented.
+ * Footer: logo and statement, link column, and the wordmark blown up and
+ * cropped along the bottom edge. The statement is set at H2 rather than the
+ * display size it had, so the footer reads as a close, not a second hero.
  */
 export default function Footer() {
   const { goTo } = useSiteNav();
 
   return (
     <footer id="footer" className="relative overflow-hidden bg-ink-950 text-white">
-      <div aria-hidden="true" className="grid-lines pointer-events-none absolute inset-0" />
-      <Ornament className="-right-24 top-10 w-[30rem] text-ice-300" rotate={-6} opacity={0.08} />
+      <div aria-hidden="true" className="ink-glow pointer-events-none absolute inset-0" />
 
       <Container className="relative pb-10 pt-[clamp(4.5rem,8vw,7rem)]">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
           <Reveal>
             <Logo onInk tagline />
-            <p className="mt-8 max-w-[14ch] text-giant text-white">
+            <p className="mt-8 max-w-[16ch] text-h2 text-white">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>
           </Reveal>

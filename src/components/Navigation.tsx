@@ -14,8 +14,8 @@ const NAV_LINKS = [
   { label: 'Ansatz', id: 'ansatz' },
   { label: 'Rechner', id: 'rechner' },
   { label: 'Branchen', id: 'branchen' },
-  { label: 'Ablauf', id: 'ablauf' },
   { label: 'Über uns', id: 'ueber-uns' },
+  { label: 'Ablauf', id: 'ablauf' },
   { label: 'FAQ', id: 'faq' },
 ];
 
@@ -114,7 +114,7 @@ export default function Navigation() {
               : 'border-ink-950/[0.05] bg-panel/60 backdrop-blur-md',
           )}
         >
-          <Link to="/" className="shrink-0" aria-label="Leibinn Consulting — zur Startseite">
+          <Link to="/" className="shrink-0" aria-label="Zur Startseite von Leibinn Consulting">
             <Logo />
           </Link>
 
@@ -192,11 +192,14 @@ export default function Navigation() {
 
         <button
           onClick={() => handleNav(CTA.id)}
-          className="mt-8 flex h-[3.875rem] w-full items-center justify-center gap-2.5 rounded-full
+          className="group mt-8 flex h-[3.875rem] w-full items-center justify-center gap-2.5 rounded-full
                      bg-canvas text-body font-medium text-ink-950 transition-colors hover:bg-white"
         >
           {CTA.label}
-          <ArrowUpRight size={18} className="text-ink-600" />
+          <ArrowUpRight
+            size={18}
+            className="text-ink-600 transition-transform duration-200 ease-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+          />
         </button>
       </div>
     </>

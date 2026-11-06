@@ -16,15 +16,30 @@ import FaqSection from '../components/FaqSection';
 import FinalCTASection from '../components/FinalCTASection';
 
 /*
- * Section rhythm alternates inset light panels against full-bleed dark, as
- * the brand handoffs do. Vergleich, Rechner, Stimmen and FAQ are the new
- * sections; their structure is built and their wording is marked as slots.
+ * Order follows the decision a Geschäftsführer actually makes, not the
+ * order the sections were written in:
+ *
+ *   problem    Realitätscheck    "this is us"
+ *   idea       Ansatz            why single benefits fail
+ *   effect     Wirkungsbereiche  what a system does
+ *   contrast   Vergleich         the same budget, two outcomes
+ *   numbers    Rechner           what it means for my headcount
+ *   fit        Branchen          it works in my industry
+ *   why us     Vorteile          not a platform, a system
+ *   who        Über uns          the person I would deal with
+ *   proof      Stimmen           people like me vouch for him
+ *   process    Ablauf            exactly what happens next
+ *   doubts     FAQ               the last objections
+ *   ask        Termin            one big, obvious next step
+ *
+ * Proof sits straight after the person it vouches for, and the process just
+ * before the ask, where "what happens if I click" is the open question.
  */
 export default function HomePage() {
   useDocumentMeta({
-    title: 'Leibinn Consulting — Benefit-Systeme für den Mittelstand',
+    title: 'Leibinn Consulting | Benefit-Systeme für den Mittelstand',
     description:
-      'Strukturierte Benefit-Systeme für kleine und mittelständische Unternehmen mit 5 bis 200 Mitarbeitenden — steuerlich optimiert, verwaltungsarm und spürbar wirksam.',
+      'Benefit-Systeme für Unternehmen mit 5 bis 200 Mitarbeitenden: steuerlich sauber, einfach zu verwalten und gebaut für Ihren Betrieb. Kostenloses Erstgespräch.',
     path: '/',
   });
 
@@ -38,11 +53,11 @@ export default function HomePage() {
         <WarumBenefitsSection />
         <VergleichSection />
         <RechnerSection />
-        <AblaufSection />
         <BranchenSection />
         <VorteileSection />
         <UeberUnsSection />
         <StimmenSection />
+        <AblaufSection />
         <FaqSection />
         <FinalCTASection />
       </main>

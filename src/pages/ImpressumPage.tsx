@@ -3,7 +3,7 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 
 export default function ImpressumPage() {
   useDocumentMeta({
-    title: 'Impressum — Leibinn Consulting',
+    title: 'Impressum | Leibinn Consulting',
     description: 'Angaben gemäß § 5 Digitale-Dienste-Gesetz (DDG).',
     path: '/impressum',
     noindex: true,
@@ -67,8 +67,8 @@ export default function ImpressumPage() {
 
       <LegalBlock heading="Berufsrechtliche Angaben">
         <p>
-          Sofern eine erlaubnispflichtige Tätigkeit ausgeübt wird — etwa als
-          Versicherungsvermittler oder -berater nach § 34 d GewO — sind hier zusätzlich
+          Sofern eine erlaubnispflichtige Tätigkeit ausgeübt wird (etwa als
+          Versicherungsvermittler oder -berater nach § 34 d GewO), sind hier zusätzlich
           Berufsbezeichnung, zuständige Aufsichtsbehörde, Registernummer im
           Vermittlerregister sowie die berufsrechtlichen Regelungen anzugeben.
         </p>
