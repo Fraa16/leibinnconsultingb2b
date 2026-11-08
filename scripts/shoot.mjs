@@ -17,7 +17,7 @@ const reduced = process.argv.includes('--reduced');
 
 const ROUTES = [
   ['/', 'home'],
-  ['/kontakt', 'kontakt'],
+  ['/impressum', 'impressum'],
 ];
 const VIEWPORTS = [
   ['desktop', 1440, 900],

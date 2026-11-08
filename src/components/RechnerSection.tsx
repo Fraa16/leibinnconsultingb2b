@@ -1,187 +1,235 @@
-import { useState } from 'react';
-import { Check } from 'lucide-react';
-import Section from './ui/Section';
-import SectionHead from './ui/SectionHead';
+import { useMemo, useState } from 'react';
+import SectionHead, { Accent } from './ui/SectionHead';
 import Reveal from './ui/Reveal';
-import Button from './ui/Button';
-import RangeSlider from './ui/RangeSlider';
-import { euro, de, useTweened } from '../hooks/useReveal';
+import { CASES, DEFAULT_CASE, DISCLAIMER, calculate, eur } from '../lib/calculator';
 import { cn } from '../lib/cn';
 
-/*
- * Statutory allowances, current for 2026: the monthly Sachbezug limit
- * (a Freigrenze, so a cent over makes the whole amount taxable) and the
- * annual health-promotion allowance (a Freibetrag). Both are free of income
- * tax and social contributions when paid on top of the agreed salary.
- *
- * Re-check them each January; the tool states them to prospects.
- */
-const ALLOWANCES = [
-  {
-    id: 'gesundheit',
-    title: 'Gesundheitsförderung',
-    statute: '§ 3 Nr. 34 EStG',
-    amountLabel: '600 € / Jahr',
-    perYear: 600,
-  },
-  {
-    id: 'sachbezug',
-    title: 'Sachbezug',
-    statute: '§ 8 Abs. 2 S. 11 EStG',
-    amountLabel: '50 € / Monat',
-    perYear: 50 * 12,
-  },
-] as const;
+/** Index of the "Ihre Werte" tab, after the three cases. */
+const OWN_VALUES = CASES.length;
 
-const PRESETS = [10, 25, 50, 100];
+const TABS = [...CASES.map((c) => c.label), 'Ihre Werte'];
 
-/**
- * Steuerfrei-Rechner.
- *
- *   perHead = (health ? 600 : 0) + (sachbezug ? 50 × 12 : 0)
- *   total   = perHead × employees
- *
- * The total rolls to each new value rather than jumping, so moving the
- * slider reads as the figure growing with the team.
- */
 export default function RechnerSection() {
-  const [employees, setEmployees] = useState(40);
-  const [enabled, setEnabled] = useState<Record<string, boolean>>({
-    gesundheit: true,
-    sachbezug: true,
-  });
+  const [income, setIncome] = useState(CASES[DEFAULT_CASE].income);
+  const [price, setPrice] = useState(CASES[DEFAULT_CASE].price);
+  const [newBuild, setNewBuild] = useState(true);
+  const [active, setActive] = useState(DEFAULT_CASE);
 
-  const perHead = ALLOWANCES.reduce((sum, a) => sum + (enabled[a.id] ? a.perYear : 0), 0);
-  const total = perHead * employees;
-  const shownTotal = useTweened(total);
+  const r = useMemo(() => calculate(income, price, newBuild), [income, price, newBuild]);
+  const maxBenefit = Math.max(...r.years.map((y) => y.benefit), 1);
+
+  const selectTab = (i: number) => {
+    setActive(i);
+    if (i < OWN_VALUES) {
+      setIncome(CASES[i].income);
+      setPrice(CASES[i].price);
+      setNewBuild(true);
+    }
+  };
+
+  // Every case is a Neubau, so Bestand turns a case into the visitor's own values.
+  const selectType = (nb: boolean) => {
+    setNewBuild(nb);
+    if (!nb && active < OWN_VALUES) setActive(OWN_VALUES);
+  };
+
+  const caseNote =
+    active < OWN_VALUES
+      ? `Fall 0${active + 1} · ${CASES[active].label}, ${CASES[active].sub}`
+      : `Ihre Werte · ${eur(income)} brutto`;
+
+  const ledger = [
+    { label: 'Mieteinnahmen p. a.', value: `+ ${eur(r.rent)}` },
+    { label: 'Zinsen', value: `− ${eur(r.interest)}` },
+    { label: 'Abschreibung (AfA)', value: `− ${eur(r.afa)}` },
+    { label: 'Bewirtschaftung', value: `− ${eur(r.costs)}` },
+  ];
 
   return (
-    <Section id="rechner" tone="ink" size="lg" className="ink-glow">
-      <SectionHead
-        eyebrow="Steuerfrei-Rechner"
-        title="So viel können Sie Ihrem Team steuerfrei geben"
-        lead="Zwei gesetzliche Spielräume, die viele Betriebe nicht voll nutzen. Stellen Sie Ihre Teamgröße ein und sehen Sie, was pro Jahr möglich ist."
-        tone="onInk"
-        titleWidth="max-w-[17ch]"
-        className="relative"
-      />
+    <section id="rechner" aria-labelledby="rechner-title" className="section-dark">
+      <div className="shell">
+        <SectionHead
+          tone="dark"
+          id="rechner-title"
+          eyebrow="04 · Rechner & Fallbeispiele"
+          title={
+            <>
+              Was Ihre Steuerlast <Accent>leisten kann.</Accent>
+            </>
+          }
+          lead="Wählen Sie ein Fallbeispiel aus unserer Beratung oder geben Sie Ihre eigenen Werte ein. Im Erstgespräch rechnen wir mit Ihren tatsächlichen Zahlen."
+        />
 
-      <Reveal className="relative mt-[clamp(3rem,5vw,4.5rem)]">
-        <div className="grid overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] border border-line-onInkStrong lg:grid-cols-[1fr_1.05fr]">
-          {/* ── Inputs ── */}
-          <div className="bg-white/[0.04] p-7 sm:p-9 lg:p-11">
-            <RangeSlider
-              label="Mitarbeitende"
-              value={employees}
-              min={3}
-              max={250}
-              onChange={setEmployees}
-              display={de(employees)}
-              className="[&_label]:text-white/55 [&_output]:text-white [&_div:last-child]:text-white/35"
-            />
+        <Reveal>
+          <div role="group" aria-label="Fallbeispiel wählen" className="mt-[clamp(40px,5vw,64px)] flex flex-wrap gap-2">
+            {TABS.map((label, i) => (
+              <button
+                key={label}
+                type="button"
+                aria-pressed={active === i}
+                onClick={() => selectTab(i)}
+                className={cn(
+                  'h-[46px] rounded-full border px-5 text-[14px] font-semibold transition-all duration-200',
+                  active === i
+                    ? 'border-copper bg-copper text-navy-950'
+                    : 'border-white/16 bg-transparent text-mist hover:border-white/40 hover:text-white',
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
 
-            <div className="mt-7 flex flex-wrap gap-2">
-              {PRESETS.map((n) => (
-                <button
-                  key={n}
-                  onClick={() => setEmployees(n)}
-                  aria-pressed={employees === n}
-                  className={cn(
-                    'tnum rounded-full border px-4 py-2 text-small transition-colors duration-200',
-                    employees === n
-                      ? 'border-ice-300 bg-ice-300 text-ink-950'
-                      : 'border-line-onInkStrong text-white/70 hover:border-white/35 hover:text-white',
-                  )}
-                >
-                  {n} MA
-                </button>
-              ))}
-            </div>
-
-            <div className="mt-9 space-y-3">
-              {ALLOWANCES.map((a) => {
-                const on = enabled[a.id];
-                return (
-                  <label
-                    key={a.id}
-                    className={cn(
-                      'flex cursor-pointer items-start gap-4 rounded-xl2 border p-5 transition-colors duration-200',
-                      on
-                        ? 'border-ice-300/50 bg-white/[0.07]'
-                        : 'border-line-onInk hover:border-line-onInkStrong',
-                    )}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={on}
-                      onChange={() => setEnabled((prev) => ({ ...prev, [a.id]: !prev[a.id] }))}
-                      className="sr-only"
-                    />
-                    <span
-                      aria-hidden="true"
+          <div className="mt-4 grid gap-5 rounded-[28px] border border-white/8 bg-navy-900 p-[clamp(20px,2.4vw,28px)] lg:grid-cols-2">
+            {/* Inputs and ledger */}
+            <div className="flex flex-col p-[clamp(4px,1vw,12px)]">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <span className="label text-mist-subtle">{caseNote}</span>
+                <div role="group" aria-label="Objektart" className="flex rounded-full bg-navy-850 p-[3px]">
+                  {(
+                    [
+                      ['Neubau', true],
+                      ['Bestand', false],
+                    ] as const
+                  ).map(([label, value]) => (
+                    <button
+                      key={label}
+                      type="button"
+                      aria-pressed={newBuild === value}
+                      onClick={() => selectType(value)}
                       className={cn(
-                        'mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition-colors duration-200',
-                        on ? 'border-ice-300 bg-ice-300 text-ink-950' : 'border-white/30',
+                        'h-[34px] rounded-full px-4 text-[13px] font-semibold transition-colors',
+                        newBuild === value ? 'bg-white text-navy-950' : 'bg-transparent text-mist hover:text-white',
                       )}
                     >
-                      {on && <Check size={12} strokeWidth={3} />}
-                    </span>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                    <span className="flex-1">
-                      <span className="block text-body font-medium text-white">{a.title}</span>
-                      <span className="mt-1 block text-small text-white/50">
-                        <span className="tnum">{a.amountLabel}</span> · {a.statute}
+              <label htmlFor="calc-income" className="mt-7 flex justify-between text-[15px] text-mist">
+                <span>Bruttojahreseinkommen</span>
+                <span className="tnum font-semibold text-white">{eur(income)}</span>
+              </label>
+              <input
+                id="calc-income"
+                type="range"
+                min={40000}
+                max={300000}
+                step={5000}
+                value={income}
+                aria-valuetext={eur(income)}
+                onChange={(e) => {
+                  setIncome(Number(e.target.value));
+                  setActive(OWN_VALUES);
+                }}
+                className="mt-3 w-full"
+              />
+
+              <label htmlFor="calc-price" className="mt-[22px] flex justify-between text-[15px] text-mist">
+                <span>Kaufpreis der Immobilie</span>
+                <span className="tnum font-semibold text-white">{eur(price)}</span>
+              </label>
+              <input
+                id="calc-price"
+                type="range"
+                min={200000}
+                max={900000}
+                step={10000}
+                value={price}
+                aria-valuetext={eur(price)}
+                onChange={(e) => {
+                  setPrice(Number(e.target.value));
+                  setActive(OWN_VALUES);
+                }}
+                className="mt-3 w-full"
+              />
+
+              <dl className="mt-7 border-t border-white/10">
+                {ledger.map((row) => (
+                  <div key={row.label} className="flex justify-between gap-4 border-b border-white/6 py-3 text-[15px]">
+                    <dt className="text-mist">{row.label}</dt>
+                    <dd className="whitespace-nowrap font-mono text-[14px]">{row.value}</dd>
+                  </div>
+                ))}
+                <div className="flex justify-between gap-4 border-b border-white/20 py-3.5 text-[16px] font-semibold">
+                  <dt>= Steuerlicher Verlust</dt>
+                  <dd className="whitespace-nowrap font-mono text-[14px]">− {eur(r.loss)}</dd>
+                </div>
+                <div className="flex justify-between gap-4 py-3 text-[15px]">
+                  <dt className="text-mist">× Persönlicher Grenzsteuersatz</dt>
+                  <dd className="whitespace-nowrap font-mono text-[14px]">{Math.round(r.rate * 100)} %</dd>
+                </div>
+              </dl>
+            </div>
+
+            {/* Result */}
+            <div className="flex flex-col rounded-[22px] bg-ivory p-[clamp(24px,3vw,36px)] text-ink">
+              <span className="label text-copper-dark">Steuervorteil im ersten Jahr</span>
+              <output
+                htmlFor="calc-income calc-price"
+                aria-live="polite"
+                className="tnum mt-3 text-[clamp(52px,6vw,84px)] font-light leading-none tracking-[-.05em]"
+              >
+                ≈ {eur(r.benefit)}
+              </output>
+
+              {/* Three across from 600px; below that a tile is too narrow for "62.460 €". */}
+              <dl className="mt-7 grid gap-3 xs:grid-cols-3">
+                {[
+                  ['10 Jahre gesamt', eur(r.total)],
+                  ['Eigenaufwand / Monat', eur(r.monthly)],
+                  ['Tilgung / Monat', eur(r.tilgMonthly)],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="flex min-w-0 items-baseline justify-between gap-1.5 rounded-[14px] bg-white p-3.5
+                               xs:flex-col xs:items-stretch xs:justify-start"
+                  >
+                    <dt className="text-[12px] text-stone-subtle">{label}</dt>
+                    <dd className="tnum text-[19px] font-semibold tracking-[-.02em]">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+
+              <div className="mt-auto pt-7">
+                <div className="flex justify-between font-mono text-[10px] font-medium uppercase tracking-[.1em] text-stone-subtle">
+                  <span>Steuervorteil je Jahr</span>
+                  <span>Jahr 1–10</span>
+                </div>
+                <div
+                  role="img"
+                  aria-label={`Steuervorteil je Jahr: ${r.years.map((y, i) => `Jahr ${i + 1} ${eur(y.benefit)}`).join(', ')}`}
+                  className="mt-3.5 flex h-[146px] items-end gap-2"
+                >
+                  {r.years.map((y, i) => (
+                    <div key={i} className="flex h-full flex-1 flex-col items-center justify-end gap-2">
+                      <div
+                        className={cn(
+                          'w-full rounded-[6px_6px_2px_2px] transition-[height] duration-300',
+                          i === 0 ? 'bg-copper' : 'bg-sand-bar',
+                        )}
+                        style={{ height: `${Math.max(3, (y.benefit / maxBenefit) * 120)}px` }}
+                      />
+                      <span aria-hidden="true" className="font-mono text-[10px] text-stone-faint">
+                        {i + 1}
                       </span>
-                    </span>
-                  </label>
-                );
-              })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-3.5 border-t border-line pt-5">
+                <p className="max-w-[300px] text-[12px] leading-[1.5] text-stone-subtle">{DISCLAIMER}</p>
+                <a href="#termin" className="btn btn-ink h-12 px-5 text-[14px]">
+                  Ergebnis prüfen lassen →
+                </a>
+              </div>
             </div>
           </div>
-
-          {/* ── Result ── */}
-          <div className="border-t border-line-onInkStrong bg-ink-950 p-7 sm:p-9 lg:border-l lg:border-t-0 lg:p-11">
-            <p className="text-meta uppercase text-white/45">Steuerfreies Potenzial pro Jahr</p>
-
-            <p className="accent-text tnum mt-6 whitespace-nowrap text-total" aria-live="polite">
-              {euro(shownTotal)}
-            </p>
-
-            <p className="mt-4 text-small text-white/55">
-              für <span className="tnum text-white">{de(employees)}</span> Mitarbeitende. Kommt vollständig
-              netto an.
-            </p>
-
-            <dl className="mt-9 border-t border-line-onInk">
-              {ALLOWANCES.filter((a) => enabled[a.id]).map((a) => (
-                <div key={a.id} className="flex items-baseline justify-between gap-4 border-b border-line-onInk py-3.5">
-                  <dt className="text-small text-white/55">{a.title}</dt>
-                  <dd className="tnum text-small text-white">{euro(a.perYear * employees)}</dd>
-                </div>
-              ))}
-              <div className="flex items-baseline justify-between gap-4 py-3.5">
-                <dt className="text-small text-white/55">Pro Mitarbeitendem und Jahr</dt>
-                <dd className="tnum text-small text-ice-300">{euro(perHead)}</dd>
-              </div>
-            </dl>
-
-            {/* Short on purpose: it has to fit one line in this panel on a 375px phone. */}
-            <Button to="/kontakt" variant="onInk" size="xl" fullWidth className="mt-8">
-              Potenzial prüfen
-            </Button>
-
-            {/*
-              The previous wording ended "vor Veröffentlichung steuerlich zu
-              prüfen" — a note meant for the client, which was showing to
-              visitors.
-            */}
-            <p className="mt-5 text-small leading-relaxed text-white/40">
-              Vereinfachte Modellrechnung auf Basis der gesetzlichen Höchstbeträge. Keine
-              Steuerberatung; die Voraussetzungen im Einzelfall klären Sie mit Ihrer Steuerberatung.
-            </p>
-          </div>
-        </div>
-      </Reveal>
-    </Section>
+        </Reveal>
+      </div>
+    </section>
   );
 }

@@ -1,87 +1,126 @@
 import { useState } from 'react';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import Section from './ui/Section';
+import BrandLine from './ui/BrandLine';
+import Image from './ui/Image';
 import Reveal from './ui/Reveal';
-import Slot from './ui/Slot';
-import { cn } from '../lib/cn';
+import SectionHead, { Accent } from './ui/SectionHead';
+import { PlayIcon } from './ui/icons';
+import { clientAvatars } from '../lib/images';
+import type { ResponsiveImage } from '../lib/images';
 
-/** Three slides; the quotes and attributions are the client's to supply. */
-const SLIDES = [0, 1, 2];
+type Testimonial = {
+  name: string;
+  role: string;
+  quote: string;
+  avatar: ResponsiveImage;
+  /**
+   * The client's video, once it exists: a self-hosted .mp4/.webm URL. While
+   * it is unset the card shows the quote without a play button, so nothing
+   * on the live page reads as unfinished.
+   */
+  video?: string;
+  /** Poster frame for the video. */
+  poster?: string;
+  /** Where the brand line sits in the card's video area. */
+  line: { line: 'a' | 'b'; className: string };
+};
 
-/**
- * Testimonial carousel.
- *
- * Cycling, progress bars and keyboard-operable controls are built. Quotes,
- * names and roles are slots — real testimonials need the clients' consent
- * before they go on the page, so none are invented here.
- */
-export default function StimmenSection() {
-  const [index, setIndex] = useState(0);
+const TESTIMONIALS: Testimonial[] = [
+  {
+    name: 'Winsome Okafor',
+    role: 'Lehrerin',
+    quote:
+      'Cedrik überzeugt durch herausragende Beratung, hohe Kundenorientierung und tiefes Fachwissen. Ein idealer Ansprechpartner.',
+    avatar: clientAvatars.okafor,
+    line: { line: 'a', className: 'right-[-20%] top-[-10%] w-[90%]' },
+  },
+  {
+    name: 'Tom Müller',
+    role: 'Selbstständiger Tätowierer',
+    quote:
+      'Ich konnte mich voll auf mein Kerngeschäft konzentrieren, ohne mir Sorgen um meinen Vermögensaufbau machen zu müssen.',
+    avatar: clientAvatars.mueller,
+    line: { line: 'b', className: 'bottom-[-10%] left-[-20%] w-[110%]' },
+  },
+  {
+    name: 'Luka Šilić',
+    role: 'Anwalt',
+    quote:
+      'Bei meinen Investments verlasse ich mich voll auf die Expertise von Herrn Leibinn, besonders auf die transparente Kommunikation.',
+    avatar: clientAvatars.silic,
+    line: { line: 'a', className: 'left-[-10%] top-[10%] w-[80%]' },
+  },
+];
 
-  const go = (next: number) => setIndex((next + SLIDES.length) % SLIDES.length);
+function VideoArea({ t }: { t: Testimonial }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (t.video && playing) {
+    return (
+      <div className="relative aspect-[16/10] bg-black">
+        <video src={t.video} poster={t.poster} controls autoPlay playsInline className="h-full w-full object-cover" />
+      </div>
+    );
+  }
 
   return (
-    <Section id="stimmen" tone="canvas" size="lg">
-      <Reveal>
-        <div className="ink-glow relative overflow-hidden rounded-[clamp(1.25rem,2.4vw,2rem)] bg-ink-950 p-7 sm:p-10 lg:p-14">
+    <div className="relative aspect-[16/10] overflow-hidden bg-navy-850">
+      {t.poster ? (
+        <img src={t.poster} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+      ) : (
+        <BrandLine line={t.line.line} color="copper" className={`absolute opacity-18 ${t.line.className}`} />
+      )}
+      <Image
+        image={t.avatar}
+        alt={t.name}
+        sizes="64px"
+        className="absolute bottom-[22px] left-6 h-16 w-16 rounded-full border-2 border-white/20 object-cover"
+      />
+      {t.video && (
+        <button
+          type="button"
+          onClick={() => setPlaying(true)}
+          aria-label={`Video von ${t.name} abspielen`}
+          className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center
+                     rounded-full bg-copper text-navy-950 shadow-play transition-colors hover:bg-copper-light"
+        >
+          <PlayIcon />
+        </button>
+      )}
+    </div>
+  );
+}
 
-          <div className="relative flex min-h-[26rem] flex-col justify-between gap-10">
-            <div className="flex items-center gap-4">
-              <span className="tnum rounded-full border border-line-onInkStrong px-3.5 py-1.5 text-meta uppercase text-ice-300">
-                {String(index + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
-              </span>
+export default function StimmenSection() {
+  return (
+    <section aria-labelledby="stimmen-title" className="section-dark">
+      <div className="shell">
+        <SectionHead
+          tone="dark"
+          id="stimmen-title"
+          eyebrow="08 · Mandantenstimmen"
+          title={
+            <>
+              Echte Mandanten. <Accent>Echte Ergebnisse.</Accent>
+            </>
+          }
+          lead="Was Menschen sagen, die ihre Steuerlast bereits in Vermögen verwandeln."
+        />
 
-              <div className="flex gap-1.5" aria-hidden="true">
-                {SLIDES.map((s) => (
-                  <span
-                    key={s}
-                    className={cn(
-                      'h-[3px] w-14 rounded-full transition-colors duration-300',
-                      s === index ? 'bg-ice-300' : 'bg-white/15',
-                    )}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <blockquote aria-live="polite">
-              <p className="max-w-[22ch] text-h2 text-white">
-                <Slot tone="onInk">Platzhalter: Kundenzitat {index + 1}</Slot>
-              </p>
-            </blockquote>
-
-            <div className="flex flex-wrap items-center justify-between gap-6 border-t border-line-onInk pt-7">
-              <div>
-                <p className="text-body text-white">
-                  <Slot tone="onInk">Platzhalter: Name</Slot>
-                </p>
-                <p className="mt-2 text-small text-white/50">
-                  <Slot tone="onInk">Platzhalter: Rolle, Unternehmen</Slot>
-                </p>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => go(index - 1)}
-                  aria-label="Vorheriges Zitat"
-                  className="grid h-14 w-14 place-items-center rounded-full border border-line-onInkStrong
-                             text-white/70 transition-colors hover:border-white/40 hover:text-white"
-                >
-                  <ArrowLeft size={18} />
-                </button>
-                <button
-                  onClick={() => go(index + 1)}
-                  aria-label="Nächstes Zitat"
-                  className="grid h-14 w-14 place-items-center rounded-full bg-ice-300 text-ink-950
-                             transition-colors hover:bg-ice-200"
-                >
-                  <ArrowRight size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Reveal>
-    </Section>
+        <ul className="section-body grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {TESTIMONIALS.map((t, i) => (
+            <Reveal as="li" key={t.name} delay={i * 80} className="flex">
+              <figure className="m-0 flex w-full flex-col overflow-hidden rounded-[24px] border border-white/8 bg-navy-900">
+                <VideoArea t={t} />
+                <blockquote className="flex-1 px-6 pt-6 text-[16px] leading-[1.6] text-mist-strong">„{t.quote}“</blockquote>
+                <figcaption className="flex flex-col gap-0.5 px-6 pb-6 pt-5">
+                  <span className="text-[15px] font-semibold">{t.name}</span>
+                  <span className="text-[13px] text-mist-subtle">{t.role}</span>
+                </figcaption>
+              </figure>
+            </Reveal>
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }

@@ -1,82 +1,98 @@
-import Section from './ui/Section';
-import SectionHead from './ui/SectionHead';
+import { useId, useState } from 'react';
 import Reveal from './ui/Reveal';
-import Button from './ui/Button';
-import Accordion from './ui/Accordion';
+import { Accent } from './ui/SectionHead';
+import { cn } from '../lib/cn';
 
-/*
- * The objections a Geschäftsführer raises before booking a call, in roughly
- * the order they come up: is this for us, what does it cost, is it really
- * tax-free, how much work is it, does it replace pay, we already have
- * benefits, how long does it take, what happens in the first call.
- *
- * Every answer stays inside what the site already claims plus statutory
- * fact. No prices, no timelines in weeks, no figures about the firm beyond
- * the ones the client supplied.
- */
-const ITEMS = [
+const FAQS = [
   {
-    q: 'Für welche Unternehmen lohnt sich ein Benefit-System?',
-    a: 'Für Betriebe mit 5 bis 200 Mitarbeitenden, die Fachkräfte gewinnen oder halten wollen. Die Branche spielt eine kleinere Rolle, als viele denken: Steuerfreie Bausteine gibt es für jeden Betrieb. Entscheidend ist, welche davon zu Ihrem Team passen.',
+    q: 'Wie läuft das Erstgespräch ab?',
+    a: 'In rund 15 Minuten besprechen wir Ihre Ausgangslage: Einkommen, steuerliche Situation, Ziele und Zeithorizont. Danach wissen Sie, ob eine Immobilienstrategie für Sie sinnvoll ist. Unverbindlich und ohne Verkaufsdruck.',
   },
   {
-    q: 'Was kostet die Beratung?',
-    a: 'Das Erstgespräch ist kostenlos und unverbindlich. Danach erhalten Sie ein Angebot, das sich nach Größe und Umfang richtet. Sie entscheiden erst, wenn Sie wissen, was Sie bekommen.',
+    q: 'Wie viel Eigenkapital benötige ich?',
+    a: 'Oft weniger als erwartet. Entscheidend sind Einkommen, Bonität und Finanzierungsrahmen. Was für Sie realistisch ist, klären wir im Erstgespräch.',
   },
   {
-    q: 'Sind Benefits wirklich steuerfrei?',
-    a: 'Viele ja, wenn die Voraussetzungen stimmen. Der monatliche Sachbezug bis 50 € und die Gesundheitsförderung bis 600 € im Jahr sind steuer- und sozialversicherungsfrei, sofern Sie sie zusätzlich zum Gehalt zahlen. Andere Bausteine werden pauschal versteuert. Wir ordnen jeden einzelnen sauber ein.',
+    q: 'Welche Risiken gibt es bei Immobilieninvestments?',
+    a: 'Leerstand, Zinsänderungen, Instandhaltung und die Entwicklung des Standorts. Wir machen diese Risiken transparent, rechnen Szenarien durch und planen Puffer ein, bevor Sie entscheiden.',
   },
   {
-    q: 'Wie viel Aufwand entsteht für uns?',
-    a: 'So wenig wie möglich. Analyse, Konzept und Kommunikation übernehmen wir. Von Ihnen brauchen wir Informationen zu Ihrem Team und kurze Abstimmungen mit Ihrer Lohnbuchhaltung.',
+    q: 'Wie finde ich rentable Objekte in der aktuellen Marktlage?',
+    a: 'Mit klaren Kriterien statt Bauchgefühl: Lage, Bausubstanz, Mietpotenzial und Wirtschaftlichkeit. Über unser Netzwerk erhalten Sie zusätzlich Zugang zu Off-Market-Objekten.',
   },
   {
-    q: 'Ersetzen Benefits eine Gehaltserhöhung?',
-    a: 'Nein, und das sollen sie auch nicht. Ein faires Gehalt bleibt die Basis. Benefits sorgen dafür, dass jeder zusätzliche Euro mehr bewirkt, weil er ohne Abzüge ankommt.',
+    q: 'Entstehen Kosten für das Erstgespräch?',
+    a: 'Nein. Das Erstgespräch ist kostenlos und unverbindlich.',
   },
   {
-    q: 'Wir haben schon Benefits. Lohnt sich das trotzdem?',
-    a: 'Gerade dann. Oft gibt es einzelne Leistungen, die kaum jemand nutzt. Manchmal reicht es schon, Vorhandenes neu zu ordnen und richtig zu kommunizieren.',
+    q: 'Begleiten Sie auch den Ankauf?',
+    a: 'Ja. Wir unterstützen bei Finanzierung, Prüfung und Vertragsdetails bis zum Notartermin und bleiben danach Ihr Ansprechpartner.',
   },
   {
-    q: 'Wie lange dauert die Einführung?',
-    a: 'Das hängt vom Umfang ab. Einzelne Bausteine wie der monatliche Sachbezug lassen sich kurzfristig starten. Das vollständige System bauen wir Schritt für Schritt mit Ihnen auf.',
+    q: 'Kann ich auch als Normalverdiener investieren?',
+    a: 'Ja. Entscheidend ist nicht ein besonders hohes Einkommen, sondern eine Strategie, die zu Budget, Lebensplanung und Zielen passt.',
   },
-  {
-    q: 'Was passiert im Erstgespräch?',
-    a: 'Wir schauen auf Ihre Situation und Ihre Ziele. Sie bekommen eine ehrliche Einschätzung und konkrete Ansatzpunkte, auch wenn wir danach nicht zusammenarbeiten.',
-  },
-].map((item, i) => ({ id: `faq-${i + 1}`, title: item.q, body: item.a }));
+];
 
-/**
- * FAQ: sticky intro beside a single-open accordion. The rows arrive one by
- * one and open smoothly, the same motion as the consequences on the dark
- * card further up.
- */
+/** One answer open at a time; the first is open on load. */
 export default function FaqSection() {
-  return (
-    <Section id="faq" tone="panel" size="lg">
-      <div className="grid gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1fr_1.8fr]">
-        <div className="lg:sticky lg:top-32 lg:self-start">
-          <SectionHead
-            eyebrow="Häufige Fragen"
-            title="Gut zu wissen, bevor wir sprechen"
-            titleWidth="max-w-[12ch]"
-            className="lg:!grid-cols-1"
-          />
-          <Reveal delay={200} className="mt-8">
-            <p className="max-w-[34ch] text-small text-content">
-              Ihre Frage ist nicht dabei? Stellen Sie sie direkt, wir antworten innerhalb von 24 Stunden.
-            </p>
-            <Button to="/kontakt" variant="secondary" className="mt-5">
-              Frage stellen
-            </Button>
-          </Reveal>
-        </div>
+  const [open, setOpen] = useState(0);
+  const baseId = useId();
 
-        <Accordion items={ITEMS} defaultOpen={0} size="md" />
+  return (
+    <section id="faq" aria-labelledby="faq-title" className="panel-light">
+      <div className="shell grid items-start gap-x-[clamp(40px,6vw,96px)] gap-y-12 lg:grid-cols-[minmax(0,.95fr)_minmax(0,1.05fr)]">
+        <Reveal className="flex flex-col gap-6 lg:sticky lg:top-[120px]">
+          <p className="eyebrow text-copper-dark">09 · Häufige Fragen</p>
+          <h2 id="faq-title" className="t-h2">
+            Gut zu <Accent>wissen.</Accent>
+          </h2>
+          <p className="t-lead max-w-[30em] text-stone">
+            Ihre Frage ist nicht dabei? Im Erstgespräch nehmen wir uns Zeit für alles, was Sie beschäftigt.
+          </p>
+          <a href="#termin" className="btn btn-ink h-[52px] self-start px-[22px] text-[15px]">
+            Frage im Gespräch klären →
+          </a>
+        </Reveal>
+
+        <Reveal delay={100} className="flex flex-col gap-2">
+          {FAQS.map((f, i) => {
+            const isOpen = open === i;
+            const btnId = `${baseId}-q${i}`;
+            const panelId = `${baseId}-a${i}`;
+            return (
+              <div key={f.q} className="rounded-[18px] bg-white">
+                <h3>
+                  <button
+                    id={btnId}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => setOpen(isOpen ? -1 : i)}
+                    className="grid w-full grid-cols-[minmax(0,1fr)_34px] items-center gap-5 px-6 py-[22px] text-left text-ink"
+                  >
+                    <span className="text-[18px] font-medium tracking-[-.01em] [text-wrap:wrap]">{f.q}</span>
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        'flex h-[34px] w-[34px] items-center justify-center rounded-full border border-line text-[18px] transition-all duration-[250ms]',
+                        isOpen ? 'rotate-45 bg-ink text-white' : 'bg-white text-ink',
+                      )}
+                    >
+                      +
+                    </span>
+                  </button>
+                </h3>
+                <div id={panelId} role="region" aria-labelledby={btnId} className="acc-panel" data-open={isOpen}>
+                  <div>
+                    <p className="mb-6 ml-6 mr-6 mt-[-6px] text-[16px] leading-[1.7] text-stone sm:mr-[78px]">{f.a}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </Reveal>
       </div>
-    </Section>
+    </section>
   );
 }

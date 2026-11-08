@@ -56,13 +56,18 @@ function build(name: string, width: number, height: number): ResponsiveImage {
 
 // Intrinsic dimensions come from the masters; they set the aspect ratio that
 // prevents layout shift while the image loads.
-export const heroImage = build('cedrik-hero', 5524, 3946);
-export const portraitImage = build('cedrik-portrait', 3807, 5710);
-export const meetingImage = build('kundengespraech', 5528, 3685);
+export const standingImage = build('cedrik-standing', 1400, 1960);
+export const meetingImage = build('cedrik-meeting', 2200, 1466);
+export const towersImage = build('ffm-towers', 2200, 1462);
+export const presentingImage = build('cedrik-presenting', 2200, 1467);
+export const portraitImage = build('cedrik-portrait', 2200, 1572);
+export const windowImage = build('cedrik-window', 2000, 1428);
 
-export const fensterImage = build('cedrik-fenster', 2000, 1428);
-export const loungeImage = build('beratung-lounge', 2000, 1333);
-export const gespraechImage = build('beratung-gespraech', 2000, 1333);
-export const skylineImage = build('frankfurt-skyline', 1920, 1080);
-/** Transparent: Cedrik cut out of his background, head to chest. */
-export const cutoutImage = build('cedrik-cutout', 1122, 925);
+/** Cedrik, square-cropped for the 36–52px avatars. */
+export const cedrikAvatar = build('cedrik-avatar', 160, 160);
+
+export const clientAvatars = {
+  okafor: build('client-okafor', 71, 71),
+  mueller: build('client-mueller', 71, 71),
+  silic: build('client-silic', 71, 71),
+};

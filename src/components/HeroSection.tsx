@@ -1,151 +1,161 @@
-import type { CSSProperties } from 'react';
-import { ArrowDown } from 'lucide-react';
-import { useSiteNav } from '../hooks/useSiteNav';
-import { heroImage } from '../lib/images';
-import Container from './ui/Container';
+import BrandLine from './ui/BrandLine';
 import Image from './ui/Image';
-import Button from './ui/Button';
-import Eyebrow from './ui/Eyebrow';
-import Reveal from './ui/Reveal';
-import SplitWords from './ui/SplitWords';
+import { Accent } from './ui/SectionHead';
+import { CalendarIcon, ShieldIcon } from './ui/icons';
+import { clientAvatars, standingImage } from '../lib/images';
+import { HERO_RESULT, eur } from '../lib/calculator';
 
-const delay = (ms: number) => ({ ['--d' as string]: `${ms}ms` }) as CSSProperties;
-
-/*
- * Proof, in the order a Geschäftsführer weighs it: has anyone like me done
- * this, how fast do I hear back, is it for a firm my size, who do I deal
- * with. "55+ Mandanten" is the client's figure; the other three are claims
- * the site already makes elsewhere. Nothing here is invented.
- */
-const PROOF = [
-  { figure: '55+', label: 'Mandanten' },
-  { figure: '24 h', label: 'Antwortzeit' },
-  { figure: '5–200', label: 'Mitarbeitende' },
-  { figure: '1:1', label: 'persönlich betreut' },
+const STATS = [
+  { value: '55+', label: 'Mandanten betreut' },
+  { value: '§ 34c', label: 'IHK-Erlaubnis Immobilienmakler' },
+  { value: '§ 34d', label: 'IHK-Erlaubnis Versicherungsmakler' },
+  { value: '15 Min', label: 'Kostenloses Erstgespräch' },
 ];
 
-/**
- * Hero: promise and offer on the left, the person on the right with the
- * proof panel overlapping the photo's lower edge.
- *
- * Arrival is staged: rule and eyebrow, the headline rising word by word, the
- * sub-line, the actions, then the photograph uncovering upward and the proof
- * panel landing last.
- */
+const AVATARS = [clientAvatars.okafor, clientAvatars.mueller, clientAvatars.silic];
+
+/** Case 02's year-by-year benefit as a 10-bar sparkline, 40px tall. */
+const maxBenefit = Math.max(...HERO_RESULT.years.map((y) => y.benefit));
+const HERO_BARS = HERO_RESULT.years.map((y) => Math.max(3, (y.benefit / maxBenefit) * 40));
+
 export default function HeroSection() {
-  const { goTo } = useSiteNav();
-
   return (
-    <section id="hero" className="relative overflow-hidden bg-canvas pb-20 pt-28 md:pb-24 md:pt-36 lg:pb-28 lg:pt-40">
-      <Container className="relative">
-        <div className="grid items-center gap-[clamp(2.5rem,5vw,5rem)] lg:grid-cols-[1.15fr_0.85fr]">
-          <Reveal variant="group">
-            <Eyebrow>Für Unternehmen mit 5 bis 200 Mitarbeitenden</Eyebrow>
+    <section id="top" aria-labelledby="hero-title" className="relative overflow-hidden">
+      <BrandLine
+        line="a"
+        color="copper"
+        className="absolute bottom-[-6%] left-[-8%] w-[min(980px,76vw)] opacity-10"
+      />
 
-            <h1 className="a-words mt-8 max-w-[16ch]" style={delay(120)}>
-              <SplitWords>
-                Vom Fachkräftemangel zum <em className="not-italic text-ink-600">begehrten Arbeitgeber</em>
-              </SplitWords>
-            </h1>
+      <div
+        className="shell relative grid items-center gap-x-[clamp(40px,5vw,88px)] gap-y-16
+                   pb-[clamp(48px,6vw,80px)] pt-[clamp(48px,6vw,88px)] lg:grid-cols-[minmax(0,1.08fr)_minmax(0,.92fr)]"
+      >
+        <div className="flex flex-col items-start">
+          <p className="eyebrow text-copper-light">Investment Consulting · Immobilien &amp; Steuern</p>
+          <h1 id="hero-title" className="t-h1 mt-8">
+            Verwandeln Sie Steuerlast in <Accent>bleibendes Vermögen.</Accent>
+          </h1>
+          <p className="mt-8 max-w-[34em] text-[clamp(17px,1.35vw,19px)] leading-[1.6] text-mist">
+            Steueroptimierte Immobilienstrategien für Unternehmer, Führungskräfte und Angestellte. Geprüfte
+            Objekte, klare Kennzahlen und ein Ansprechpartner, der Sie vom ersten Gespräch bis zum Notartermin
+            begleitet.
+          </p>
 
-            <p className="a-rise mt-7 max-w-[46ch] text-lead text-content" style={delay(520)}>
-              Von einer Gehaltserhöhung kommt bei Ihrem Team oft nur die Hälfte an. Ein durchdachtes
-              Benefit-System kommt vollständig an. Wir entwickeln es für Ihren Betrieb: steuerlich
-              sauber und einfach zu verwalten.
-            </p>
+          <div className="mt-10 flex flex-wrap items-center gap-3">
+            <a href="#termin" className="btn btn-copper h-[58px] gap-3 px-7 text-[16px]">
+              <CalendarIcon />
+              Kostenloses Erstgespräch buchen
+            </a>
+            <a href="#rechner" className="btn btn-outline h-[58px] px-[26px] text-[16px]">
+              Steuervorteil berechnen
+            </a>
+          </div>
 
-            <div className="a-rise mt-9 flex flex-col gap-3 sm:flex-row sm:items-center" style={delay(640)}>
-              <Button to="/kontakt" size="xl">
-                Kostenloses Erstgespräch sichern
-              </Button>
-              <Button onClick={() => goTo('realitaetscheck')} size="xl" variant="link" className="sm:ml-4">
-                Zum Realitätscheck
-              </Button>
-            </div>
-
-            <div className="relative mt-11 py-5" style={delay(760)}>
-              <span aria-hidden="true" className="a-line absolute inset-x-0 top-0 h-px bg-line" />
-              <p className="a-fade max-w-[54ch] text-small text-content-muted">
-                Für Geschäftsführer:innen, Inhaber:innen und HR-Verantwortliche im deutschen Mittelstand
-              </p>
-              <span aria-hidden="true" className="a-line absolute inset-x-0 bottom-0 h-px bg-line" />
-            </div>
-          </Reveal>
-
-          <div className="relative lg:pl-6">
-            {/*
-              Short delay on purpose: this photo is the page's largest paint,
-              and every millisecond it stays clipped is a millisecond added to
-              the LCP that search and ad platforms score the page on.
-            */}
-            <Reveal
-              variant="mask"
-              delay={120}
-              className="relative overflow-hidden rounded-[clamp(1.5rem,2.6vw,2rem)]"
-            >
-              <Image
-                image={heroImage}
-                alt="Cedrik Leibinn, Berater für Mitarbeiterbindung"
-                priority
-                sizes="(min-width: 1024px) 46vw, 100vw"
-                className="h-[clamp(26rem,50vw,42rem)] w-full object-cover"
-                style={{ objectPosition: '50% 14%' }}
-              />
-              <div
-                aria-hidden="true"
-                className="absolute inset-0"
-                style={{
-                  background:
-                    'linear-gradient(155deg, rgba(42,45,124,0.30) 0%, transparent 44%), linear-gradient(to top, rgba(0,0,34,0.66) 0%, transparent 46%)',
-                }}
-              />
-            </Reveal>
-
-            {/* Proof panel, overlapping the photo's lower edge. */}
-            <Reveal
-              delay={900}
-              className="relative z-10 -mt-12 ml-4 mr-2 rounded-xl3 border border-line bg-panel/95 shadow-float
-                         backdrop-blur-sm sm:ml-10 lg:-mr-6"
-            >
-              <dl className="grid grid-cols-2 divide-line sm:grid-cols-4 sm:divide-x">
-                {PROOF.map((item, i) => (
-                  <div
-                    key={item.figure}
-                    className={
-                      'flex flex-col px-5 py-4 sm:px-4 sm:py-5 ' +
-                      (i < 2 ? 'border-b border-line sm:border-b-0 ' : '') +
-                      (i % 2 === 0 ? 'border-r border-line sm:border-r-0' : '')
-                    }
-                  >
-                    <dt className="order-2 mt-1 block text-[0.8125rem] leading-snug text-content-muted">
-                      {item.label}
-                    </dt>
-                    <dd className="tnum order-1 text-[1.5rem] font-medium leading-none tracking-[-0.03em] text-content-strong">
-                      {item.figure}
-                    </dd>
-                  </div>
+          <div className="mt-11 flex flex-wrap items-center gap-x-7 gap-y-5">
+            <div className="flex items-center gap-3.5">
+              <div className="flex">
+                {AVATARS.map((img, i) => (
+                  <Image
+                    key={img.fallback}
+                    image={img}
+                    alt=""
+                    sizes="40px"
+                    priority
+                    className={`h-10 w-10 rounded-full border-2 border-navy-950 object-cover ${i ? '-ml-2.5' : ''}`}
+                  />
                 ))}
-              </dl>
-            </Reveal>
+              </div>
+              <div className="flex flex-col gap-[3px]">
+                <span className="text-[15px] font-semibold">55+ Mandanten</span>
+                <span className="text-[13px] text-mist-subtle">vertrauen auf unsere Beratung</span>
+              </div>
+            </div>
+            <span aria-hidden="true" className="h-9 w-px bg-white/12" />
+            <div className="flex items-center gap-3 text-copper-light">
+              <ShieldIcon size={26} />
+              <div className="flex flex-col gap-[3px]">
+                <span className="text-[15px] font-semibold text-white">IHK-Erlaubnis</span>
+                <span className="text-[13px] text-mist-subtle">nach § 34c und § 34d GewO</span>
+              </div>
+            </div>
           </div>
         </div>
-      </Container>
 
-      <button
-        onClick={() => goTo('realitaetscheck')}
-        className="group mx-auto mt-16 hidden items-center gap-3 lg:flex"
-        aria-label="Nach unten scrollen"
-      >
-        <span className="text-meta uppercase text-content-faint transition-colors group-hover:text-ink-600">
-          Mehr erfahren
-        </span>
-        <span
-          className="grid h-9 w-9 place-items-center rounded-full border border-line text-content-muted
-                     transition-colors group-hover:border-ink-300 group-hover:text-ink-600"
-        >
-          <ArrowDown size={15} />
-        </span>
-      </button>
+        <div className="relative xs:pl-12">
+          <div className="relative aspect-[4/5] max-h-[720px] overflow-hidden rounded-[28px] bg-navy-850">
+            <Image
+              image={standingImage}
+              alt="Cedrik Leibinn, Gründer von Leibinn Consulting"
+              sizes="(min-width: 1000px) min(470px, 36vw), (min-width: 600px) calc(100vw - 110px), calc(100vw - 40px)"
+              priority
+              wrapperClassName="absolute inset-0"
+              className="h-full w-full object-cover"
+              style={{ objectPosition: '50% 18%' }}
+            />
+            <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-navy-950/[.78] to-navy-950/0" />
+            <div className="absolute bottom-[22px] left-6 flex flex-col gap-1">
+              <span className="text-[17px] font-semibold">Cedrik Leibinn</span>
+              <span className="label text-white/72">Gründer · Ihr Ansprechpartner</span>
+            </div>
+          </div>
+
+          {/* Sits at 46% so it never covers the face. */}
+          <div
+            className="absolute left-0 top-[46%] w-[min(270px,70%)] rounded-[18px] border border-white/10
+                       bg-navy-900 p-5 shadow-float"
+          >
+            <div className="flex justify-between font-mono text-[10px] font-medium uppercase tracking-[.1em] text-mist-subtle">
+              <span>Modellrechnung</span>
+              <span>Fall 02</span>
+            </div>
+            <div className="mt-3.5 text-[13px] text-mist">Steuervorteil im 1. Jahr</div>
+            <div className="tnum mt-1 text-[34px] font-medium tracking-[-.04em]">≈ {eur(HERO_RESULT.benefit)}</div>
+            <div aria-hidden="true" className="mt-3.5 flex h-10 items-end gap-1">
+              {HERO_BARS.map((h, i) => (
+                <div
+                  key={i}
+                  className={`flex-1 rounded-[3px_3px_1px_1px] ${i === 0 ? 'bg-copper-light' : 'bg-copper-light/30'}`}
+                  style={{ height: `${h}px` }}
+                />
+              ))}
+            </div>
+            <div className="mt-2.5 text-[11px] text-mist-subtle">Leitende Angestellte · 140.000 € brutto</div>
+          </div>
+
+          {/* Hangs over the photo's bottom-right edge. */}
+          <div
+            className="absolute bottom-[-28px] right-[-20px] flex w-[min(250px,66%)] flex-col gap-3 rounded-[18px]
+                       bg-ivory p-[18px] text-ink shadow-float"
+          >
+            <div className="flex items-center gap-3">
+              <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-ink text-copper-light">
+                <CalendarIcon />
+              </span>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[15px] font-semibold">Erstgespräch</span>
+                <span className="text-[12px] text-stone-subtle">15 Min · kostenlos · online</span>
+              </div>
+            </div>
+            <a href="#termin" className="btn btn-ink h-10 gap-2 text-[13px]">
+              Termin wählen →
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div className="shell relative pb-[clamp(56px,7vw,96px)]">
+        <dl className="grid gap-x-8 gap-y-7 border-t border-white/10 pt-8 xs:grid-cols-2 xl:grid-cols-4">
+          {STATS.map((s) => (
+            <div key={s.label} className="flex flex-col-reverse gap-2">
+              <dt className="font-mono text-[11px] font-medium uppercase leading-[1.5] tracking-[.1em] text-mist-subtle">
+                {s.label}
+              </dt>
+              <dd className="text-[40px] font-light leading-none tracking-[-.04em]">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
     </section>
   );
 }

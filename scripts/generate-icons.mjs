@@ -6,13 +6,13 @@
  * The wing mark is wide — a 1.6:1 shape — so it cannot simply be dropped into
  * a square. It is centred on a navy tile with generous margin, which is also
  * how it survives being shrunk to the 16px favicon slot: at that size the
- * gradient reads as one silhouette rather than as two strokes.
+ * mark reads as one silhouette rather than as two strokes.
  */
 import sharp from 'sharp';
 import { readFileSync, writeFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const { glyph, gradient } = JSON.parse(readFileSync(resolve('src/assets/brand/logo-paths.json'), 'utf8'));
+const { glyph } = JSON.parse(readFileSync(resolve('src/assets/brand/logo-paths.json'), 'utf8'));
 
 const SVG_OUT = resolve('public/favicon.svg');
 const TOUCH_OUT = resolve('public/apple-touch-icon.png');
@@ -21,7 +21,8 @@ const MASK_OUT = resolve('public/icon-512.png');
 /** Tile */
 const SIZE = 64;
 const RADIUS = 14;
-const TILE = '#15174F';
+const TILE = '#08111F'; // navy-950, the page background
+const MARK = '#D6AE84'; // copper-light, the accent on dark
 /** Share of the tile's width the mark spans. */
 const INSET = 0.74;
 
@@ -33,19 +34,12 @@ const dx = (SIZE - markWidth) / 2;
 const dy = (SIZE - markHeight) / 2;
 
 /*
- * On the navy tile the mark's dark end would vanish, so the gradient lifts:
- * ice at the top left through to a mid-blue that still separates from the
- * ground. Same hues as the Logo component uses on dark surfaces.
+ * The redesign shows the lockup in one colour, so the mark is solid copper on
+ * the navy tile: the accent colour the page uses on dark surfaces.
  */
 const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SIZE} ${SIZE}" role="img" aria-label="Leibinn Consulting">
-  <defs>
-    <linearGradient id="m" x1="0" y1="0" x2="0.92" y2="0.78">
-      <stop offset="0" stop-color="${gradient.from}"/>
-      <stop offset="1" stop-color="#6A72D6"/>
-    </linearGradient>
-  </defs>
   <rect width="${SIZE}" height="${SIZE}" rx="${RADIUS}" fill="${TILE}"/>
-  <g fill="url(#m)" transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)}) scale(${scale.toFixed(5)})">
+  <g fill="${MARK}" transform="translate(${dx.toFixed(2)} ${dy.toFixed(2)}) scale(${scale.toFixed(5)})">
 ${glyph.paths.map((d) => `    <path d="${d}"/>`).join('\n')}
   </g>
 </svg>

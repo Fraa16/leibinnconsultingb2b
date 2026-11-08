@@ -1,207 +1,100 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
-import { useSiteNav } from '../hooks/useSiteNav';
-import { cn } from '../lib/cn';
 import Logo from './ui/Logo';
+import SectionLink from './ui/SectionLink';
+import { CalendarIcon } from './ui/icons';
 
-/*
- * The five original entries, plus the two new sections that earn a direct
- * link. Section ids are scroll targets on the homepage; `kontakt` is a route.
- */
 const NAV_LINKS = [
-  { label: 'Startseite', id: 'hero' },
-  { label: 'Ansatz', id: 'ansatz' },
-  { label: 'Rechner', id: 'rechner' },
-  { label: 'Branchen', id: 'branchen' },
-  { label: 'Über uns', id: 'ueber-uns' },
-  { label: 'Ablauf', id: 'ablauf' },
-  { label: 'FAQ', id: 'faq' },
+  { id: 'leistungen', label: 'Leistungen' },
+  { id: 'rechner', label: 'Rechner' },
+  { id: 'prozess', label: 'Ablauf' },
+  { id: 'vertrauen', label: 'Über uns' },
+  { id: 'faq', label: 'FAQ' },
 ];
 
-const CTA = { label: 'Kontakt', id: 'kontakt' };
-
 /**
- * Floating pill navigation.
- *
- * Follows the brand handoff: a sticky pill inset 16px from the top, 72px
- * high, radius 999, translucent with a 16px blur and a 1px hairline. Below
- * the breakpoint it collapses to a compact pill and a full-screen navy
- * overlay with numbered entries.
+ * Sticky floating pill bar. From 1000px it carries the nav and the CTA; below
+ * that both fold into a "Menü" button with a dropdown panel.
  */
 export default function Navigation() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
-  const { goTo } = useSiteNav();
-  const location = useLocation();
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  const close = () => setOpen(false);
 
+  // The dropdown only exists below 1000px; leaving that range closes it, as
+  // does Escape.
   useEffect(() => {
-    let frame = 0;
-    const onScroll = () => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        setIsScrolled(window.scrollY > 16);
-        frame = 0;
-      });
-    };
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    const wide = window.matchMedia('(min-width: 1000px)');
+    const onChange = () => wide.matches && setOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    wide.addEventListener('change', onChange);
+    window.addEventListener('keydown', onKey);
     return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (frame) cancelAnimationFrame(frame);
+      wide.removeEventListener('change', onChange);
+      window.removeEventListener('keydown', onKey);
     };
   }, []);
 
-  useEffect(() => {
-    if (location.pathname !== '/') return;
-    const sections = NAV_LINKS.map((l) => document.getElementById(l.id)).filter(
-      (el): el is HTMLElement => Boolean(el),
-    );
-    if (!sections.length) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible) setActiveSection(visible.target.id);
-      },
-      { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.25, 0.5, 1] },
-    );
-    sections.forEach((s) => observer.observe(s));
-    return () => observer.disconnect();
-  }, [location.pathname]);
-
-  // Lock the page while the overlay is open, and close it on Escape.
-  useEffect(() => {
-    if (!isMenuOpen) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setIsMenuOpen(false);
-        menuButtonRef.current?.focus();
-      }
-    };
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener('keydown', onKey);
-    };
-  }, [isMenuOpen]);
-
-  useEffect(() => setIsMenuOpen(false), [location.pathname]);
-
-  const handleNav = (id: string) => {
-    setIsMenuOpen(false);
-    goTo(id);
-  };
-
-  const isHome = location.pathname === '/';
+  const logo = <Logo className="h-4 text-white" />;
 
   return (
-    <>
-      <div className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 sm:pt-4">
-        <header
-          className={cn(
-            'mx-auto flex max-w-shell items-center justify-between rounded-full border',
-            'h-16 pl-5 pr-2 transition-all duration-300 ease-brand lg:h-[4.5rem] lg:pl-7 lg:pr-2.5',
-            isScrolled
-              ? 'border-ink-950/[0.08] bg-panel/[0.86] shadow-nav backdrop-blur-xl'
-              : 'border-ink-950/[0.05] bg-panel/60 backdrop-blur-md',
-          )}
-        >
-          <Link to="/" className="shrink-0" aria-label="Zur Startseite von Leibinn Consulting">
-            <Logo />
-          </Link>
-
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Hauptnavigation">
-            {NAV_LINKS.map((link) => {
-              const active = isHome && activeSection === link.id;
-              return (
-                <button
-                  key={link.id}
-                  onClick={() => handleNav(link.id)}
-                  aria-current={active ? 'true' : undefined}
-                  className={cn(
-                    'rounded-full px-3.5 py-2 text-small font-medium transition-colors duration-200',
-                    active ? 'text-content-strong' : 'text-content/80 hover:text-content-strong',
-                  )}
-                >
-                  {link.label}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => handleNav(CTA.id)}
-              className="group hidden h-[3.25rem] items-center gap-2 rounded-full bg-ink-950 pl-6 pr-5
-                         text-small font-medium text-white shadow-cta transition-colors duration-200
-                         hover:bg-ink-800 sm:inline-flex"
-            >
-              {CTA.label}
-              <ArrowUpRight
-                size={17}
-                className="text-ice-300 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-              />
-            </button>
-
-            <button
-              ref={menuButtonRef}
-              className="grid h-12 w-12 place-items-center rounded-full border border-ink-950/10
-                         text-content-strong transition-colors hover:bg-ink-950/[0.04] lg:hidden"
-              onClick={() => setIsMenuOpen((open) => !open)}
-              aria-label="Menü"
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </header>
-      </div>
-
-      {/* Full-screen overlay, numbered like the handoff's mobile menu. */}
+    <header className="sticky top-0 z-[60] px-[clamp(8px,1.2vw,16px)] pt-3">
       <div
-        id="mobile-menu"
-        hidden={!isMenuOpen}
-        className="fixed inset-0 z-40 flex flex-col bg-ink-950 px-5 pb-8 pt-24 lg:hidden"
+        className="mx-auto flex h-[72px] max-w-nav items-center justify-between gap-6 rounded-full border
+                   border-white/8 bg-navy-900/80 pl-[clamp(18px,2vw,28px)] pr-3 backdrop-blur-[16px]"
       >
-        <nav className="flex-1 overflow-y-auto" aria-label="Hauptnavigation">
-          <ul className="divide-y divide-line-onInk border-y border-line-onInk">
-            {NAV_LINKS.map((link, i) => (
-              <li key={link.id}>
-                <button
-                  onClick={() => handleNav(link.id)}
-                  className="flex w-full items-baseline gap-5 py-5 text-left transition-colors hover:text-white"
-                >
-                  <span aria-hidden="true" className="tnum text-meta uppercase text-ice-300">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <span className="text-h3 text-white">{link.label}</span>
-                </button>
+        {pathname === '/' ? (
+          <a href="#top" className="flex-none py-2 hover:text-white">
+            {logo}
+          </a>
+        ) : (
+          <Link to="/" className="flex-none py-2 hover:text-white">
+            {logo}
+          </Link>
+        )}
+
+        <nav aria-label="Hauptnavigation" className="hidden lg:block">
+          <ul className="flex items-center gap-[clamp(18px,2.2vw,34px)] text-[14px] font-medium text-white/72">
+            {NAV_LINKS.map((l) => (
+              <li key={l.id}>
+                <SectionLink to={l.id}>{l.label}</SectionLink>
               </li>
             ))}
           </ul>
         </nav>
 
+        <SectionLink to="termin" className="btn btn-copper hidden h-12 px-[22px] text-[14px] lg:inline-flex">
+          <CalendarIcon size={17} />
+          Erstgespräch buchen
+        </SectionLink>
+
         <button
-          onClick={() => handleNav(CTA.id)}
-          className="group mt-8 flex h-[3.875rem] w-full items-center justify-center gap-2.5 rounded-full
-                     bg-canvas text-body font-medium text-ink-950 transition-colors hover:bg-white"
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+          className="h-12 rounded-full border border-white/18 bg-transparent px-5 text-[14px] font-semibold text-white lg:hidden"
         >
-          {CTA.label}
-          <ArrowUpRight
-            size={18}
-            className="text-ink-600 transition-transform duration-200 ease-brand group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          />
+          {open ? 'Schließen' : 'Menü'}
         </button>
       </div>
-    </>
+
+      <nav
+        id="mobile-menu"
+        aria-label="Hauptnavigation"
+        hidden={!open}
+        className="mx-auto mt-2 flex max-w-nav flex-col rounded-[24px] border border-white/8 bg-navy-900 px-6 pb-6 pt-3
+                   text-[18px] font-medium lg:hidden"
+      >
+        {NAV_LINKS.map((l) => (
+          <SectionLink key={l.id} to={l.id} onClick={close} className="border-b border-white/8 py-3.5">
+            {l.label}
+          </SectionLink>
+        ))}
+        <SectionLink to="termin" onClick={close} className="btn btn-copper mt-4 h-[54px] w-full text-[18px]">
+          Erstgespräch buchen
+        </SectionLink>
+      </nav>
+    </header>
   );
 }

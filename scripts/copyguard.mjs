@@ -17,7 +17,7 @@ import { writeFileSync } from 'node:fs';
 
 const OUT = process.argv[2];
 const BASE = process.argv[3] || 'http://localhost:4173';
-const ROUTES = ['/', '/kontakt'];
+const ROUTES = ['/', '/impressum', '/datenschutz'];
 const VIEWPORTS = [
   { width: 390, height: 844 },
   { width: 1440, height: 900 },
@@ -97,7 +97,7 @@ for (const viewport of VIEWPORTS) {
       try {
         const button = others.nth(i);
         const label = ((await button.innerText()) || '').trim();
-        if (/anfragen|sichern|senden|absenden/i.test(label)) continue;
+        if (/anfragen|sichern|senden|absenden|bestätigen|kalender laden/i.test(label)) continue;
         await button.click({ timeout: 600 });
         await page.waitForTimeout(140);
         await capture();

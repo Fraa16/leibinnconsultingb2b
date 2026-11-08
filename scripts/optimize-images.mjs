@@ -16,26 +16,43 @@ import { join, resolve } from 'node:path';
 const SRC = resolve('assets-source');
 const OUT = resolve('src/assets/images');
 
-/** width: the CSS pixel widths each image is rendered at, x1 and x2 */
+/**
+ * widths: the CSS pixel widths each image is rendered at, x1 and x2.
+ *
+ * Most photos sit in `object-fit: cover` frames whose aspect differs from the
+ * photo's, so the width the browser needs is the *covered* width, not the
+ * frame's. The notes give that number at 1440px; `sizes` in src/ matches it.
+ *
+ * crop: optional `extract` region (in master pixels) applied before resizing.
+ */
 const IMAGES = [
-  // Hero: full-bleed on mobile, ~47% of a 1600px shell on desktop.
-  { in: 'cedrik-hero.avif', out: 'cedrik-hero', widths: [640, 960, 1280, 1920] },
-  // Portrait card: capped at max-w-md (448px), 3:4 crop.
-  { in: 'Cedrik-Leibinn.jpg', out: 'cedrik-portrait', widths: [448, 672, 896] },
-  // Meeting photo: a letterbox band the full width of the content column, so
-  // it needs a derivative that still holds up on a 2x desktop display.
-  { in: 'Kundengespraech.jpg', out: 'kundengespraech', widths: [768, 1200, 1600, 2400] },
-  // Consequences card, inside a column that tops out near 620px.
-  { in: 'cedrik-fenster.jpg', out: 'cedrik-fenster', widths: [480, 720, 960] },
-  // Ablauf: the sticky column beside the steps, roughly 42vw.
-  { in: 'beratung-lounge.jpg', out: 'beratung-lounge', widths: [560, 840, 1120] },
-  // Kontakt: the panel beside the form.
-  { in: 'beratung-gespraech.jpg', out: 'beratung-gespraech', widths: [640, 960, 1280] },
-  // Closing CTA: full-bleed behind a heavy navy scrim, so quality can be low.
-  { in: 'frankfurt-skyline.webp', out: 'frankfurt-skyline', widths: [1024, 1600, 1920] },
-  // Closing CTA: Cedrik cut out of photo 7 (rembg, birefnet-portrait model),
-  // cropped head to chest. Transparent; AVIF and WebP both keep the alpha.
-  { in: 'cedrik-cutout.png', out: 'cedrik-cutout', widths: [480, 720, 1000] },
+  // Hero: 4:5 frame, ~460px wide beside the headline; full-bleed stacked.
+  { in: 'cedrik-standing.jpg', out: 'cedrik-standing', widths: [480, 720, 960, 1400] },
+  // Leistungen bento, large card: ~790×340 at desktop.
+  { in: 'cedrik-meeting.jpg', out: 'cedrik-meeting', widths: [640, 960, 1280, 1600] },
+  // Situation: 4:5 portrait frame over a landscape photo, so the covered
+  // width is ~1.9× the frame width (≈ 980px at desktop).
+  { in: 'ffm-towers.jpg', out: 'ffm-towers', widths: [640, 1000, 1400, 2000] },
+  // Mehrwert: 5:4 frame, ~575px wide.
+  { in: 'cedrik-presenting.jpg', out: 'cedrik-presenting', widths: [720, 1080, 1440] },
+  // Vertrauen: 4:5 frame over a landscape photo (≈ 910px covered at desktop).
+  { in: 'cedrik-portrait.jpg', out: 'cedrik-portrait', widths: [640, 960, 1400, 1900] },
+  // Avatars (36–52px): the same photo, square-cropped the way the design's
+  // `object-position: 45% 22%` frames it, so a 52px circle does not pull a
+  // 2200px photo.
+  {
+    in: 'cedrik-portrait.jpg',
+    out: 'cedrik-avatar',
+    crop: { left: 283, top: 0, width: 1572, height: 1572 },
+    widths: [104, 160],
+  },
+  // Termin: 16:10 frame, ~550px wide.
+  { in: 'cedrik-window.jpg', out: 'cedrik-window', widths: [640, 960, 1280] },
+  // Client avatars in the trust row and testimonials. The supplied files are
+  // 71px; nothing larger exists.
+  { in: 'client-okafor.png', out: 'client-okafor', widths: [71] },
+  { in: 'client-mueller.png', out: 'client-mueller', widths: [71] },
+  { in: 'client-silic.png', out: 'client-silic', widths: [71] },
 ];
 
 const AVIF = { quality: 52, effort: 6 };
@@ -67,11 +84,13 @@ for (const img of selected) {
   before += srcBytes;
 
   const meta = await sharp(src).metadata();
-  console.log(`\n${img.in}  ${meta.width}×${meta.height}  ${mb(srcBytes)}`);
+  const srcWidth = img.crop ? img.crop.width : meta.width;
+  console.log(`\n${img.in} → ${img.out}  ${srcWidth}×${img.crop ? img.crop.height : meta.height}  ${mb(srcBytes)}`);
 
   for (const w of img.widths) {
-    if (w > meta.width) continue;
-    const base = sharp(src).resize({ width: w, withoutEnlargement: true });
+    if (w > srcWidth) continue;
+    const source = img.crop ? sharp(src).extract(img.crop) : sharp(src);
+    const base = source.resize({ width: w, withoutEnlargement: true });
 
     const avifPath = join(OUT, `${img.out}-${w}.avif`);
     const webpPath = join(OUT, `${img.out}-${w}.webp`);

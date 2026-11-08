@@ -43,7 +43,7 @@ export default function ImpressumPage() {
           <br />
           Registernummer: <Placeholder>HRB-Nummer</Placeholder>
         </p>
-        <p className="text-content-muted">
+        <p className="text-stone-subtle">
           Entfällt, sofern kein Eintrag im Handels-, Vereins-, Partnerschafts- oder
           Genossenschaftsregister besteht.
         </p>

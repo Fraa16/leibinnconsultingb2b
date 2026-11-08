@@ -45,8 +45,8 @@ for (const target of targets) {
   const el = page.locator(selector).first();
   await el.scrollIntoViewIfNeeded();
   await page.waitForTimeout(500);
-  // Hide the floating nav so it does not sit over the capture.
-  await page.addStyleTag({ content: 'div.fixed.inset-x-0.top-0{display:none!important}' });
+  // Hide the sticky header so it does not sit over the capture.
+  await page.addStyleTag({ content: 'header{visibility:hidden!important}' });
   await el.screenshot({ path: `${outDir}/${name}-${width}.png` });
   console.log(`${name}-${width}.png`);
 }

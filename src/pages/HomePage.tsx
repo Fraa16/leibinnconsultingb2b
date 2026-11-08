@@ -2,66 +2,46 @@ import { useDocumentMeta } from '../hooks/useDocumentMeta';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import HeroSection from '../components/HeroSection';
-import RealitaetscheckSection from '../components/RealitaetscheckSection';
-import AnsatzSection from '../components/AnsatzSection';
-import WarumBenefitsSection from '../components/WarumBenefitsSection';
-import VergleichSection from '../components/VergleichSection';
+import LeistungenSection from '../components/LeistungenSection';
+import SituationSection from '../components/SituationSection';
+import OrientierungSection from '../components/OrientierungSection';
 import RechnerSection from '../components/RechnerSection';
+import MehrwertSection from '../components/MehrwertSection';
 import AblaufSection from '../components/AblaufSection';
-import BranchenSection from '../components/BranchenSection';
-import VorteileSection from '../components/VorteileSection';
-import UeberUnsSection from '../components/UeberUnsSection';
+import VertrauenSection from '../components/VertrauenSection';
 import StimmenSection from '../components/StimmenSection';
 import FaqSection from '../components/FaqSection';
-import FinalCTASection from '../components/FinalCTASection';
+import TerminSection from '../components/TerminSection';
 
-/*
- * Order follows the decision a Geschäftsführer actually makes, not the
- * order the sections were written in:
- *
- *   problem    Realitätscheck    "this is us"
- *   idea       Ansatz            why single benefits fail
- *   effect     Wirkungsbereiche  what a system does
- *   contrast   Vergleich         the same budget, two outcomes
- *   numbers    Rechner           what it means for my headcount
- *   fit        Branchen          it works in my industry
- *   why us     Vorteile          not a platform, a system
- *   who        Über uns          the person I would deal with
- *   proof      Stimmen           people like me vouch for him
- *   process    Ablauf            exactly what happens next
- *   doubts     FAQ               the last objections
- *   ask        Termin            one big, obvious next step
- *
- * Proof sits straight after the person it vouches for, and the process just
- * before the ask, where "what happens if I click" is the open question.
+const HOME_TITLE = 'Leibinn Consulting | Steueroptimierte Immobilienstrategien';
+const HOME_DESCRIPTION =
+  'Verwandeln Sie Steuerlast in bleibendes Vermögen: steueroptimierte Immobilienstrategien für Unternehmer, Führungskräfte und Angestellte. Kostenloses Erstgespräch mit Cedrik Leibinn.';
+
+/**
+ * One page, one goal: booking the free 15-minute Erstgespräch. Dark sections
+ * run full-bleed and light ones sit as inset ivory panels, alternating down
+ * the page; the eyebrows number the sections 01–10 in this order.
  */
 export default function HomePage() {
-  useDocumentMeta({
-    title: 'Leibinn Consulting | Benefit-Systeme für den Mittelstand',
-    description:
-      'Benefit-Systeme für Unternehmen mit 5 bis 200 Mitarbeitenden: steuerlich sauber, einfach zu verwalten und gebaut für Ihren Betrieb. Kostenloses Erstgespräch.',
-    path: '/',
-  });
+  useDocumentMeta({ title: HOME_TITLE, description: HOME_DESCRIPTION, path: '/' });
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <>
       <Navigation />
       <main id="inhalt">
         <HeroSection />
-        <RealitaetscheckSection />
-        <AnsatzSection />
-        <WarumBenefitsSection />
-        <VergleichSection />
+        <LeistungenSection />
+        <SituationSection />
+        <OrientierungSection />
         <RechnerSection />
-        <BranchenSection />
-        <VorteileSection />
-        <UeberUnsSection />
-        <StimmenSection />
+        <MehrwertSection />
         <AblaufSection />
+        <VertrauenSection />
+        <StimmenSection />
         <FaqSection />
-        <FinalCTASection />
+        <TerminSection />
       </main>
       <Footer />
-    </div>
+    </>
   );
 }

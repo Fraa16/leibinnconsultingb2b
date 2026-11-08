@@ -47,48 +47,24 @@ export default function DatenschutzPage() {
         </p>
       </LegalBlock>
 
-      <LegalBlock heading="Kontaktformular">
+      <LegalBlock heading="Schriftarten">
         <p>
-          Wenn Sie uns über das Formular auf der Seite „Kontakt“ eine Anfrage senden, verarbeiten
-          wir die von Ihnen eingegebenen Angaben: Vorname, Nachname, E-Mail-Adresse,
-          Telefonnummer, Unternehmen, Unternehmensgröße, optional Ihre Position sowie Ihre
-          Nachricht.
-        </p>
-        <p>
-          Diese Daten werden zur Bearbeitung Ihrer Anfrage und für mögliche Anschlussfragen
-          verwendet. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, soweit die Anfrage auf den
-          Abschluss eines Vertrags gerichtet ist, im Übrigen Art. 6 Abs. 1 lit. f DSGVO aufgrund
-          unseres berechtigten Interesses an der Beantwortung von Anfragen.
-        </p>
-        <p>
-          Die Übermittlung erfolgt verschlüsselt. Ihre Angaben werden gelöscht, sobald sie für die
-          Zweckerreichung nicht mehr erforderlich sind und keine gesetzlichen
-          Aufbewahrungspflichten entgegenstehen, spätestens <Placeholder>Löschfrist</Placeholder>.
+          Die verwendeten Schriftarten werden lokal von unserem Server ausgeliefert. Beim Seitenaufruf
+          wird dafür keine Verbindung zu Servern Dritter hergestellt.
         </p>
       </LegalBlock>
 
-      <LegalBlock heading="Auftragsverarbeiter: Supabase">
+      <LegalBlock heading="Terminbuchung über Calendly">
         <p>
-          Die über das Kontaktformular übermittelten Angaben werden in einer Datenbank des
-          Anbieters Supabase gespeichert. Der Anbieter verarbeitet die Daten ausschließlich in
-          unserem Auftrag auf Grundlage eines Auftragsverarbeitungsvertrags nach Art. 28 DSGVO.
+          Für die Buchung des Erstgesprächs kann ein Kalender des Anbieters Calendly LLC eingebunden
+          werden. Er wird erst geladen, wenn Sie auf „Kalender laden“ klicken; vorher besteht keine
+          Verbindung zu Calendly. Mit dem Laden werden unter anderem Ihre IP-Adresse sowie die von
+          Ihnen eingegebenen Angaben (Name, E-Mail-Adresse, gewählter Termin) an Calendly übertragen.
         </p>
         <p>
-          Serverstandort der eingesetzten Instanz: <Placeholder>Region</Placeholder>. Sofern eine
-          Verarbeitung außerhalb der EU/des EWR stattfindet, erfolgt diese auf Grundlage
-          von <Placeholder>Standardvertragsklauseln bzw. Angemessenheitsbeschluss</Placeholder>.
-        </p>
-      </LegalBlock>
-
-      <LegalBlock heading="Schriftarten von Google Fonts">
-        <p>
-          Diese Website bindet Schriftarten über Google Fonts ein. Beim Seitenaufruf stellt Ihr
-          Browser eine Verbindung zu Servern von Google her, wobei Ihre IP-Adresse übertragen
-          wird. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
-        </p>
-        <p className="text-content-muted">
-          Hinweis für die Umsetzung: Werden die Schriften stattdessen lokal ausgeliefert, entfällt
-          diese Verbindung, und dieser Abschnitt ist entsprechend zu streichen.
+          Rechtsgrundlage ist <Placeholder>Art. 6 Abs. 1 lit. a bzw. lit. b DSGVO</Placeholder>.
+          Sitz des Anbieters, Datenübermittlung in Drittländer und Speicherdauer:{' '}
+          <Placeholder>Angaben zu Calendly, Auftragsverarbeitungsvertrag und Drittlandtransfer</Placeholder>.
         </p>
       </LegalBlock>
 

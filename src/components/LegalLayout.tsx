@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
-import { AlertTriangle } from 'lucide-react';
 import Navigation from './Navigation';
 import Footer from './Footer';
-import Container from './ui/Container';
 
 type LegalLayoutProps = {
   title: string;
@@ -11,47 +9,49 @@ type LegalLayoutProps = {
 };
 
 /**
- * Shared shell for /impressum and /datenschutz.
+ * Shared shell for /impressum and /datenschutz: the site header and footer
+ * around an ivory panel, the way the homepage sets its light sections.
  *
- * Both pages were dead <button> elements in the footer. They are legally
- * required for a German commercial site, so the routes exist now — but the
- * content is scaffolding with explicit placeholders, not legal advice.
+ * The content is scaffolding with explicit placeholders, not legal advice.
  */
 export default function LegalLayout({ title, intro, children }: LegalLayoutProps) {
   return (
-    <div className="min-h-screen bg-canvas">
+    <>
       <Navigation />
-      <main id="inhalt">
-        <section className="pb-24 pt-32 md:pb-32 md:pt-40">
-          <Container width="narrow">
-            <h1 className="max-w-[18ch]">{title}</h1>
-            {intro && <p className="mt-5 max-w-measure text-lead text-content">{intro}</p>}
+      <main id="inhalt" className="pb-[clamp(56px,7vw,96px)] pt-[clamp(32px,4vw,56px)]">
+        <section className="panel-light">
+          <div className="shell max-w-[880px]">
+            <p className="eyebrow text-copper-dark">Rechtliches</p>
+            <h1 className="t-h2 mt-6">{title}</h1>
+            {intro && <p className="t-lead mt-6 text-stone">{intro}</p>}
 
-            <div
-              role="note"
-              className="mt-8 flex items-start gap-3 rounded-xl2 border border-danger/25 bg-danger-surface px-5 py-4"
-            >
-              <AlertTriangle size={18} className="mt-0.5 shrink-0 text-danger" aria-hidden="true" />
-              <p className="text-small leading-relaxed text-danger">
-                Diese Seite ist ein unausgefülltes Gerüst. Alle mit [PLATZHALTER] markierten Angaben
-                müssen ergänzt und die Texte vor der Veröffentlichung anwaltlich geprüft werden.
+            <div role="note" className="mt-8 flex items-start gap-3 rounded-[14px] border border-line bg-white px-5 py-4">
+              <span aria-hidden="true" className="mt-0.5 font-mono text-[12px] font-medium text-copper-dark">
+                !
+              </span>
+              <p className="text-[14px] leading-[1.6] text-stone">
+                Diese Seite ist ein unausgefülltes Gerüst. Alle mit [PLATZHALTER] markierten Angaben müssen ergänzt und
+                die Texte vor der Veröffentlichung anwaltlich geprüft werden.
               </p>
             </div>
 
-            <div className="mt-14 divide-y divide-line border-t border-line">{children}</div>
-          </Container>
+            <div className="mt-12 divide-y divide-line border-t border-line">{children}</div>
+          </div>
         </section>
       </main>
       <Footer />
-    </div>
+    </>
   );
 }
 
 export function LegalBlock({ heading, children }: { heading: string; children: ReactNode }) {
   return (
     <section className="py-8">
-      <h2 className="text-h3">{heading}</h2>
-      <div className="mt-4 space-y-3 text-small leading-relaxed text-content [&_a]:text-ink-600 [&_a]:underline [&_a]:underline-offset-4">
+      <h2 className="text-[22px] font-medium leading-[1.2] tracking-[-.015em]">{heading}</h2>
+      <div
+        className="mt-4 space-y-3 text-[15px] leading-[1.7] text-stone [&_a:hover]:text-copper-dark [&_a]:text-ink [&_a]:underline
+                   [&_a]:underline-offset-4"
+      >
         {children}
       </div>
     </section>
@@ -60,6 +60,6 @@ export function LegalBlock({ heading, children }: { heading: string; children: R
 
 export function Placeholder({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-md border border-line bg-ink-50 px-1.5 py-0.5 font-medium text-ink-700">[{children}]</span>
+    <span className="rounded-md border border-line bg-white px-1.5 py-0.5 font-medium text-copper-dark">[{children}]</span>
   );
 }
