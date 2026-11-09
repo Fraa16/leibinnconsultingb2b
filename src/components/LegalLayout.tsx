@@ -26,7 +26,7 @@ export default function LegalLayout({ title, intro, draft = true, children }: Le
       <main id="inhalt">
         <section className="pb-24 pt-32 md:pb-32 md:pt-40">
           <Container width="narrow">
-            <h1 className="max-w-[18ch]">{title}</h1>
+            <h1 className="max-w-[18ch] hyphens-manual break-words lg:hyphens-none lg:break-normal">{title}</h1>
             {intro && <p className="mt-5 max-w-measure text-lead text-content">{intro}</p>}
 
             {draft && (
