@@ -386,3 +386,39 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Cookie banner (vanilla-cookieconsent) in the B2B tokens. */
+#cc-main {
+  --cc-font-family: 'Instrument Sans Variable', 'Instrument Sans', system-ui, sans-serif;
+  --cc-bg: #ffffff;
+  --cc-primary-color: #0d1022;
+  --cc-secondary-color: #565c6e;
+  --cc-btn-primary-bg: #000022;
+  --cc-btn-primary-color: #ffffff;
+  --cc-btn-primary-border-color: #000022;
+  --cc-btn-primary-hover-bg: #2a2d7c;
+  --cc-btn-primary-hover-color: #ffffff;
+  --cc-btn-primary-hover-border-color: #2a2d7c;
+  --cc-btn-secondary-bg: #f5f6f9;
+  --cc-btn-secondary-color: #0d1022;
+  --cc-btn-secondary-border-color: #d3d8e4;
+  --cc-btn-secondary-hover-bg: #edf0f6;
+  --cc-btn-secondary-hover-color: #0d1022;
+  --cc-btn-secondary-hover-border-color: #d3d8e4;
+  --cc-btn-border-radius: 999px;
+  --cc-modal-border-radius: 20px;
+  --cc-separator-border-color: #e6e9f0;
+  --cc-toggle-on-bg: #2a2d7c;
+  --cc-toggle-off-bg: #868ca0;
+  --cc-toggle-readonly-bg: #d3d8e4;
+  --cc-cookie-category-block-bg: #f5f6f9;
+  --cc-cookie-category-block-border: #e6e9f0;
+  --cc-cookie-category-block-hover-bg: #edf0f6;
+  --cc-cookie-category-block-hover-border: #d3d8e4;
+  --cc-cookie-category-expanded-block-bg: #ffffff;
+  --cc-footer-bg: #f5f6f9;
+  --cc-footer-color: #565c6e;
+  --cc-footer-border-color: #e6e9f0;
+  --cc-link-color: #2a2d7c;
+  --cc-overlay-bg: rgba(0, 0, 34, 0.55);
+}

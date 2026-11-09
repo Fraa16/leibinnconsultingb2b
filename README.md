@@ -3,7 +3,7 @@
 Landing page and contact route for Leibinn Consulting: benefit systems for German
 SMEs with 5–200 employees.
 
-Vite · React 18 · TypeScript · Tailwind · framer-motion · Supabase
+Vite · React 18 · TypeScript · Tailwind · framer-motion
 
 ---
 
@@ -11,7 +11,7 @@ Vite · React 18 · TypeScript · Tailwind · framer-motion · Supabase
 
 ```bash
 npm install
-cp .env.example .env     # fill in the Supabase project values
+cp .env.example .env     # optional: lead service URL, ad IDs
 npm run dev
 ```
 
@@ -30,7 +30,8 @@ npm run dev
 Verification scripts (need `npm run preview` running on :4173):
 
 ```bash
-node scripts/test-form.mjs      # contact form, end to end; the Supabase call is intercepted
+node scripts/test-form.mjs      # contact form, end to end; the lead-service call is intercepted
+                                # (build with VITE_LEADS_API_URL set to any URL)
 node scripts/test-nav.mjs       # every CTA, routing, layout overflow, a11y basics
 node scripts/copyguard.mjs out.txt   # extracts all rendered copy, for diffing
 node scripts/measure-weight.mjs http://localhost:4173 label
@@ -49,13 +50,13 @@ re-encoding every photo.
    `index.html` (canonical, OG, JSON-LD), `public/sitemap.xml`, `public/robots.txt`
    and `SITE_ORIGIN` in `src/hooks/useDocumentMeta.ts`. Change it in those four
    places if it is wrong.
-2. **Apply the Supabase migration**
-   `supabase/migrations/20260916210000_add_position_to_contact_submissions.sql`.
-   It adds the `position` column the form has always collected. The form falls
-   back to inserting without that field if the migration has not run, so leads
-   are never lost, but the job title is silently dropped until it is applied.
-3. **Set the environment variables on the host** (`VITE_SUPABASE_URL`,
-   `VITE_SUPABASE_ANON_KEY`). `.env` is no longer committed.
+2. **Contact form → central lead service.** `/kontakt` sends enquiries to
+   [Fraa16/leibinn-leads](https://github.com/Fraa16/leibinn-leads) (shared
+   database for all Leibinn sites, email to the team). Set `VITE_LEADS_API_URL`
+   on the host; without it the form shows its error state.
+3. **Cookie banner and ad tracking** live in `src/lib/consent.ts` (the same file
+   on every Leibinn site). Meta Pixel and LinkedIn Insight Tag load only after
+   consent and only once their IDs are set; see `.env.example`.
 4. **Datenschutz.** `/impressum` is copied 1:1 from the main website (all
    Leibinn sites share it). `/datenschutz` is still scaffolding: it gets aligned
    with the main site's text once the shared services are decided, then needs a
