@@ -87,7 +87,7 @@ export default {
       fontFamily: {
         // Instrument Sans is the Benefits page's face in the brand handoff.
         sans: [
-          '"Instrument Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
+          '"Instrument Sans Variable"', '"Instrument Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"',
           'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif',
         ],
         signature: ['"Alex Brush"', 'cursive'],

@@ -85,7 +85,7 @@ export default function HeroSection() {
             >
               <Image
                 image={heroImage}
-                alt="Cedrik Leibinn, Berater für Mitarbeiterbindung"
+                alt="Cedrik Leibinn, Gründer von Leibinn Consulting"
                 priority
                 sizes="(min-width: 1024px) 46vw, 100vw"
                 className="h-[clamp(26rem,50vw,42rem)] w-full object-cover"

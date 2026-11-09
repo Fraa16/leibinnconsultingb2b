@@ -18,6 +18,8 @@
     "test:nav": "node scripts/test-nav.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource/alex-brush": "^5.3.0",
     "@supabase/supabase-js": "^2.57.4",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.344.0",

@@ -28,7 +28,7 @@ export default function UeberUnsSection() {
                 className="absolute bottom-5 left-5 rounded-full border border-white/20 bg-ink-950/75
                            px-4 py-2 text-meta uppercase text-white/85 backdrop-blur-sm"
               >
-                Gründer &amp; Geschäftsführer
+                Gründer von Leibinn Consulting
               </figcaption>
             </figure>
 

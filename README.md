@@ -56,13 +56,16 @@ re-encoding every photo.
    are never lost, but the job title is silently dropped until it is applied.
 3. **Set the environment variables on the host** (`VITE_SUPABASE_URL`,
    `VITE_SUPABASE_ANON_KEY`). `.env` is no longer committed.
-4. **Fill in `/impressum` and `/datenschutz`.** Both pages are scaffolding: every
-   `[PLATZHALTER]` needs real company data, and the text needs a lawyer's review.
-   Both are legally required for a German commercial site.
+4. **Datenschutz.** `/impressum` is copied 1:1 from the main website (all
+   Leibinn sites share it). `/datenschutz` is still scaffolding: it gets aligned
+   with the main site's text once the shared services are decided, then needs a
+   lawyer's review.
 5. **Check the SPA rewrite.** `public/_redirects` (Netlify) and `vercel.json` are
    both included. Without one of them, loading `/kontakt` directly returns a 404.
-6. Consider **self-hosting the fonts**. They currently come from Google Fonts,
-   which is why the privacy policy has a section about it.
+6. **Fonts are self-hosted** (`@fontsource-variable/instrument-sans`,
+   `@fontsource/alex-brush`), as on the other Leibinn sites. The scaffold
+   privacy policy still has a Google Fonts section; it goes when the
+   Datenschutz text is aligned with the main site.
 7. **Supply two or three real testimonials, or switch the section off.** The
    Stimmen carousel is the last section still built from `Slot` placeholders,
    and it is live on the page. Quotes need the client's permission, so none were
