@@ -102,7 +102,7 @@ as a named step, and the old names still resolve as aliases.
 | Token | Hex | Was |
 | --- | --- | --- |
 | `ink-600` | `#2A2D7C` | `true-cobalt` / `primary`; identity and all CTAs |
-| `ink-700` | `#202266` | Wirkungsbereich segment, final-CTA gradient |
+| `ink-700` | `#202266` | final-CTA gradient, button hover |
 | `ink-800` | `#15174F` | `deep-navy` |
 | `ink-900` | `#0B0C39` | `deep-navy-dark` |
 | `ink-950` | `#000022` | `prussian-blue`, the handoff's `navy`; footer |
@@ -162,7 +162,16 @@ Every one of them is switched off under `prefers-reduced-motion`. Two pitfalls
 are documented in the CSS: a mask must never clip the observed element itself
 (IntersectionObserver counts the target's own `clip-path`, so it would never
 fire), and an `a-*` class must not share an element with a positioning
-transform (the revealed state's `transform: none` would cancel it).
+transform (the revealed state's `transform: none` would cancel it). A third
+one bit the Wirkungsbereiche diagram: a Tailwind `transition-*` utility on the
+same element replaces the `a-*` class's own transition, so the reveal snaps.
+Put the entrance on a wrapper and the state transition on the child.
+
+The Wirkungsbereiche diagram (`WarumBenefitsSection.tsx`) is one SVG disc of
+four interlocking segments, built from clip paths rather than blend modes; the
+geometry is explained at the top of that file. Labels sit outside the shapes:
+beside the disc on leader lines from `lg`, at its four corners below that,
+with the diagram and the panel side by side on tablets.
 
 Scroll-linked motion (the Ansatz photo's travel, the Ablauf timeline's fill)
 writes transforms straight to the element each frame instead of going through
