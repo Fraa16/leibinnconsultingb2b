@@ -135,7 +135,7 @@ export default function FinalCTASection() {
                     >
                       <Image
                         image={cutoutImage}
-                        alt="Cedrik Leibinn, Gründer und Geschäftsführer"
+                        alt="Cedrik Leibinn, Gründer von Leibinn Consulting"
                         sizes="(min-width: 1024px) 40vw, 88vw"
                         className="h-auto w-full"
                       />
@@ -148,7 +148,7 @@ export default function FinalCTASection() {
                              text-meta uppercase text-white/85 backdrop-blur-sm lg:block"
                   style={delay(900)}
                 >
-                  Cedrik Leibinn · Gründer &amp; Geschäftsführer
+                  Cedrik Leibinn · Gründer
                 </span>
               </div>
             </div>

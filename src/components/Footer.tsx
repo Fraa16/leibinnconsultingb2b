@@ -73,6 +73,13 @@ export default function Footer() {
             <Link to="/datenschutz" className="text-small text-white/35 transition-colors hover:text-white">
               Datenschutz
             </Link>
+            <button
+              type="button"
+              data-cookie-settings
+              className="text-small text-white/35 transition-colors hover:text-white"
+            >
+              Cookie-Einstellungen
+            </button>
           </div>
         </div>
       </Container>

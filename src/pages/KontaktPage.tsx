@@ -10,7 +10,7 @@ import Field from '../components/ui/Field';
 import Image from '../components/ui/Image';
 import { gespraechImage } from '../lib/images';
 import { controlClasses } from '../lib/formStyles';
-import { supabase } from '../lib/supabase';
+import { submitLead } from '../lib/consent';
 import { STATIC_VARIANTS, VIEWPORT, staggerVariants, staggerChild } from '../lib/motion';
 import { cn } from '../lib/cn';
 
@@ -54,11 +54,8 @@ export default function KontaktPage() {
   };
 
   /**
-   * Persists the lead.
-   *
-   * The original handler was `e.preventDefault(); setIsSubmitted(true);` — no
-   * network call at all, so every enquiry was silently discarded while the
-   * visitor was told they would hear back within 24 hours.
+   * Sends the enquiry to the central lead service (shared database + email to
+   * the team), which also reports the "lead" conversion after consent.
    */
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,23 +69,18 @@ export default function KontaktPage() {
 
     setStatus('submitting');
     try {
-      if (!supabase) throw new Error('Supabase is not configured');
-
-      const { position, ...core } = form;
-      const row = { ...core, nachricht: form.nachricht || null };
-
-      let { error } = await supabase
-        .from('contact_submissions')
-        .insert([{ ...row, position: position || null }]);
-
-      // `position` arrives with a migration in this change. If it has not been
-      // applied yet, PostgREST rejects the whole row over the unknown column —
-      // so fall back to inserting without it rather than losing the lead.
-      if (error && /position/i.test(`${error.message} ${error.details ?? ''}`)) {
-        console.warn('contact_submissions.position missing: run the migration. Retrying without it.');
-        ({ error } = await supabase.from('contact_submissions').insert([row]));
-      }
-      if (error) throw error;
+      await submitLead({
+        form: 'kontakt',
+        name: `${form.vorname} ${form.nachname}`.trim(),
+        email: form.email,
+        telefon: form.telefonnummer,
+        firma: form.firma,
+        position: form.position,
+        mitarbeiteranzahl: form.mitarbeiteranzahl,
+        nachricht: form.nachricht,
+        fields: { vorname: form.vorname, nachname: form.nachname },
+        website: honeypot,
+      });
 
       setForm(EMPTY);
       setSubmitted(false);
