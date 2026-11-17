@@ -56,17 +56,19 @@ re-encoding every photo.
    on the host; without it the form shows its error state.
 3. **Cookie banner and ad tracking** live in `src/lib/consent.ts` (the same file
    on every Leibinn site). Meta Pixel and LinkedIn Insight Tag load only after
-   consent and only once their IDs are set; see `.env.example`.
+   consent and only once their IDs are set; Google Analytics 4 and Google Ads are
+   optional and appear in the banner only once theirs are; see `.env.example`.
 4. **Datenschutz.** `/impressum` is copied 1:1 from the main website (all
-   Leibinn sites share it). `/datenschutz` is still scaffolding: it gets aligned
-   with the main site's text once the shared services are decided, then needs a
-   lawyer's review.
+   Leibinn sites share it). `/datenschutz` renders the shared privacy policy, `src/lib/privacy.ts`, the same file on every
+   Leibinn site (like `consent.ts`): change it in one repo, copy it to the others.
+   The page only says which features the site has; Google Analytics 4 and Google
+   Ads sections appear once their IDs are set, as in the cookie banner. Have the
+   text reviewed by a lawyer before the ads start.
 5. **Check the SPA rewrite.** `public/_redirects` (Netlify) and `vercel.json` are
    both included. Without one of them, loading `/kontakt` directly returns a 404.
 6. **Fonts are self-hosted** (`@fontsource-variable/instrument-sans`,
-   `@fontsource/alex-brush`), as on the other Leibinn sites. The scaffold
-   privacy policy still has a Google Fonts section; it goes when the
-   Datenschutz text is aligned with the main site.
+   `@fontsource/alex-brush`), as on the other Leibinn sites; the privacy policy
+   says so.
 7. **Supply two or three real testimonials, or switch the section off.** The
    Stimmen carousel is the last section still built from `Slot` placeholders,
    and it is live on the page. Quotes need the client's permission, so none were
@@ -84,12 +86,11 @@ re-encoding every photo.
    Konzept and Kommunikation are handled by Leibinn, and that implementation can
    start with single building blocks at short notice. These follow from the
    site's existing claims but are worth the client's yes.
-10. **Decide on the logo's tagline.** The supplied lockup reads "Leibinn
-   Consulting / Investment Consulting", but this site sells benefit systems to
-   employers. The tagline is drawn in the footer and the share card and left off
-   in the header; if it is wrong for this audience, pass `tagline={false}` to the
-   footer `Logo` and drop the `lockup.tagline` group from
-   `scripts/generate-og.mjs`.
+10. **Logo tagline: removed.** The supplied lockup reads "Leibinn Consulting /
+   Investment Consulting", which does not fit a benefits site. As decided, the
+   footer and the share card show "Leibinn Consulting" only, like the header
+   (`Logo` without `tagline`; `scripts/generate-og.mjs` centres the name on the
+   mark the same way).
 
 ---
 

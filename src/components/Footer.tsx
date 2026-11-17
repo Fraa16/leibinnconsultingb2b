@@ -30,7 +30,7 @@ export default function Footer() {
       <Container className="relative pb-10 pt-[clamp(4.5rem,8vw,7rem)]">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr] lg:gap-20">
           <Reveal>
-            <Logo onInk tagline />
+            <Logo onInk />
             <p className="mt-8 max-w-[16ch] text-h2 text-white">
               Benefit-Systeme für kleine und mittelständische Unternehmen.
             </p>

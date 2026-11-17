@@ -26,7 +26,7 @@ const H = 630;
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-/** The lockup, laid into the card at a given width. */
+/** The lockup without the tagline (as in the header), laid into the card at a given width. */
 function logo({ x, y, width }) {
   const [, , vw] = lockup.viewBox.split(' ').map(Number);
   const scale = width / vw;
@@ -34,8 +34,7 @@ function logo({ x, y, width }) {
   return `
   <g transform="translate(${x} ${y}) scale(${scale.toFixed(5)})">
     <g fill="url(#mark)">${lockup.mark.map(path).join('')}</g>
-    <g fill="#FFFFFF">${lockup.name.map(path).join('')}</g>
-    <g fill="#FFFFFF" opacity="0.55">${lockup.tagline.map(path).join('')}</g>
+    <g fill="#FFFFFF" transform="translate(0 ${lockup.compactShift ?? 0})">${lockup.name.map(path).join('')}</g>
   </g>`;
 }
 
